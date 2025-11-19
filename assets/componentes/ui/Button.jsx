@@ -1,23 +1,18 @@
 import React from "react";
 
 /**
- * @estiloClase {string} Asigna la clase del boton
- * @onClick {function} Asigna la funcion del onClick
- * @texto {string} Asigna el texto del boton
+ * Componente Button
+ *
+ * @param {React.ReactNode} props.children El contenido a mostrar dentro del boton. Puede ser una cadena de texto, un elemento img o svg
+ * @param {function} props.onClick La funcion JavaScript que se ejecutara cuando el usuario haga clic en el boton
+ * @param {string} [props.classButton = 'boton-primary'] Clases CSS adicionales para estilizar el boton  ( Opcional )
  */
-const BotonReutilizable = ({
-    texto,
-    onClick,
-    estiloClase = "boton-primario",
-}) => {
+const Button = ({ children, onClick, classButton = "button-primary" }) => {
     return (
-        <button
-            className={`boton-base ${estiloClase}`} // Combina una clase base con la personalizada
-            onClick={onClick} // Asigna la función 'onClick' recibida por props
-        >
-            {texto}
+        <button className={`button-default ${classButton}`} onClick={onClick}>
+            {children}
         </button>
     );
 };
 
-export default BotonReutilizable;
+export default Button;
