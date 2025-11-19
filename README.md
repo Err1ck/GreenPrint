@@ -57,8 +57,11 @@ Sustituye 'test' por lo que hayas puesto como primer parámetro en `.addEntry` e
 2. Crearla de nuevo
 `php bin/console doctrine:database:create`
 
-3.  Ejecutar migraciones
+3. Crear la nueva version de la migracion
+`php bin/console make:migration`
+
+4.  Ejecutar migraciones
 `php bin/console doctrine:migrations:migrate`
 
-4. Ejecutar fixtures (datos falsos)
+1. Ejecutar fixtures (datos falsos)
 `php bin/console doctrine:fixtures:load`

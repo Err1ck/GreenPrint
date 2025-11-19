@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Config\Framework\HttpClient\DefaultOptions\RetryFailedConfig;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -16,7 +15,6 @@ use Symfony\Config\Framework\HttpClient\DefaultOptions\RetryFailedConfig;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     use TimestampableTrait;
 
     #[ORM\Id]
@@ -54,24 +52,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $biography = null;
 
-
     /**
      * @var int Monedas usuario
      */
     #[ORM\Column]
     private ?int $leaf_coins_user = 0;
 
-
     /**
-     * @var int Seguidores
+     * @var int Monedas comunidad
      */
     #[ORM\Column]
     private ?int $tree_coins_community = 0;
 
-
-    //campo id empresa / comunity
-    // leaf_coins_user
-    // tree_coins_community (empresas)
+    /**
+     * Relación con Community
+     */
+    #[ORM\ManyToOne(targetEntity: Community::class, inversedBy: 'users')]
+    #[ORM\JoinColumn(name: 'community_id', referencedColumnName: 'id', nullable: true)]
+    private ?Community $community = null;
 
     public function getId(): ?int
     {
@@ -89,7 +87,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
     public function getEmail(): ?string
     {
         return $this->email;
@@ -98,45 +95,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -145,7 +124,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -157,7 +135,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFollowerCount(int $follower_count): static
     {
         $this->follower_count = $follower_count;
-
         return $this;
     }
 
@@ -169,7 +146,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBiography(string $biography): static
     {
         $this->biography = $biography;
-
         return $this;
     }
 
@@ -195,8 +171,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCommunity(): ?Community
+    {
+        return $this->community;
+    }
 
-
+    public function setCommunity(?Community $community): static
+    {
+        $this->community = $community;
+        return $this;
+    }
 
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
@@ -205,7 +189,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $data = (array) $this;
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
-
         return $data;
     }
 
