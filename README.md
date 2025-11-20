@@ -47,3 +47,21 @@ Sustituye 'test' por lo que hayas puesto como primer parámetro en `.addEntry` e
         return $this->render('test/test.html.twig'); // Aquí pones la ruta de la plantilla
     }
 `
+
+
+## DATABASES
+
+1. Eliminar la base de datos
+`php bin/console doctrine:database:drop --force`
+
+2. Crearla de nuevo
+`php bin/console doctrine:database:create`
+
+3. Crear la nueva version de la migracion
+`php bin/console make:migration`
+
+4.  Ejecutar migraciones
+`php bin/console doctrine:migrations:migrate`
+
+1. Ejecutar fixtures (datos falsos)
+`php bin/console doctrine:fixtures:load`
