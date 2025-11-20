@@ -20,7 +20,7 @@ final class HomeController extends AbstractController
         return $this->render('about/index.html.twig');
     }
 
-      #[Route('/testpage', name: 'app_testpage')]
+    #[Route('/testpage', name: 'app_testpage')]
     public function testpage(): Response
     {
         return $this->render('home/testpage.html.twig');

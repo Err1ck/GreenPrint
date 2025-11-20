@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Entity;
+// namespace App\Entity;
 
 
-use App\Repository\PostsRepository;
-use App\Entity\User;
-use DateTime;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
+// use App\Repository\PostsRepository;
+// use App\Entity\User;
+// use DateTime;
+// use Doctrine\DBAL\Types\Types;
+// use Doctrine\ORM\Mapping as ORM;
 
 // #[ORM\Entity(repositoryClass: PostsRepository::class)]
 // class Posts

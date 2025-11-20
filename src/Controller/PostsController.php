@@ -1,13 +1,13 @@
 <?php
 
-// namespace App\Controller;
+namespace App\Controller;
 
-// use App\Entity\Posts;
-// use App\Form\PostsType;
-// use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-// use Symfony\Component\HttpFoundation\Request;
-// use Symfony\Component\HttpFoundation\Response;
-// use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\Posts;
+use App\Form\PostsType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 // final class PostsController extends AbstractController
 // {
