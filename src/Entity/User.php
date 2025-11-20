@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -20,18 +21,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['user'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['user'])]
     private ?string $username = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user'])]
     private array $roles = [];
 
     /**
@@ -44,24 +49,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var int Seguidores
      */
     #[ORM\Column]
+    #[Groups(['user'])]
     private ?int $follower_count = 0;
 
     /**
      * @var string Biografia del perfil usuario
      */
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user'])]
     private ?string $biography = null;
 
     /**
      * @var int Monedas usuario
      */
     #[ORM\Column]
+    #[Groups(['user'])]
     private ?int $leaf_coins_user = 0;
 
     /**
      * @var int Monedas comunidad
      */
     #[ORM\Column]
+    #[Groups(['user'])]
     private ?int $tree_coins_community = 0;
 
     /**
@@ -69,6 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\ManyToOne(targetEntity: Community::class, inversedBy: 'users')]
     #[ORM\JoinColumn(name: 'community_id', referencedColumnName: 'id', nullable: true)]
+    #[Groups(['user'])]
     private ?Community $community = null;
 
     public function getId(): ?int
