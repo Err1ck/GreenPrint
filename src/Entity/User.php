@@ -22,7 +22,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user'])]
+    #[Groups(['user', 'follows'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
