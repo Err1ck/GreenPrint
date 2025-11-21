@@ -19,16 +19,16 @@ final class PostsController extends AbstractController
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
 
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        //     $user = $this->getUser();
-        //     $post->setUser($user);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+            $user = $this->getUser();
+            $post->setUser($user);
 
-        //     $em->persist($post);
-        //     $em->flush();
+            $em->persist($post);
+            $em->flush();
 
             return $this->redirectToRoute('/home');
-        // }
+        }
 
         return $this->render('posts/index.html.twig', [
             'form' => $form->createView(),
