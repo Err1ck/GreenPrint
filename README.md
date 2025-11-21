@@ -50,7 +50,6 @@ Sustituye 'test' por lo que hayas puesto como primer parámetro en `.addEntry` e
 
 
 ## DATABASES
-### ATENCION!!!! ANTES DE TODO ESTO VE A MIGRATIONS Y `ELIMINA TODAS EXCEPTO EL GITIGNORE`
 
 1. Eliminar la base de datos
 `php bin/console doctrine:database:drop --force`

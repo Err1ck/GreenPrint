@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mi App - Symfony + React</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    {# Incluir CSS compilado por Webpack #}
+    {{ encore_entry_link_tags('perfil') }}
+</head>
+<body>
+    {# Contenedor donde React se montará #}
+    <div id="root"></div>
+    
+    {# Incluir JavaScript compilado por Webpack #}
+    {{ encore_entry_script_tags('perfil') }}
+</body>
+</html>
