@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class PostsController extends AbstractController
 {
-    #[Route('/Registrar-Posts', name: 'RegistrarPosts')]
+    #[Route('/registrar-posts', name: 'RegistrarPosts')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $post = new Posts();
