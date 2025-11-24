@@ -2,36 +2,47 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\TimestampableTrait;
 use App\Repository\PostsRepository;
-use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PostsRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Posts
 {
+    use TimestampableTrait;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['posts'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', nullable: false)]
+    #[ORM\JoinColumn(name: 'username', nullable: false)]
+    #[Groups(['posts'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['posts'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['posts'])]
     private ?string $leaf = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['posts'])]
     private ?string $photo = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['posts'])]
     private ?\DateTimeInterface $fecha_publicacion = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['posts'])]
     private ?string $contenido = null;
 
     public function __construct()

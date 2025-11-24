@@ -46,6 +46,9 @@ class Community
     #[Groups(['community'])]
     private ?string $banner_url = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Wallet $wallet = null;
+
     public function getId(): ?int
     {
         return $this->id;
