@@ -11,11 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/users', name: 'api_users_')]
 final class UserController extends AbstractController
 {
     #[Route('', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Lista todos los usuarios.'
+    )]
     public function index(UserRepository $users, SerializerInterface $serializer): JsonResponse
     {
 
@@ -31,6 +36,10 @@ final class UserController extends AbstractController
 
     //🚪GET /api/movies/{id} → Obtener una película por ID🚪
     #[Route('/{id<\d+>}', name: 'show', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra el usuario por la ID dada.'
+    )]
     public function show(int $id, UserRepository $users, SerializerInterface $serializer): JsonResponse
     {
         $user = $users->find($id);
@@ -47,6 +56,10 @@ final class UserController extends AbstractController
     }
 
     #[Route('/{id<\d+>}/edit', name: 'user_edit', methods: ['PUT'])]
+    #[OA\Put(
+        tags: ['UserController'],
+        summary: 'Edita el usario por la ID dada.'
+    )]
     public function edit(int $id, Request $request, UserRepository $users, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         // 1. Buscar el usuario en la base de datos
@@ -115,6 +128,10 @@ final class UserController extends AbstractController
 
 
     #[Route('/{id<\d+>}/destroy', name: 'user_destroy', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['UserController'],
+        summary: 'Elimina el usario por la ID dada.'
+    )]
     public function destroy(int $id, UserRepository $users, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
 
@@ -131,9 +148,9 @@ final class UserController extends AbstractController
         $entityManager->remove($user); // eliminar usuario
 
         $entityManager->flush(); // updatear db
-    
+
         return new JsonResponse(
-           ['message' => 'Usuario eliminado correctamente.'],
+            ['message' => 'Usuario eliminado correctamente.'],
             JsonResponse::HTTP_OK,
             [],
         );

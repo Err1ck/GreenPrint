@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Trait\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'community_members')]
@@ -14,14 +15,17 @@ class CommunityMembers
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['member'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['member'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Community::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['member'])]
     private ?Community $community = null;
 
     public function getId(): ?int

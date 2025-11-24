@@ -30,7 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['user'])]
+    #[Groups(['user', 'follows'])]
     private ?string $username = null;
 
     /**
