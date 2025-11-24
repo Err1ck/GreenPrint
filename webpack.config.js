@@ -1,16 +1,16 @@
-const Encore = require('@symfony/webpack-encore');
+const Encore = require("@symfony/webpack-encore");
 
 // Manually configure the runtime environment if not already configured yet by the "encore" command.
 // It's useful when you use tools that rely on webpack.config.js file.
 if (!Encore.isRuntimeEnvironmentConfigured()) {
-    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
+    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || "dev");
 }
 
 Encore
     // directory where compiled assets will be stored
-    .setOutputPath('public/build/')
+    .setOutputPath("public/build/")
     // public path used by the web server to access the output path
-    .setPublicPath('/build')
+    .setPublicPath("/build")
     // only needed for CDN's or subdirectory deploy
     //.setManifestKeyPrefix('build/')
 
@@ -20,9 +20,13 @@ Encore
      * Each entry will result in one JavaScript file (e.g. app.js)
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
-    .addEntry('app', './assets/app.js')
-    .addEntry('about', './assets/about.js')
-    .addEntry('testpage', './assets/testpage.js')
+    .addEntry("app", "./assets/app.js")
+    .addEntry("home", "./assets/home.js")
+    .addEntry("cartera", "./assets/cartera.js")
+    .addEntry("comunidades", "./assets/comunidades.js")
+    .addEntry("loginTest", "./assets/loginTest.js")
+    .addEntry("perfil", "./assets/perfil.js")
+    .addEntry("tendencias", "./assets/tendencias.js")
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
@@ -54,8 +58,8 @@ Encore
 
     // enables and configure @babel/preset-env polyfills
     .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = '3.38';
+        config.useBuiltIns = "usage";
+        config.corejs = "3.38";
     })
 
     // enables Sass/SCSS support
@@ -65,14 +69,13 @@ Encore
     //.enableTypeScriptLoader()
 
     // uncomment if you use React
-    .enableReactPreset()
+    .enableReactPreset();
 
-    // uncomment to get integrity="..." attributes on your script & link tags
-    // requires WebpackEncoreBundle 1.4 or higher
-    //.enableIntegrityHashes(Encore.isProduction())
+// uncomment to get integrity="..." attributes on your script & link tags
+// requires WebpackEncoreBundle 1.4 or higher
+//.enableIntegrityHashes(Encore.isProduction())
 
-    // uncomment if you're having problems with a jQuery plugin
-    //.autoProvidejQuery()
-;
+// uncomment if you're having problems with a jQuery plugin
+//.autoProvidejQuery()
 
 module.exports = Encore.getWebpackConfig();
