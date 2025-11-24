@@ -3,10 +3,12 @@
 namespace App\Entity\Trait;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait TimestampableTrait
 {
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['user','follows'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
