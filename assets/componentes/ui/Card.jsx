@@ -1,21 +1,14 @@
 import React from "react";
+import SvgComponente from "./Svg";
 
-const Card = ({ image, date, title, description, classImage  = "" }) => {
+const Card = ({ image, date, title, description, classImage = "" }) => {
     return (
         <article className="overflow-hidden rounded-lg shadow-sm transition hover:shadow-lg">
-
             {/* Imagen opcional */}
-            {image && (
-                <img
-                    alt=""
-                    src={image}
-                    className={`img-default ${classImage}`}
-                />
-            )}
+            {image && <SvgComponente img_class="" img_src="" img_alt="" />}
 
             {(date || title || description) && (
                 <div className="bg-white p-4 sm:p-6">
-
                     {/* Fecha opcional */}
                     {date && (
                         <time className="block text-xs text-gray-500">
