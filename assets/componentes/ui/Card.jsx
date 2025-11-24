@@ -1,6 +1,15 @@
 import React from "react";
 import SvgComponente from "./Svg";
 
+/**
+ * 
+ * @param image  Es la imagen svg que pondremos.
+ * @param date Es la fecha que utilizaremos
+ * @param title Es el titulo que utilizaremos
+ * @param description Es la descripción que se pondra.
+ * @param classImage Es la clase que tiene la imagen.
+ * @returns 
+ */
 const Card = ({ image, date, title, description, classImage = "" }) => {
     return (
         <article className="overflow-hidden rounded-lg shadow-sm transition hover:shadow-lg">
