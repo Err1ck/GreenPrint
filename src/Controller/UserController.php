@@ -2,7 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\CommunityMembers;
 use App\Entity\User;
+use App\Entity\UserFollows;
+use App\Repository\CommunityMembersRepository;
+use App\Repository\CommunityRepository;
+use App\Repository\UserFollowsRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -153,6 +158,297 @@ final class UserController extends AbstractController
             ['message' => 'Usuario eliminado correctamente.'],
             JsonResponse::HTTP_OK,
             [],
+        );
+    }
+
+
+    #[Route('/{id<\d+>}/follow', name: 'user_follow', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['UserController'],
+        summary: 'Seguir usuario. ID de la URL -> tu usuario / ID pasado por JS -> usuario a seguir.'
+    )]
+    public function follow(int $id, Request $request, UserRepository $users, UserFollowsRepository $followEntity, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'User not found'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        // ✅ Declarar antes del if
+        if (!isset($data['following_user_id'])) {
+            return new JsonResponse(
+                ['error' => 'following_user_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user_to_followId = $data['following_user_id'];
+
+        if ($id === $user_to_followId) {
+            return new JsonResponse(
+                ['error' => 'No puedes seguirte a ti mismo'],
+                JsonResponse::HTTP_NOT_ACCEPTABLE
+            );
+        }
+
+        $user_to_follow = $users->find($user_to_followId);
+
+        if (!$user_to_follow) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingFollow = $followEntity->findOneBy([
+            'user' => $user,
+            'followingUser' => $user_to_follow
+        ]);
+
+        if ($existingFollow) {
+            return new JsonResponse(
+                ['error' => 'Ya sigues a este usuario'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $follow = new UserFollows();
+        $follow->setUser($user);
+        $follow->setFollowingUser($user_to_follow);
+        $follow->setCreatedAt(new \DateTimeImmutable());
+        $follow->setUpdatedAt(new \DateTimeImmutable());
+
+        // ⚠️ Deberías validar $follow, no $user
+        $errors = $validator->validate($follow);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $entityManager->persist($follow);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha empezado a seguir al usuario $user_to_followId."],
+            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+        );
+    }
+
+    #[Route('/{id<\d+>}/unfollow', name: 'user_unfollow', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['UserController'],
+        summary: 'Dejar de seguir usuario. ID de la URL -> tu usuario / ID pasado por JS -> usuario a dejar de seguir.'
+    )]
+    public function unfollow(int $id, Request $request, UserRepository $users, UserFollowsRepository $followEntity, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'User not found'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (isset($data['following_user_id'])) {
+
+            if ($id === $data['following_user_id']) {
+                return new JsonResponse(
+                    ['error' => 'No puedes dejar de seguirte a ti mismo'],
+                    JsonResponse::HTTP_NOT_ACCEPTABLE
+                );
+            }
+
+            $user_to_unfollow = $users->find($data['following_user_id']);
+            $user_to_unfollowId = $data['following_user_id'] ?? null; // solo para mostrar en el return
+
+            if (!$user_to_unfollow) {
+                return new JsonResponse(
+                    ['error' => 'User not found'],
+                    JsonResponse::HTTP_NOT_FOUND
+                );
+            } else {
+
+                $followColumn = $followEntity->findOneBy(['user' => $user, 'followingUser' => $user_to_unfollow]);
+
+                // 4. Validar la entidad antes de guardar
+                $errors = $validator->validate($user);
+
+                if (count($errors) > 0) {
+                    $errorMessages = [];
+                    foreach ($errors as $error) {
+                        $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+                    }
+
+                    return new JsonResponse(
+                        ['errors' => $errorMessages],
+                        JsonResponse::HTTP_BAD_REQUEST
+                    );
+                }
+
+                $entityManager->remove($followColumn);
+
+                $entityManager->flush();
+            }
+        }
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha dejado de seguir al usuario $user_to_unfollowId."],
+            JsonResponse::HTTP_OK,
+            [],
+        );
+    }
+
+
+    #[Route('/{id<\d+>}/join', name: 'user_join_community', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['UserController'],
+        summary: 'Unirse a una comundad. ID de la URL -> tu usuario / ID pasado por JS -> usuario a seguir.'
+    )]
+    public function join(int $id, Request $request, UserRepository $users, CommunityRepository $communities,  CommunityMembersRepository $communityMembersRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'User not found'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        // ✅ Declarar antes del if
+        if (!isset($data['community_id'])) {
+            return new JsonResponse(
+                ['error' => 'community_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $community_id = $data['community_id'];
+
+        $community_to_join = $communities->find($community_id);
+
+        if (!$community_to_join) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingMember = $communityMembersRepository->findOneBy([
+            'user' => $user,
+            'community' => $community_to_join
+        ]);
+
+        if ($existingMember) {
+            return new JsonResponse(
+                ['error' => 'Ya formas parte de esta comunidd'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $follow = new CommunityMembers();
+        $follow->setUser($user);
+        $follow->setCommunity($community_to_join);
+        $follow->setCreatedAt(new \DateTimeImmutable());
+        $follow->setUpdatedAt(new \DateTimeImmutable());
+
+        // ⚠️ Deberías validar $follow, no $user
+        $errors = $validator->validate($follow);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $entityManager->persist($follow);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha empezado ahora es miembro de la comunidad $community_id."],
+            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+        );
+    }
+
+    #[Route('/{id<\d+>}/leave', name: 'user_leave_community', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['UserController'],
+        summary: 'Dejar una comundad. ID de la URL -> tu usuario / ID pasado por JS -> usuario a seguir.'
+    )]
+    public function leave(int $id, Request $request, UserRepository $users, CommunityRepository $communities,  CommunityMembersRepository $communityMembersRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'User not found'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        // ✅ Declarar antes del if
+        if (!isset($data['community_id'])) {
+            return new JsonResponse(
+                ['error' => 'community_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $community_id = $data['community_id'];
+
+        $community_to_join = $communities->find($community_id);
+
+        if (!$community_to_join) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $membership = $communityMembersRepository->findOneBy(['user' => $user->getId(), 'community' => $community_to_join->getId()]);
+
+        if (!$membership) {
+            return new JsonResponse(
+                ['error' => 'No formas parte de esta comunidad.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $entityManager->remove($membership);
+
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha empezado dejado de ser miembro de la comunidad $community_id."],
+            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
         );
     }
 }
