@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Community;
+use App\Repository\CommunityFollowsRepository;
+use App\Repository\CommunityMembersRepository;
 use App\Repository\CommunityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,7 +63,19 @@ final class CommunityController extends AbstractController
     #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['PUT'])]
     #[OA\Put(
         tags: ['CommunityController'],
-        summary: 'Edita la comunidad por la ID dada.'
+        summary: 'Edita la comunidad por la ID dada.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'name', type: 'string', example: 'MyCommunity'),
+                    new OA\Property(property: 'biography', type: 'string', example: 'Lorem ipsum...'),
+                    new OA\Property(property: 'photo_url', type: 'string', example: 'path/img'),
+                    new OA\Property(property: 'banner_url', type: 'string', example: 'path/img')
+                ]
+            )
+        ),
     )]
     public function edit(int $id, Request $request, CommunityRepository $communities, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
@@ -83,6 +97,11 @@ final class CommunityController extends AbstractController
         if (isset($data['name'])) {
             $community->setName($data['name']);
         }
+
+        if (isset($data['biography'])) {
+            $community->setBiography($data['biography']);
+        }
+
         if (isset($data['photo_url'])) {
             $community->setPhotoURL($data['photo_url']);
         }
@@ -90,7 +109,7 @@ final class CommunityController extends AbstractController
             $community->setBannerURL($data['banner_url']);
         }
 
-      $errors = $validator->validate($community);
+        $errors = $validator->validate($community);
 
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -197,6 +216,109 @@ final class CommunityController extends AbstractController
             ['message' => "La comunidad ha sido eliminada."],
             JsonResponse::HTTP_OK,
             [],
+        );
+    }
+
+    #[Route('/{id<\d+>}/members', name: 'community_members', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['CommunityController'],
+        summary: 'Muestra los seguidores de la comunidad por la ID dada.'
+    )]
+    public function getMembers(int $id, Request $request, CommunityRepository $communities, CommunityMembersRepository $members, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+
+        $community = $communities->find($id);
+
+        if (!$community) {
+            return new JsonResponse(['error' => 'Comunidad no encontrada.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $communityMembers = $members->findBy(['community' => $community->getId()]);
+
+        if (!$communityMembers) {
+            return new JsonResponse(['error' => 'Esta comunidad no tiene miembros.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(
+            // Podemos retornar el obj
+            $serializer->serialize($communityMembers, 'json', ['groups' => 'getMembers']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+
+    #[Route('/followers', name: 'community_followers_from_all_communities', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['CommunityController'],
+        summary: 'Muestra los seguidores de todos las comunidades.'
+    )]
+    public function getAllFollowers(CommunityRepository $communities, CommunityFollowsRepository $followers, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+
+        $communityFollowers = $followers->findAll();
+
+        if (!$communityFollowers) {
+            return new JsonResponse(['error' => 'Todavía nadie sigue a ninguna comunidad.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(
+            // Podemos retornar el obj
+            $serializer->serialize($communityFollowers, 'json', ['groups' => 'getAllCommunityFollowers']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    #[Route('/members', name: 'community_members_from_all_communities', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['CommunityController'],
+        summary: 'Muestra los miembros de todos las comunidades.'
+    )]
+    public function getAllMembers(CommunityMembersRepository $community, SerializerInterface $serializer): JsonResponse
+    {
+        $all = $community->findAll();
+
+        if (!$all) {
+            return new JsonResponse(['error' => 'Todavía nadie es miembro a ninguna comunidad.'], JsonResponse::HTTP_NOT_FOUND);
+        };
+
+        return new JsonResponse(
+            $serializer->serialize($all, 'json', ['groups' => 'member']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    #[Route('/{id<\d+>}/followers', name: 'community_followers_', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['CommunityController'],
+        summary: 'Muestra los seguidores de la comunidad dada por URL.'
+    )]
+    public function getFollowers(int $id, CommunityRepository $communities, CommunityFollowsRepository $followers, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+
+        $community = $communities->find($id);
+
+        if (!$community) {
+            return new JsonResponse(['error' => 'Comunidad no encontrada.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $communityFollowers = $followers->findBy(['community' => $community->getId()]);
+
+        if (!$communityFollowers) {
+            return new JsonResponse(['error' => 'Esta comunidad no tiene seguidores.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(
+            // Podemos retornar el obj
+            $serializer->serialize($communityFollowers, 'json', ['groups' => 'getCommunityFollowers']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
         );
     }
 }

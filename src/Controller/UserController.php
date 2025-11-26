@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\CommunityFollows;
 use App\Entity\CommunityMembers;
 use App\Entity\User;
 use App\Entity\UserFollows;
+use App\Repository\CommunityFollowsRepository;
 use App\Repository\CommunityMembersRepository;
 use App\Repository\CommunityRepository;
 use App\Repository\UserFollowsRepository;
@@ -63,7 +65,19 @@ final class UserController extends AbstractController
     #[Route('/{id<\d+>}/edit', name: 'user_edit', methods: ['PUT'])]
     #[OA\Put(
         tags: ['UserController'],
-        summary: 'Edita el usario por la ID dada.'
+        summary: 'Edita el usario por la ID dada.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'username', type: 'string', example: 'Gordinxi'),
+                    new OA\Property(property: 'biography', type: 'string', example: 'Lorem ipsum...'),
+                    new OA\Property(property: 'photo_url', type: 'string', example: 'path/img'),
+                    new OA\Property(property: 'banner_url', type: 'string', example: 'path/img')
+                ]
+            )
+        ),
     )]
     public function edit(int $id, Request $request, UserRepository $users, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
@@ -316,6 +330,85 @@ final class UserController extends AbstractController
         );
     }
 
+    #[Route('/{id<\d+>}/follow-community', name: 'user_follow_community', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['UserController'],
+        summary: 'Seguir comunidad. ID de la URL -> tu usuario / ID pasado por JS -> comunidad a seguir.'
+    )]
+    public function followCommunity(int $id, Request $request, UserRepository $users, CommunityRepository $communities, CommunityFollowsRepository $followEntity, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        // ✅ Declarar antes del if
+        if (!isset($data['community_id'])) {
+            return new JsonResponse(
+                ['error' => 'community_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $community_id = $data['community_id'];
+
+        $community_to_follow = $communities->find($community_id);
+
+        if (!$community_to_follow) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingFollow = $followEntity->findOneBy([
+            'user' => $user,
+            'community' => $community_to_follow
+        ]);
+
+        if ($existingFollow) {
+            return new JsonResponse(
+                ['error' => 'Ya sigues esta comunidad.'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $follow = new CommunityFollows();
+        $follow->setUser($user);
+        $follow->setCommunity($community_to_follow);
+        $follow->setCreatedAt(new \DateTimeImmutable());
+        $follow->setUpdatedAt(new \DateTimeImmutable());
+
+        // ⚠️ Deberías validar $follow, no $user
+        $errors = $validator->validate($follow);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $entityManager->persist($follow);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha empezado a seguir a la comunidad $community_id."],
+            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+        );
+    }
+
 
     #[Route('/{id<\d+>}/join', name: 'user_join_community', methods: ['POST'])]
     #[OA\Post(
@@ -391,7 +484,7 @@ final class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "El usuario $id ha empezado ahora es miembro de la comunidad $community_id."],
+            ['message' => "El usuario $id ahora es miembro de la comunidad $community_id."],
             JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
         );
     }
@@ -449,6 +542,136 @@ final class UserController extends AbstractController
         return new JsonResponse(
             ['message' => "El usuario $id ha empezado dejado de ser miembro de la comunidad $community_id."],
             JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+        );
+    }
+
+    #[Route('/{id<\d+>}/communities', name: 'user_show_communities', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra todas las comunidades el cual el usuario dado por URL es miembro.'
+    )]
+    public function showCommunities(int $id, Request $request, UserRepository $users, CommunityMembersRepository $members, SerializerInterface $serializer): JsonResponse
+    {
+        // Verificar que el usuario existe
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Buscar todos los follows donde user_id = $id
+        $userMemberships = $members->findBy(['user' => $user]);
+
+        if (empty($userMemberships)) {
+            return new JsonResponse(
+                ['message' => 'Este usuario no es miembro de ninguna comunidad.'],
+                JsonResponse::HTTP_OK
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($userMemberships, 'json', ['groups' => 'member']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    #[Route('/{id<\d+>}/following', name: 'user_show_following', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra todos los follows del usuario dado por URL.'
+    )]
+    public function showFollowing(int $id, Request $request, UserRepository $users, UserFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
+    {
+        // Verificar que el usuario existe
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Buscar todos los follows donde user_id = $id
+        $userFollows = $follows->findBy(['user' => $user]);
+
+        if (empty($userFollows)) {
+            return new JsonResponse(
+                ['message' => 'Este usuario no sigue a nadie.'],
+                JsonResponse::HTTP_OK
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($userFollows, 'json', ['groups' => 'getFollowing']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    #[Route('/{id<\d+>}/followers', name: 'user_show_followers', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra todos los followers del usuario dado por URL.'
+    )]
+    public function showFollowers(int $id, Request $request, UserRepository $users, UserFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
+    {
+        // Verificar que el usuario existe
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Buscar todos los follows donde user_id = $id
+        $userFollows = $follows->findBy(['followingUser' => $user]);
+
+        if (empty($userFollows)) {
+            return new JsonResponse(
+                ['message' => 'Nadie sigue a este usuario.'],
+                JsonResponse::HTTP_OK
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($userFollows, 'json', ['groups' => 'getFollowers']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    #[Route('/followers', name: 'users_get_all_followers_list', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra todos los follows de TODOS los usuarios.'
+    )]
+    public function getAllFollowerList(UserFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
+    {
+
+        $all = $follows->findAll();
+
+        if (!$all) {
+            return new JsonResponse(
+                ['error' => 'Todavía nadie sigue a nadie.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($all, 'json', ['groups' => 'follows']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
         );
     }
 }

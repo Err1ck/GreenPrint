@@ -15,17 +15,17 @@ class CommunityMembers
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['member'])]
+    #[Groups(['member', 'getMembers', 'getAllCommunityFollowers'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['member'])]
+    #[Groups(['member', 'getMembers', 'getAllCommunityFollowers'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Community::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['member'])]
+    #[Groups(['member', 'getAllCommunityFollowers'])]
     private ?Community $community = null;
 
     public function getId(): ?int
