@@ -9,15 +9,15 @@ import SvgComponente from "./Svg";
  * @param atext Texto o contenido que se mostrará dentro del enlace <a>.
  * @returns
  */
-const NavLinkIcon = ({
+const LinkIcon = ({
     name,
-    classIcon = "NavLinkIconDefault",
+    classIcon = "LinkIconDefault",
     href = "#",
     anchorClass,
     anchorText,
 }) => {
     return (
-        <div className="nav-link-icon">
+        <div className="link-icon">
             <SvgComponente name={name} className={classIcon} />
 
             <a href={href} className={anchorClass}>
@@ -26,4 +26,4 @@ const NavLinkIcon = ({
         </div>
     );
 };
-export default NavLinkIcon;
+export default LinkIcon;
