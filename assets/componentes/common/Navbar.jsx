@@ -1,4 +1,4 @@
-import NavLinkIcon from "../ui/NavLinkIcon";
+import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 
 function Navbar({ navbarSp = false }) {
@@ -6,28 +6,28 @@ function Navbar({ navbarSp = false }) {
         <>
             <nav className="navbarRight">
                 <SvgComponente name="icon1" />
-                <NavLinkIcon
+                <LinkIcon
                     name={"icon2"}
                     classIcon={"icon2"}
                     href={"#"}
                     anchorClass={"icon2-anchor"}
                     anchorText={"Mi perfil"}
                 />
-                <NavLinkIcon
+                <LinkIcon
                     name={"icon3"}
                     classIcon={"icon3"}
                     href={"#"}
                     anchorClass={"icon3-anchor"}
                     anchorText={"Tendencia"}
                 />
-                <NavLinkIcon
+                <LinkIcon
                     name={"icon4"}
                     classIcon={"icon4"}
                     href={"#"}
                     anchorClass={"icon4-anchor"}
                     anchorText={"Comunidad"}
                 />
-                <NavLinkIcon
+                <LinkIcon
                     name={"icon5"}
                     classIcon={"icon5"}
                     href={"#"}
@@ -38,6 +38,7 @@ function Navbar({ navbarSp = false }) {
             {
                 (navbarSp = false && (
                     <nav className="navbarLeft">
+                        <LinkIcon anchor={false} />
                         <div>Buscador</div>
                         <div>Tendencias</div>
                         <div>Comunidades</div>

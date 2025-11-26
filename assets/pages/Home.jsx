@@ -1,17 +1,8 @@
 import React from "react";
+import Navbar from "../componentes/common/Navbar";
 
 function TestHomePage() {
-    return (
-        <div
-            style={{
-                textAlign: "center",
-                padding: "50px",
-                fontFamily: "Arial, sans-serif",
-            }}
-        >
-            <h1>TEST HOME</h1>
-        </div>
-    );
+    return <Navbar />;
 }
 
 export default TestHomePage;

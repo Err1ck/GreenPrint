@@ -32,14 +32,16 @@ const RECURSOS = {
     },
 };
 
-function SvgComponente({ name, className }) {
+function SvgComponente({ name }) {
     const SvgIcon = RECURSOS.svg[name];
-    if (SvgIcon) {
-        return <SvgIcon role="img" className={className} />;
-    }
     const imagePath = RECURSOS.img[name];
+    const classNameDef = ` ${name}`.trim();
+
+    if (SvgIcon) {
+        return <SvgIcon role="img" className={classNameDef} />;
+    }
     if (imagePath) {
-        return <img src={imagePath} className={className} />;
+        return <img src={imagePath} className={classNameDef} />;
     }
 
     console.error(`Recurso no encontrado: ${name}`);
