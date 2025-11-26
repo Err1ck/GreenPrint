@@ -2,20 +2,28 @@ import react from "react";
 import SvgComponente from "./Svg";
 
 /**
- * 
- * @param  param0 
- * @returns 
+ *
+ * @param  href URL a la que navegará el usuario cuando haga clic en el texto del enlace.
+ * @param imageClass Clase CSS que se pasará al componente SvgComponente para estilizar la imagen/vector.
+ * @param classicon Clase CSS utilizada para estilizar el elemento <a> que actúa como enlace.
+ * @param atext Texto o contenido que se mostrará dentro del enlace <a>.
+ * @returns
  */
-const NavLinkIcon = ({ href = "#", imageClass, classIcon = "NavLinkIconDefault", aText }) => {
+const NavLinkIcon = ({
+    name,
+    classIcon = "NavLinkIconDefault",
+    href = "#",
+    anchorClass,
+    anchorText,
+}) => {
     return (
-        <article className="nav-link-icon">
-            <SvgComponente img_class={imageClass} />
+        <div className="nav-link-icon">
+            <SvgComponente name={name} className={classIcon} />
 
-            <a href={href} className={classIcon}>
-                {aText}
+            <a href={href} className={anchorClass}>
+                {anchorText}
             </a>
-
-        </article>
-    )
-}
-export default NavLinkIcon
+        </div>
+    );
+};
+export default NavLinkIcon;
