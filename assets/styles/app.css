@@ -1,14 +1,16 @@
 :root {
     /*Colors*/
-    --color-bg: #f5f7f2;
-    --color-bg-alt: #ffffff;
+    --color-bg: #ffffff;
+    --color-bg-alt: #d3fac7;
     --color-text: #1b4332;
     --color-text-secondary: #6c757d;
+    --color-text-anchor: #25a244;
     --color-primary: #3cb371;
     --color-secondary: #4da3d9;
+    /*--color-secondary: #155D27*/
     --color-alert: #ffd166;
     --color-border: #dadada;
-
+    --color-hover: #a98467;
     /*Tamaños de fuente*/
     /*Textos*/
     --font-size-100: 0.5rem;
