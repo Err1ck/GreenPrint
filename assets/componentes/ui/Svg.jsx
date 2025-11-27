@@ -1,13 +1,13 @@
-import Icono1 from "./img/icon1.svg";
-import Icono2 from "./img/icon2.svg";
-import Icono3 from "./img/icon3.svg";
-import Icono4 from "./img/icon4.svg";
-import Icono5 from "./img/icon5.svg";
-import Icono6 from "./img/icon6.svg";
-import Icono7 from "./img/icon7.svg";
-import Icono8 from "./img/icon8.svg";
-import Icono9 from "./img/icon9.svg";
-import Icono10 from "./img/icon10.svg";
+import Icono1 from "../../img/perfil.svg";
+import Icono2 from "../../img/home.svg";
+import Icono3 from "../../img/comunidadesmias.svg";
+import Icono4 from "../../img/tendencias.svg";
+import Icono5 from "../../img/lupa.svg";
+import Icono6 from "../../img/comunidadgeneral.svg";
+import Icono7 from "../../img/mas.svg";
+import Icono8 from "../../img/comentario.svg";
+import Icono9 from "../../img/like1.svg";
+import Icono10 from "../../img/like2.svg";
 
 /**
  *
