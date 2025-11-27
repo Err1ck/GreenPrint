@@ -25,7 +25,7 @@ const LinkIcon = ({
                     </a>
                 ))
             }
-            {(anchor = false && <span className={classname}>{text}</span>)}
+            {(anchor = false && <div className={classname}>{text}</div>)}
         </div>
     );
 };
