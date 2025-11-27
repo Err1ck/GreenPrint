@@ -17,7 +17,7 @@ const LinkIcon = ({
 }) => {
     return (
         <div className="link-icon">
-            <SvgComponente name={name} className={classIcon} />
+            <SvgComponente name={name} />
             {
                 (anchor = true && (
                     <a className={classname} href={href}>

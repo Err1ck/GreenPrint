@@ -4,53 +4,78 @@ import SvgComponente from "../ui/Svg";
 function Navbar({ navbarSp = false }) {
     return (
         <>
-            <nav className="navbarRight">
+            <nav className="navbarLeft">
                 <SvgComponente name="icon1" />
                 <LinkIcon
                     name={"icon2"}
-                    classIcon={"icon2"}
                     href={"#"}
-                    anchorClass={"icon2-anchor"}
-                    anchorText={"Mi perfil"}
+                    classname={"icon2-anchor"}
+                    text={"Mi perfil"}
                 />
                 <LinkIcon
                     name={"icon3"}
-                    classIcon={"icon3"}
                     href={"#"}
-                    anchorClass={"icon3-anchor"}
-                    anchorText={"Tendencia"}
+                    classname={"icon3-anchor"}
+                    text={"Tendencia"}
                 />
                 <LinkIcon
                     name={"icon4"}
-                    classIcon={"icon4"}
                     href={"#"}
-                    anchorClass={"icon4-anchor"}
-                    anchorText={"Comunidad"}
+                    classname={"icon4-anchor"}
+                    text={"Comunidad"}
                 />
                 <LinkIcon
                     name={"icon5"}
-                    classIcon={"icon5"}
                     href={"#"}
-                    anchorClass={"icon2-anchor"}
-                    anchorText={"Cartera"}
+                    classname={"icon2-anchor"}
+                    text={"Cartera"}
                 />
             </nav>
             {
                 (navbarSp = false && (
-                    <nav className="navbarLeft">
-                        <LinkIcon anchor={false} />
-                        <div>Buscador</div>
-                        <div>Tendencias</div>
-                        <div>Comunidades</div>
+                    <nav className="navbarRight">
+                        <LinkIcon
+                            name={"icon6"}
+                            anchor={false}
+                            classname={"icono6-nonanchor"}
+                            text={"Buscador"}
+                        />
+                        <LinkIcon
+                            name={"icon7"}
+                            anchor={false}
+                            classname={"icono7-nonanchor"}
+                            text={"Tendencias"}
+                        />
+                        <LinkIcon
+                            name={"icon8"}
+                            anchor={false}
+                            classname={"icono8-nonanchor"}
+                            text={"Comunidades"}
+                        />
                     </nav>
                 ))
             }
             {
                 (navbarSp = true && (
-                    <nav className="navbarLeft">
-                        <div>Buscador</div>
-                        <div>Comunidad</div>
-                        <div>comunidad</div>
+                    <nav className="navbarRight2">
+                        <LinkIcon
+                            name={"icon6"}
+                            anchor={false}
+                            classname={"icono6-nonanchor"}
+                            text={"Buscador"}
+                        />
+                        <LinkIcon
+                            name={"icon7"}
+                            anchor={false}
+                            classname={"icono7-nonanchor"}
+                            text={"Comunidad 1"}
+                        />
+                        <LinkIcon
+                            name={"icon8"}
+                            anchor={false}
+                            classname={"icono8-nonanchor"}
+                            text={"Comunidad 2"}
+                        />
                     </nav>
                 ))
             }
