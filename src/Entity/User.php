@@ -9,7 +9,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -45,20 +44,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
-
-    /**
-     * @var string profile photo url
-     */
-    #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['user'])]
-    private ?string $photo_url = null;
-
-    /**
-     * @var string banner photo url
-     */
-    #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['user'])]
-    private ?string $banner_url = null;
 
     /**
      * @var int Seguidores
@@ -106,9 +91,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username): static
+    public function setUsername(string $username): static 
     {
-        $this->username = $username;
+        $this->username = $username;    
         return $this;
     }
 
@@ -206,29 +191,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->community = $community;
         return $this;
     }
-
-    public function getPhotoURL(): ?string
-    {
-        return $this->photo_url;
-    }
-
-    public function setPhotoURL(string $photo_url): static
-    {
-        $this->photo_url = $photo_url;
-        return $this;
-    }
-
-    public function getBannerURL(): ?string
-    {
-        return $this->banner_url;
-    }
-
-    public function setBannerURL(string $banner_url): static
-    {
-        $this->banner_url = $banner_url;
-        return $this;
-    }
-
 
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
