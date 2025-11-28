@@ -4,8 +4,8 @@ import "../componentes/common/Navbar.css";
 function TestHomePage() {
     return (
         <>
-            <Navbar navbarType={1} />;
-            <Navbar navbarType={2} />;
+            <Navbar navbarType={1} />
+            <Navbar navbarType={2} />
         </>
     );
 }
