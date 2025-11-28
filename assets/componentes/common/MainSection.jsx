@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../common/MainSection.css";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import Button from "../ui/Button";
@@ -6,30 +7,29 @@ import Button from "../ui/Button";
 const MainSection = ({
     userName,
     userProfileUrl,
-    avatarSrc,
     date,
     time,
-    initialText = "",
+    text,
     postImage = null,
-    initialComments = 0,
-    initialRetweets = 0,
-    initialLike1 = 0,
-    initialLike2 = 0,
+    comments = 0,
+    retweets = 0,
+    like1 = 0,
+    like2 = 0,
 }) => {
-    const [text, setText] = useState(initialText);
-    const [comments, setComments] = useState(initialComments);
-    const [retweets, setRetweets] = useState(initialRetweets);
-    const [like1, setLike1] = useState(initialLike1);
-    const [like2, setLike2] = useState(initialLike2);
+    const [commentCount, setCommentCount] = useState(comments);
+    const [retweetCount, setRetweetCount] = useState(retweets);
+    const [like1Count, setLike1Count] = useState(like1);
+    const [like2Count, setLike2Count] = useState(like2);
 
     return (
         <section className="main-section">
             {/* CABECERA */}
             <header className="main-header">
                 <LinkIcon
-                    src={avatarSrc}
-                    to={userProfileUrl}
-                    label={userName}
+                    name={"imagen2"}
+                    anchor={false}
+                    classname={"sectionIcon"}
+                    
                 />
 
                 <div className="post-info">
@@ -41,15 +41,9 @@ const MainSection = ({
                 </div>
             </header>
 
-            {/* INPUT TEXTO */}
-            <div className="input-wrapper">
-                <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    className="post-input"
-                    placeholder="Escribe tu post..."
-                />
+            {/* TEXTO DEL POST */}
+            <div className="post-text-wrapper">
+                <p className="post-text">{text}</p>
             </div>
 
             {/* IMAGEN DEL POST (OPCIONAL) */}
@@ -61,37 +55,54 @@ const MainSection = ({
 
             {/* ACCIONES */}
             <footer className="post-footer">
-                <Button
-                    classButton="button-action"
-                    onClick={() => setComments((prev) => prev + 1)}
-                >
-                    <SvgComponente type="comment" />
-                    <span className="action-count">{comments}</span>
-                </Button>
+                <div className="container-botones">
+                <div className="comentario-retweet">
+                {/* Comentarios */}
+                <div className="action-group">
+                    <Button
+                        classButton="button-action"
+                    >
+                        <SvgComponente name="icon8" />
+                    </Button>
+                    <span className="action-count">{commentCount}</span>
+                </div>
 
-                <Button
-                    classButton="button-action"
-                    onClick={() => setRetweets((prev) => prev + 1)}
-                >
-                    <SvgComponente type="retweet" />
-                    <span className="action-count">{retweets}</span>
-                </Button>
+                {/* Retweets */}
+                <div className="action-group">
+                    <Button
+                        classButton="button-action"
+                        onClick={() => setRetweetCount((prev) => prev + 1)}
+                    >
+                        <SvgComponente name="icon11" />
+                    </Button>
+                    <span className="action-count">{retweetCount}</span>
+                </div>
+                </div>
 
-                <Button
-                    classButton="button-action"
-                    onClick={() => setLike1((prev) => prev + 1)}
-                >
-                    <SvgComponente type="like1" />
-                    <span className="action-count">{like1}</span>
-                </Button>
+                {/* Like 1 */}
+                <div className="like1-like2">
+                <div className="action-group">
+                    <Button
+                        classButton="button-action"
+                        onClick={() => setLike1Count((prev) => prev + 1)}
+                    >
+                        <SvgComponente name="icon9" />
+                    </Button>
+                    <span className="action-count">{like1Count}</span>
+                </div>
 
-                <Button
-                    classButton="button-action"
-                    onClick={() => setLike2((prev) => prev + 1)}
-                >
-                    <SvgComponente type="like2" />
-                    <span className="action-count">{like2}</span>
-                </Button>
+                {/* Like 2 */}
+                <div className="action-group">
+                    <Button
+                        classButton="button-action"
+                        onClick={() => setLike2Count((prev) => prev + 1)}
+                    >
+                        <SvgComponente name="icon10" />
+                    </Button>
+                    <span className="action-count">{like2Count}</span>
+                </div>
+                </div>
+                </div>
             </footer>
         </section>
     );

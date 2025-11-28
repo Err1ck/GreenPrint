@@ -8,7 +8,10 @@ import Icono7 from "../../img/mas.svg";
 import Icono8 from "../../img/comentario.svg";
 import Icono9 from "../../img/like1.svg";
 import Icono10 from "../../img/like2.svg";
+import Icono11 from "../../img/retweet.svg"
+import Icono12 from "../../img/cartera.svg"
 import Imagen1 from "../../img/logo.jpg";
+import Imagen2 from "../../img/avatar-test.jpg";
 
 const RECURSOS = {
     svg: {
@@ -22,9 +25,12 @@ const RECURSOS = {
         icon8: Icono8,
         icon9: Icono9,
         icon10: Icono10,
+        icon11: Icono11,
+        icon12: Icono12
     },
     img: {
         imagen1: Imagen1,
+        imagen2: Imagen2,
     },
 };
 
