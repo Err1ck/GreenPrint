@@ -5,9 +5,9 @@ import MainSection from "../componentes/common/MainSection";
 function TestHomePage() {
     return (
         <>
-            <Navbar navbarType={1} />
-            <Navbar navbarType={2} />
-            {/* <MainSection
+            {/* <Navbar navbarType={1} />
+            <Navbar navbarType={2} /> */}
+            <MainSection
                 userName="DanielRoses"
                 userProfileUrl="/perfil/danielroses"
                 avatarSrc="/imagenes/daniel-avatar.jpg"
@@ -20,7 +20,7 @@ function TestHomePage() {
                 initialRetweets={2}
                 initialLike1={10}
                 initialLike2={3}
-            /> */}
+            />
         </>
     );
 }
