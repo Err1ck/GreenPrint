@@ -16,7 +16,6 @@
     --font-size-100: 0.5rem;
     --font-size-200: 0.75rem;
     --font-size-300: 1rem; /*default*/
-    font-size: var(--font-size-300);
     /*Titulos*/
     --font-size-400: 1.25rem; /* h5*/
     --font-size-500: 1.5rem; /* h4*/
