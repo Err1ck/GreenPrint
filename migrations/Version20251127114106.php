@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251120124346 extends AbstractMigration
+final class Version20251127114106 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -31,8 +31,8 @@ final class Version20251120124346 extends AbstractMigration
         $this->addSql('ALTER TABLE community_members ADD CONSTRAINT FK_6165BBACA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE community_members ADD CONSTRAINT FK_6165BBACFDA7B0BF FOREIGN KEY (community_id) REFERENCES community (id)');
         $this->addSql('ALTER TABLE user ADD CONSTRAINT FK_8D93D649FDA7B0BF FOREIGN KEY (community_id) REFERENCES community (id)');
-        $this->addSql('ALTER TABLE user_follows ADD CONSTRAINT FK_136E9479A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE user_follows ADD CONSTRAINT FK_136E94791896F387 FOREIGN KEY (following_user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE user_follows ADD CONSTRAINT FK_136E9479A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user_follows ADD CONSTRAINT FK_136E94791896F387 FOREIGN KEY (following_user_id) REFERENCES user (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema): void
