@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Entity\UserPostLeaf;
 use App\Repository\PostRepository;
+use App\Repository\UserPostLeafRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,12 +14,17 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/posts', name: 'api_posts_')]
 final class PostController extends AbstractController
 {
 
     #[Route('', name: 'api_posts_list', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['PostController'],
+        summary: 'Muestra todos los posts.'
+    )]
     public function index(PostRepository $postsRepository, SerializerInterface $serializer): JsonResponse
     {
         $all = $postsRepository->findAll();
@@ -30,6 +37,10 @@ final class PostController extends AbstractController
         );
     }
 
+    #[OA\Get(
+        tags: ['PostController'],
+        summary: 'Muestra el post por ID dada por URL.'
+    )]
     #[Route('/{id<\d+>}', name: 'api_post_show', methods: ['GET'])]
     public function show(int $id, PostRepository $postRepository, SerializerInterface $serializer): JsonResponse
     {
@@ -50,6 +61,10 @@ final class PostController extends AbstractController
         );
     }
 
+    #[OA\Delete(
+        tags: ['PostController'],
+        summary: 'Borra el post dado por id URL.'
+    )]
     #[Route('/{id<\d+>}/delete', name: 'api_post_destroy', methods: ['DELETE'])]
     public function destroy(int $id, PostRepository $postRepository, SerializerInterface $serializer, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -73,6 +88,22 @@ final class PostController extends AbstractController
     }
 
     #[Route('/create', name: 'api_posts_create', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['PostController'],
+        summary: 'Crea un nuevo post.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'user', type: 'int', example: '1 (user_id)'),
+                    new OA\Property(property: 'title', type: 'string', example: 'Title'),
+                    new OA\Property(property: 'content', type: 'string', example: 'Lorem ipsum...'),
+                    new OA\Property(property: 'image', type: 'string', example: 'path/img'),
+                ]
+            )
+        ),
+    )]
     public function create(Request $request, UserRepository $users, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
 
@@ -154,6 +185,21 @@ final class PostController extends AbstractController
 
 
     #[Route('/{id<\d+>}/edit', name: 'api_posts_edit', methods: ['PUT'])]
+    #[OA\Put(
+        tags: ['PostController'],
+        summary: 'Edita el post dado ID.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', example: 'Title'),
+                    new OA\Property(property: 'content', type: 'string', example: 'Lorem ipsum...'),
+                    new OA\Property(property: 'image', type: 'string', example: 'path/img'),
+                ]
+            )
+        ),
+    )]
     public function edit(int $id, Request $request, UserRepository $users, PostRepository $posts, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
 
@@ -203,6 +249,125 @@ final class PostController extends AbstractController
             ['message' => "El post ha sido editado."],
             JsonResponse::HTTP_OK,
             [],
+        );
+    }
+
+
+
+    #[Route('/{id<\d+>}/like-leaf', name: 'post_user_liked_leaf', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['PostController'],
+        summary: 'Darle like (leaf) al post. ID de la URL -> post.'
+    )]
+    public function likePostLeaf(int $id, Request $request, PostRepository $posts, UserRepository $users, UserPostLeafRepository $likeLeafs, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['user'])) {
+            return new JsonResponse(
+                ['error' => 'El post necesita el campo: user (user_id).'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user = $users->find($data['user']);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usario no encontrado.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $existingLikeLeaf = $likeLeafs->findOneBy([
+            'user' => $user,
+            'post' => $post
+        ]);
+
+        if ($existingLikeLeaf) {
+            return new JsonResponse(
+                ['error' => 'Ya has dado like (leaf) a este post.'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $postLikeLeaf = new UserPostLeaf();
+        $postLikeLeaf->setUser($user);
+        $postLikeLeaf->setPost($post);
+        $postLikeLeaf->setCreatedAt(new \DateTimeImmutable());
+        $postLikeLeaf->setUpdatedAt(new \DateTimeImmutable());
+
+        // ⚠️ Deberías validar $follow, no $user
+        $errors = $validator->validate($postLikeLeaf);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $entityManager->persist($postLikeLeaf);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "Se ha dado el like (leaf) al post correctamente."],
+            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+        );
+    }
+
+    #[Route('/{id<\d+>}/unlike-leaf', name: 'post_user_unliked_leaf', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['PostController'],
+        summary: 'Quitar like (leaf) al post. ID de la URL -> post.'
+    )]
+    public function unlikePostLeaf(int $id, Request $request, PostRepository $posts, UserRepository $users, UserPostLeafRepository $likeLeafs, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    {
+
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encotrado.'],
+                JsonResponse::HTTP_NOT_FOUND,
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $user = $users->find($data['user']);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encotrado.'],
+                JsonResponse::HTTP_NOT_FOUND,
+            );
+        }
+
+        $likedPost = $likeLeafs->findBy(['user'=> $user, 'post'=> $post]);
+
+        $entityManager->remove($post);
+
+        $entityManager->flush();
+
+
+        return new JsonResponse(
+            ['message' => "Se ha quitado el like (leaf) al post correctamente."],
+            JsonResponse::HTTP_OK, // 201 es más apropiado para creación
         );
     }
 }

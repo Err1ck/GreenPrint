@@ -9,6 +9,7 @@ use App\Entity\UserFollows;
 use App\Repository\CommunityFollowsRepository;
 use App\Repository\CommunityMembersRepository;
 use App\Repository\CommunityRepository;
+use App\Repository\PostRepository;
 use App\Repository\UserFollowsRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -669,6 +670,39 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             $serializer->serialize($all, 'json', ['groups' => 'follows']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+    #[Route('/{id<\d+>}/posts', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Lista todos los posts por usuario id dada.'
+    )]
+    public function showPosts(int $id, UserRepository $users, PostRepository $posts, SerializerInterface $serializer): JsonResponse
+    {
+
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $userPosts = $posts->findBy(['user' => $user]);
+
+        if (!$userPosts) {
+            return new JsonResponse(
+                ['error' => 'Este usuario aún no ha subido ningún post.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($userPosts, 'json', ['groups' => 'post']),
             JsonResponse::HTTP_OK,
             [],
             true
