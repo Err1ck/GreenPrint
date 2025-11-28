@@ -2,27 +2,30 @@ import react from "react";
 import SvgComponente from "./Svg";
 
 /**
- *
  * @param  href URL a la que navegará el usuario cuando haga clic en el texto del enlace.
- * @param imageClass Clase CSS que se pasará al componente SvgComponente para estilizar la imagen/vector.
  * @param classicon Clase CSS utilizada para estilizar el elemento <a> que actúa como enlace.
- * @param atext Texto o contenido que se mostrará dentro del enlace <a>.
+ * @param text Texto o contenido que se mostrará dentro del enlace <a>.
  * @returns
  */
 const LinkIcon = ({
     name,
     classIcon = "LinkIconDefault",
+    anchor = true,
     href = "#",
-    anchorClass,
-    anchorText,
+    classname,
+    text,
 }) => {
     return (
         <div className="link-icon">
-            <SvgComponente name={name} className={classIcon} />
-
-            <a href={href} className={anchorClass}>
-                {anchorText}
-            </a>
+            <SvgComponente name={name} />
+            {
+                (anchor = true && (
+                    <a className={classname} href={href}>
+                        {text}
+                    </a>
+                ))
+            }
+            {(anchor = false && <div className={classname}>{text}</div>)}
         </div>
     );
 };

@@ -1,16 +1,12 @@
 import React from "react";
-
+import Navbar from "../componentes/common/Navbar";
+import "../componentes/common/Navbar.css";
 function TestHomePage() {
     return (
-        <div
-            style={{
-                textAlign: "center",
-                padding: "50px",
-                fontFamily: "Arial, sans-serif",
-            }}
-        >
-            <h1>TEST HOME</h1>
-        </div>
+        <>
+            <Navbar navbarType={1} />;
+            <Navbar navbarType={2} />;
+        </>
     );
 }
 
