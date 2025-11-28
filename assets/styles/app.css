@@ -1,7 +1,7 @@
 :root {
     /*Colors*/
     --color-bg: #ffffff;
-    --color-bg-alt: #d3fac7;
+    --color-bg-alt: #ecfce7;
     --color-text: #1b4332;
     --color-text-secondary: #6c757d;
     --color-text-anchor: #25a244;
@@ -24,7 +24,7 @@
     --font-size-800: 3rem; /* Titulos de pagina*/
 
     /*Font Weight*/
-
+    --font-weight-500: 500;
     /*Typography*/
 
     /*Spacing*/
