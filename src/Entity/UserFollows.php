@@ -20,12 +20,12 @@ class UserFollows
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "CASCADE", nullable: false)]
-    #[Groups(['follows'])]
+    #[Groups(['follows', 'getFollowers'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "following_user_id", referencedColumnName: "id", onDelete: "CASCADE", nullable: false)]
-    #[Groups(['follows'])]
+    #[Groups(['follows', 'getFollowing'])]
     private ?User $followingUser = null;
 
     public function getUser(): ?User

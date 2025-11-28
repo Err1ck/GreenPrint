@@ -13,6 +13,25 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        
+        # Firewall para el API
+        api:
+            pattern: ^/api
+            stateless: false
+            lazy: true
+            provider: app_user_provider
+            
+            json_login:
+                check_path: api_login
+                username_path: email
+                password_path: password
+                success_handler: App\Security\AuthenticationSuccessHandler
+                failure_handler: App\Security\AuthenticationFailureHandler
+            
+            logout:
+                path: api_logout
+                target: api_logout_success
+        
         main:
             lazy: true
             provider: app_user_provider
@@ -34,6 +53,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # Permitir acceso público a login y registro del API
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 

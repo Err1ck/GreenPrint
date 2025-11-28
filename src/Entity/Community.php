@@ -17,12 +17,20 @@ class Community
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['community'])]
+    #[Groups(['community', 'member', 'getAllCommunityFollowers'])]
     private ?int $id = null;
- 
-    #[ORM\Column(length:255, nullable: true)]
-    #[Groups(['community'])]
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['community', 'member', 'getAllCommunityFollowers'])]
     private ?string $name = null;
+
+    /**
+     * @var string Biografia del perfil usuario
+     */
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['community'])]
+    private ?string $biography = null;
+
 
     #[ORM\Column]
     #[Groups(['community'])]
@@ -32,7 +40,7 @@ class Community
     #[Groups(['community'])]
     private ?int $member_count = null;
 
-        /**
+    /**
      * @var string profile photo url
      */
     #[ORM\Column(length: 180, nullable: true)]
@@ -112,5 +120,14 @@ class Community
         return $this;
     }
 
+    public function getBiography(): ?string
+    {
+        return $this->biography;
+    }
 
+    public function setBiography(string $biography): static
+    {
+        $this->biography = $biography;
+        return $this;
+    }
 }
