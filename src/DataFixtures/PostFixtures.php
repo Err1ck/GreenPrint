@@ -2,13 +2,14 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Posts;
+use App\Entity\Post;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Faker\Factory as FakerFactory;
 
-class PostsFixtures extends Fixture
+class PostFixtures extends Fixture
 {
     private UserPasswordHasherInterface $passwordHasher;
 
@@ -19,6 +20,9 @@ class PostsFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+
+        $faker = FakerFactory::create();
+
         // Crear un usuario para asociarlo a los posts
         $user = new User();
         $user->setUsername('admin');
@@ -31,12 +35,12 @@ class PostsFixtures extends Fixture
 
         // Crear varios posts
         for ($i = 1; $i <= 10; $i++) {
-            $post = new Posts();
+            $post = new Post();
             $post->setUser($user);
             $post->setTitle("Título del post $i");
-            $post->setLeaf("Leaf $i");
-            $post->setPhoto("foto$i.jpg");
-            $post->setContenido("Contenido de ejemplo del post número $i");
+            $post->setLeaf($faker->numberBetween(0, 2000));
+            $post->setImage("foto$i.jpg");
+            $post->setContent("Contenido de ejemplo del post número $i");
 
             $manager->persist($post);
         }
