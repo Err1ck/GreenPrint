@@ -6,7 +6,9 @@ function Navbar({ navbarType }) {
         <>
             {navbarType === 1 && (
                 <nav className="navbarLeft">
-                    <SvgComponente name="imagen1" />
+                    <div className="navbarImg">
+                        <SvgComponente name="imagen1" />
+                    </div>
                     <LinkIcon
                         name={"icon1"}
                         href={"#"}
