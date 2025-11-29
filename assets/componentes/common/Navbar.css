@@ -4,7 +4,7 @@
     /* left: var(--spacing-sm); separacion o no?*/
     left: 0;
     z-index: 1000;
-    width: var(--spacing-3xl);
+    width: calc(2 * var(--spacing-3xl));
     height: calc(5 * var(--font-size-800));
     padding: var(--spacing-lg);
     /* background-color: var(--color-bg-alt) ; */
@@ -24,7 +24,7 @@
     top: 20vh;
     right: var(--spacing-sm);
     z-index: 1000;
-    width: var(--spacing-3xl);
+    width: calc(2 * var(--spacing-3xl));
     height: calc(5 * var(--font-size-800));
     padding: var(--spacing-md);
     background-color: var(--color-bg-alt);

@@ -1,89 +1,92 @@
 /* Contenedor principal de la card */
 .main-section {
-  border: 1px solid #000;
-  border-radius: 10px;
-  padding: 16px;
-  background-color: #fff;
-  max-width: 600px;
-  margin: 20px auto;
+    border: 1px solid #000;
+    border-radius: 10px;
+    padding: 16px;
+    background-color: #fff;
+    max-width: 600px;
+    margin: 20px auto;
 }
 
 /* Header: avatar + nombre | fecha | hora */
-.main-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-.post-info {
-  display: flex;
-  gap: 6px;
-  font-size: 14px;
+.header-info {
+    display: flex;
+    gap: 6px;
+    font-size: 14px;
 }
 
-.post-username {
-  font-weight: bold;
+.info-username {
+    font-weight: bold;
 }
 
 /* Caja de texto del post (centro) */
-.post-text-wrapper {
-  margin: 12px 0 16px;
+.section-textWrapper {
+    margin: 12px 0 16px;
 }
 
-.post-text-box {
-  border: 1px solid #000;
-  border-radius: 6px;
-  padding: 12px;
-  background-color: #f8f8f8;
-}
+/* .textWrapper-text-box {
+    border: 1px solid #000;
+    border-radius: 6px;
+    padding: 12px;
+    background-color: #f8f8f8;
+} */
 
-.post-text {
-  margin: 0;
-  font-size: 14px;
-  padding: 20px;
-  border: 2px solid black;
+.textWrapper-text {
+    margin: 0;
+    font-size: 14px;
+    padding: 20px;
+    border: 2px solid black;
 }
 
 /* Acciones (abajo) */
-.post-footer {
-  display: flex;
-  gap: 20px;
-  margin-top: 12px;
+.section-footer {
+    display: flex;
+    gap: 20px;
+    margin-top: 12px;
 }
 
-.action-group {
-  display: flex;
-  align-items: center;
-  gap: 6px; /* espacio entre botón y número */
+.action-group,
+.nonaction-group {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* espacio entre botón y número */
 }
 
 /* botón redondito con el SVG dentro */
-.button-default.button-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 8px;
-  background: none;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
+.button-default,
+.action-button,
+.nonaction-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
 }
 
-.action-count {
-  font-size: 14px;
+.action-count,
+.nonaction-count {
+    font-size: 14px;
 }
-.container-botones {
+.footer-container {
     display: flex;
     justify-content: space-between;
     width: 100%;
 }
 
-.comentario-retweet,
-.like1-like2 {
+.container-left,
+.container-right {
     display: flex;
     gap: 20px; /* separación entre botones del mismo grupo */
 }
-
