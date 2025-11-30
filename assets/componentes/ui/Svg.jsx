@@ -12,7 +12,7 @@ import Icono11 from "../../img/retweet.svg"
 import Icono12 from "../../img/cartera.svg"
 import Imagen1 from "../../img/logo.jpg";
 import Imagen2 from "../../img/avatar-test.jpg";
-
+import "../../styles/app.css"
 const RECURSOS = {
     svg: {
         icon1: Icono1,

@@ -1,65 +1,53 @@
-/* Contenedor principal de la card */
 .main-section {
-    border: 1px solid #000;
-    border-radius: 10px;
-    padding: 16px;
+    box-shadow: var(--box-shadow-lvl-2);
+    border: var(--border-width-default) var(--border-style-default)
+        var(--color-bg);
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+    margin: 1.5rem 3rem;
     background-color: #fff;
-    max-width: 600px;
-    margin: 20px auto;
 }
-
-/* Header: avatar + nombre | fecha | hora */
+.main-section:hover {
+    background-color: #ecfce7;
+}
+.main-section:hover .section-textWrapper {
+    background-color: #fff;
+}
 .section-header {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
 }
-
 .header-info {
     display: flex;
     gap: 6px;
     font-size: 14px;
 }
-
 .info-username {
     font-weight: bold;
 }
-
-/* Caja de texto del post (centro) */
 .section-textWrapper {
     margin: 12px 0 16px;
 }
-
-/* .textWrapper-text-box {
-    border: 1px solid #000;
-    border-radius: 6px;
-    padding: 12px;
-    background-color: #f8f8f8;
-} */
 
 .textWrapper-text {
     margin: 0;
     font-size: 14px;
     padding: 20px;
-    border: 2px solid black;
+    border: 0.5px solid rgb(168, 167, 167);
 }
-
-/* Acciones (abajo) */
 .section-footer {
     display: flex;
     gap: 20px;
     margin-top: 12px;
 }
-
 .action-group,
 .nonaction-group {
     display: flex;
     align-items: center;
-    gap: 6px; /* espacio entre botón y número */
+    gap: 6px;
 }
-
-/* botón redondito con el SVG dentro */
 .button-default,
 .action-button,
 .nonaction-button {
@@ -74,7 +62,6 @@
     height: 28px;
     cursor: pointer;
 }
-
 .action-count,
 .nonaction-count {
     font-size: 14px;
@@ -84,9 +71,8 @@
     justify-content: space-between;
     width: 100%;
 }
-
 .container-left,
 .container-right {
     display: flex;
-    gap: 20px; /* separación entre botones del mismo grupo */
+    gap: 20px;
 }
