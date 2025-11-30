@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import "../../styles/MainSection.css";
+import "../common/MainSection.css";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import Button from "../ui/Button";
-import "../../styles/app.css";
+
 const MainSection = ({
     userName,
     userProfileUrl,

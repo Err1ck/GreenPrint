@@ -1,7 +1,7 @@
 import React from "react";
-import "../styles/Home.css";
-import "../styles/app.css";
 import Navbar from "../componentes/common/Navbar";
+import "../componentes/common/Navbar.css";
+import "../styles/Home.css";
 import MainSection from "../componentes/common/MainSection";
 function TestHomePage() {
     return (
