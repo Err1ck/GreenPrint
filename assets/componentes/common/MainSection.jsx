@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../common/MainSection.css";
+import "../../styles/MainSection.css"
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import Button from "../ui/Button";

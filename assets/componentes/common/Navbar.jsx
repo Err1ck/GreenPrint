@@ -1,6 +1,6 @@
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
-
+import "../../styles/Navbar.css"
 function Navbar({ navbarType }) {
     return (
         <>
