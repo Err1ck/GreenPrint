@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../common/MainSection.css";
+import "../../styles/MainSection.css"
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import Button from "../ui/Button";
@@ -23,85 +23,79 @@ const MainSection = ({
 
     return (
         <section className="main-section">
-            {/* CABECERA */}
-            <header className="main-header">
+            <header className="section-header">
                 <LinkIcon
                     name={"imagen2"}
                     anchor={false}
-                    classname={"sectionIcon"}
-                    
+                    classname={"header-icon"}
                 />
-
-                <div className="post-info">
-                    <span className="post-username">{userName}</span>
-                    <span className="separator">|</span>
-                    <span>{date}</span>
-                    <span className="separator">|</span>
-                    <span>{time}</span>
+                <div className="header-info">
+                    <span className="info-username">{userName}</span>
+                    <span className="info-separator">|</span>
+                    <span className="info-date">{date}</span>
+                    <span className="info-separator">|</span>
+                    <span className="info-time">{time}</span>
                 </div>
             </header>
-
-            {/* TEXTO DEL POST */}
-            <div className="post-text-wrapper">
-                <p className="post-text">{text}</p>
+            <div className="section-textWrapper">
+                <p className="textWrapper-text">{text}</p>
             </div>
-
-            {/* IMAGEN DEL POST (OPCIONAL) */}
             {postImage && (
-                <div className="post-image-wrapper">
-                    <img src={postImage} alt="post" className="post-image" />
+                <div className="section-imageWrapper">
+                    <img
+                        src={postImage}
+                        alt="post"
+                        className="imageWrapper-image"
+                    />
                 </div>
             )}
-
-            {/* ACCIONES */}
-            <footer className="post-footer">
-                <div className="container-botones">
-                <div className="comentario-retweet">
-                {/* Comentarios */}
-                <div className="action-group">
-                    <Button
-                        classButton="button-action"
-                    >
-                        <SvgComponente name="icon8" />
-                    </Button>
-                    <span className="action-count">{commentCount}</span>
-                </div>
-
-                {/* Retweets */}
-                <div className="action-group">
-                    <Button
-                        classButton="button-action"
-                        onClick={() => setRetweetCount((prev) => prev + 1)}
-                    >
-                        <SvgComponente name="icon11" />
-                    </Button>
-                    <span className="action-count">{retweetCount}</span>
-                </div>
-                </div>
-
-                {/* Like 1 */}
-                <div className="like1-like2">
-                <div className="action-group">
-                    <Button
-                        classButton="button-action"
-                        onClick={() => setLike1Count((prev) => prev + 1)}
-                    >
-                        <SvgComponente name="icon9" />
-                    </Button>
-                    <span className="action-count">{like1Count}</span>
-                </div>
-
-                {/* Like 2 */}
-                <div className="action-group">
-                    <Button
-                        classButton="button-action"
-                        onClick={() => setLike2Count((prev) => prev + 1)}
-                    >
-                        <SvgComponente name="icon10" />
-                    </Button>
-                    <span className="action-count">{like2Count}</span>
-                </div>
-                </div>
+            <footer className="section-footer">
+                <div className="footer-container">
+                    <div className="container-left">
+                        <div className="nonaction-group">
+                            <Button classButton="nonaction-button">
+                                <SvgComponente name="icon8" />
+                            </Button>
+                            <span className="nonaction-count">
+                                {commentCount}
+                            </span>
+                        </div>
+                        <div className="action-group">
+                            <Button
+                                classButton="action-button"
+                                onClick={() =>
+                                    setRetweetCount((prev) => prev + 1)
+                                }
+                            >
+                                <SvgComponente name="icon11" />
+                            </Button>
+                            <span className="action-count">{retweetCount}</span>
+                        </div>
+                    </div>
+                    <div className="container-right">
+                        <div className="action-group">
+                            <Button
+                                classButton="action-button"
+                                onClick={() =>
+                                    setLike1Count((prev) => prev + 1)
+                                }
+                            >
+                                <SvgComponente name="icon9" />
+                            </Button>
+                            <span className="action-count">{like1Count}</span>
+                        </div>
+                        <div className="action-group">
+                            <Button
+                                classButton="action-button"
+                                onClick={() =>
+                                    setLike2Count((prev) => prev + 1)
+                                }
+                            >
+                                <SvgComponente name="icon10" />
+                            </Button>
+                            <span className="action-count">{like2Count}</span>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </section>
