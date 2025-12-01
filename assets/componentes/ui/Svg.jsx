@@ -12,6 +12,7 @@ import Icono11 from "../../img/retweet.svg";
 import Icono12 from "../../img/cartera.svg";
 import Imagen1 from "../../img/logo.jpg";
 import Imagen2 from "../../img/avatar-test.jpg";
+import Imagen3 from "../../img/logo2.jpg";
 
 const RECURSOS = {
     svg: {
@@ -31,6 +32,7 @@ const RECURSOS = {
     img: {
         imagen1: Imagen1,
         imagen2: Imagen2,
+        imagen3: Imagen3,
     },
 };
 
