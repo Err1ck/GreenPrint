@@ -1,15 +1,17 @@
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
-import "../../styles/Navbar.css"
+import Button from "../ui/Button";        // ⬅️ AÑADIDO
+import "../../styles/Navbar.css";
+
 function Navbar({ navbarType }) {
     return (
         <>
             {navbarType === 1 && (
                 <nav className="navbarLeft">
                     <div className="navbarLeft-container">
-                        <div className="navbarImg">
-                            <SvgComponente name="imagen1" />
-                        </div>
+                        <a href="/home" className="navbarImg">
+                            <LinkIcon name={"imagen1"} href={"/home"} />
+                        </a>
                         <LinkIcon
                             name={"icon1"}
                             href={"#"}
@@ -31,6 +33,7 @@ function Navbar({ navbarType }) {
                     </div>
                 </nav>
             )}
+
             {navbarType === 2 && (
                 <nav className="navbarRight">
                     <div className="navbarRight-container">
@@ -52,9 +55,15 @@ function Navbar({ navbarType }) {
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
+
+                        {/* ⬇️ AÑADIDO: botón con el icono + (icon7) */}
+                        <Button classButton="navicon">
+                            <SvgComponente name="icon7" />
+                        </Button>
                     </div>
                 </nav>
             )}
+
             {navbarType === 3 && (
                 <nav className="navbarRight2">
                     <div className="navbarRight2-container">

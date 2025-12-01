@@ -20,6 +20,7 @@
     grid-column-end: 7;
     padding-left: 2.5rem;
 }
+
 .navbarRight-container {
     display: flex;
     flex-direction: column;
@@ -28,6 +29,7 @@
     grid-column-start: 2;
     grid-column-end: 4;
 }
+
 .navbarRight,
 .navbarRight2 {
     height: 100vh;
@@ -90,6 +92,7 @@
     object-fit: cover;
     transition: transform 0.3s ease;
 }
+
 /* [class^="imagen"]:hover {
   transform: scale(1.05);
 } */
