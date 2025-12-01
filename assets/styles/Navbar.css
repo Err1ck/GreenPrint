@@ -30,20 +30,15 @@
 }
 .navbarRight,
 .navbarRight2 {
-    /* position: fixed;
-  right: 0; */
     height: 100vh;
-
     /* background-color: #ecfce7; */
     box-shadow: var(--box-shadow-lvl-2);
     border-left: var(--border-width-default) var(--border-style-default)
         var(--color-bg);
     display: flex;
     justify-content: center;
-
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-
     width: 100%;
 }
 .navbarImg {
@@ -54,7 +49,6 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-
     padding: 0.5rem;
     width: fit-content;
 }
@@ -96,7 +90,6 @@
     object-fit: cover;
     transition: transform 0.3s ease;
 }
-
 /* [class^="imagen"]:hover {
   transform: scale(1.05);
 } */
