@@ -24,7 +24,7 @@ Encore
     .addEntry("home", "./assets/home.js")
     .addEntry("cartera", "./assets/cartera.js")
     .addEntry("comunidades", "./assets/comunidades.js")
-    .addEntry("loginTest", "./assets/loginTest.js")
+    .addEntry("login", "./assets/login.js")
     .addEntry("perfil", "./assets/perfil.js")
     .addEntry("tendencias", "./assets/tendencias.js")
 

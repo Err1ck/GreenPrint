@@ -29,10 +29,10 @@ final class HomeController extends AbstractController
     {
         return $this->render('home/comunidades.html.twig');
     }
-    #[Route('/loginTest', name: 'app_loginTest')]
-    public function loginTest(): Response
+    #[Route('/login', name: 'app_login')]
+    public function login(): Response
     {
-        return $this->render('home/loginTest.html.twig');
+        return $this->render('home/login.html.twig');
     }
     #[Route('/perfil', name: 'app_perfil')]
     public function perfil(): Response
