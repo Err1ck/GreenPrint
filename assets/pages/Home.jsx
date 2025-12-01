@@ -1,7 +1,11 @@
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import MainSection from "../componentes/common/MainSection";
+import Modal from "../componentes/common/Modal";
 function HomePage() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
     return (
         <>
             <div className="navbarLeft-content">
@@ -92,8 +96,9 @@ function HomePage() {
                 <div className="spacer-right"></div>
             </div>
             <div className="navbarRight-content">
-                <Navbar navbarType={2} />
+                <Navbar navbarType={2} onOpenModal={openModal} />
             </div>
+            {isModalOpen && <Modal onClose={closeModal} />}
         </>
     );
 }

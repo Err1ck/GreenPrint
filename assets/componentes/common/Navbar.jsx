@@ -2,6 +2,7 @@ import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
 import Footer from "./Footer";
+import Button from "../ui/Button";
 function Navbar({ navbarType }) {
     return (
         <>
@@ -56,6 +57,10 @@ function Navbar({ navbarType }) {
                             text={"Comunidades"}
                         />
                         <Footer />
+                        <Button
+                            onClick={onOpenModal}
+                            classButton="button-navbar-open-modal"
+                        />
                     </div>
                 </nav>
             )}
