@@ -1,6 +1,7 @@
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
-import "../../styles/Navbar.css"
+import "../../styles/Navbar.css";
+import Footer from "./Footer";
 function Navbar({ navbarType }) {
     return (
         <>
@@ -8,7 +9,7 @@ function Navbar({ navbarType }) {
                 <nav className="navbarLeft">
                     <div className="navbarLeft-container">
                         <div className="navbarImg">
-                            <SvgComponente name="imagen1" />
+                            <SvgComponente name="imagen3" />
                         </div>
                         <LinkIcon
                             name={"icon1"}
@@ -18,13 +19,13 @@ function Navbar({ navbarType }) {
                         />
                         <LinkIcon
                             name={"icon4"}
-                            href={"#"}
+                            href={"/tendencias"}
                             classname={"navicon"}
                             text={"Tendencia"}
                         />
                         <LinkIcon
                             name={"icon3"}
-                            href={"#"}
+                            href={"/comunidades"}
                             classname={"navicon"}
                             text={"Comunidad"}
                         />
@@ -43,15 +44,18 @@ function Navbar({ navbarType }) {
                         <LinkIcon
                             name={"icon4"}
                             anchor={false}
+                            href={"/tendencias"}
                             classname={"navicon"}
                             text={"Tendencias"}
                         />
                         <LinkIcon
                             name={"icon6"}
                             anchor={false}
+                            href={"/comunidades"}
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
+                        <Footer />
                     </div>
                 </nav>
             )}
@@ -76,6 +80,7 @@ function Navbar({ navbarType }) {
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
+                        <Footer />
                     </div>
                 </nav>
             )}
