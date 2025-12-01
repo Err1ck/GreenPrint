@@ -1,8 +1,7 @@
-import React from "react";
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import MainSection from "../componentes/common/MainSection";
-function TestHomePage() {
+function HomePage() {
     return (
         <>
             <div className="navbarLeft-content">
@@ -99,4 +98,4 @@ function TestHomePage() {
     );
 }
 
-export default TestHomePage;
+export default HomePage;

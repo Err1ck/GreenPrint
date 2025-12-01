@@ -1,7 +1,7 @@
 // import './stimulus_bootstrap.js';
 import React from "react";
 import { createRoot } from "react-dom/client";
-import TestHomePage from "./pages/Home";
+import HomePage from "./pages/Home";
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -13,4 +13,4 @@ import "./styles/app.css";
 // console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
 const container = document.getElementById("root");
 const root = createRoot(container);
-root.render(<TestHomePage />);
+root.render(<HomePage />);

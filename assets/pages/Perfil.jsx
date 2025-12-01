@@ -1,6 +1,6 @@
 import React from "react";
 
-function TestPerfilPage() {
+function PerfilPage() {
     return (
         <div
             style={{
@@ -14,4 +14,4 @@ function TestPerfilPage() {
     );
 }
 
-export default TestPerfilPage;
+export default PerfilPage;
