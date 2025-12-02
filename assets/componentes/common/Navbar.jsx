@@ -3,7 +3,7 @@ import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
 import Footer from "./Footer";
 import Button from "../ui/Button";
-function Navbar({ navbarType }) {
+function Navbar({ navbarType, onOpenModal }) {
     return (
         <>
             {navbarType === 1 && (
@@ -60,7 +60,9 @@ function Navbar({ navbarType }) {
                         <Button
                             onClick={onOpenModal}
                             classButton="button-navbar-open-modal"
-                        />
+                        >
+                            <LinkIcon name={"icon7"} />
+                        </Button>
                     </div>
                 </nav>
             )}

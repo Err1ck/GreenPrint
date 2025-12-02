@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "../ui/Button";
 import LinkIcon from "../ui/LinkIcon";
-import "../../styles/Modal.css"
+import "../../styles/Modal.css";
 
 function Modal({ children, onClose }) {
     const [postText, setPostText] = useState("");
@@ -41,19 +41,19 @@ function Modal({ children, onClose }) {
                 </div>
                 <div className="post-media-tools">
                     <LinkIcon
-                        name={"icon_image"}
+                        name={"icon15"}
                         anchor={false}
                         classname={"media-tool"}
                         text={""}
                     />
                     <LinkIcon
-                        name={"icon_gif"}
+                        name={"icon14"}
                         anchor={false}
                         classname={"media-tool"}
                         text={""}
                     />
                     <LinkIcon
-                        name={"icon_emoji"}
+                        name={"icon13"}
                         anchor={false}
                         classname={"media-tool"}
                         text={""}

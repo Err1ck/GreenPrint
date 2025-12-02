@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import MainSection from "../componentes/common/MainSection";

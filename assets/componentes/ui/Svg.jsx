@@ -10,6 +10,9 @@ import Icono9 from "../../img/like1.svg";
 import Icono10 from "../../img/like2.svg";
 import Icono11 from "../../img/retweet.svg";
 import Icono12 from "../../img/cartera.svg";
+import Icono13 from "../../img/emoji.svg";
+import Icono14 from "../../img/gif.svg";
+import Icono15 from "../../img/image.svg";
 import Imagen1 from "../../img/logo.jpg";
 import Imagen2 from "../../img/avatar-test.jpg";
 import Imagen3 from "../../img/logo2.jpg";
@@ -28,6 +31,9 @@ const RECURSOS = {
         icon10: Icono10,
         icon11: Icono11,
         icon12: Icono12,
+        icon13: Icono13,
+        icon14: Icono14,
+        icon15: Icono15,
     },
     img: {
         imagen1: Imagen1,
