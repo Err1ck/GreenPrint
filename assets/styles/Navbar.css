@@ -96,6 +96,18 @@
     color: var(--color-text-secondary);
     width: 9rem;
 }
+.button-navbar-open-modal {
+    width: 5rem;
+    height: 5rem;
+    border-radius: var(--border-radius-full);
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #ecfce7;
+    margin-top: 5rem;
+}
 /* [class^="imagen"]:hover {
   transform: scale(1.05);
 } */

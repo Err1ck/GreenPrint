@@ -9,7 +9,7 @@ import React from "react";
  */
 const Button = ({ children, onClick, classButton = "button-primary" }) => {
     return (
-        <button className={`button-default ${classButton}`} onClick={onClick}>
+        <button className={` ${classButton}`} onClick={onClick}>
             {children}
         </button>
     );
