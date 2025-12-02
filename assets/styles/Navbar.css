@@ -54,6 +54,7 @@
     padding: 0.5rem;
     width: fit-content;
 }
+
 .navicon {
     text-decoration: none;
     color: var(--color-text-secondary);
@@ -108,6 +109,19 @@
     background-color: #ecfce7;
     margin-top: 5rem;
 }
+.input-buscador {
+    width: 12rem;               /* HAZLO TAN GRANDE COMO QUIERAS */
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-400);
+    outline: none;
+}
+
+.input-buscador:focus {
+    border-color: #74c88a; /* verde suave */
+}
+
 /* [class^="imagen"]:hover {
   transform: scale(1.05);
 } */

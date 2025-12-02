@@ -3,7 +3,19 @@ import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
 import Footer from "./Footer";
 import Button from "../ui/Button";
+
 function Navbar({ navbarType, onOpenModal }) {
+    // 🔹 Lógica de búsqueda cuando se pulsa Enter en el buscador
+    const handleSearch = (textoBuscado) => {
+        // De momento, solo mostramos en consola:
+        console.log("Buscando:", textoBuscado);
+
+        // Más adelante aquí puedes:
+        // - filtrar posts
+        // - navegar a otra ruta
+        // - llamar a una API, etc.
+    };
+
     return (
         <>
             {navbarType === 1 && (
@@ -33,15 +45,19 @@ function Navbar({ navbarType, onOpenModal }) {
                     </div>
                 </nav>
             )}
+
             {navbarType === 2 && (
                 <nav className="navbarRight">
                     <div className="navbarRight-container">
+                        {/* 🔍 AQUÍ transformamos Buscador en input */}
                         <LinkIcon
                             name={"icon5"}
-                            anchor={false}
-                            classname={"navicon"}
-                            text={"Buscador"}
+                            anchor={false}          // activa modo "no enlace"
+                            classname={"navicon"}   // misma clase para no romper diseño
+                            onSearch={handleSearch} // ⬅️ NUEVO: lógica al pulsar Enter
+                            text={"Buscador"}       // este texto ya no se usa en modo buscador, pero no molesta
                         />
+
                         <LinkIcon
                             name={"icon4"}
                             anchor={false}
@@ -56,7 +72,9 @@ function Navbar({ navbarType, onOpenModal }) {
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
+
                         <Footer />
+
                         <Button
                             onClick={onOpenModal}
                             classButton="button-navbar-open-modal"
@@ -66,6 +84,7 @@ function Navbar({ navbarType, onOpenModal }) {
                     </div>
                 </nav>
             )}
+
             {navbarType === 3 && (
                 <nav className="navbarRight2">
                     <div className="navbarRight2-container">
