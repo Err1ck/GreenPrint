@@ -62,7 +62,7 @@ function Modal({ children, onClose }) {
                 <div className="post-actions">
                     <Button
                         onClick={handlePostSubmit}
-                        classButton={`button-primary post-button ${
+                        classButton={`post-button ${
                             !isPostButtonEnabled ? "disabled" : ""
                         }`}
                         disabled={!isPostButtonEnabled}

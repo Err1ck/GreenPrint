@@ -13,10 +13,10 @@ function Navbar({ navbarType, onOpenModal }) {
                             <SvgComponente name="imagen3" />
                         </div>
                         <LinkIcon
-                            name={"icon1"}
-                            href={"#"}
+                            name={"icon3"}
+                            href={"/comunidades"}
                             classname={"navicon"}
-                            text={"Mi perfil"}
+                            text={"Comunidades"}
                         />
                         <LinkIcon
                             name={"icon4"}
@@ -25,11 +25,18 @@ function Navbar({ navbarType, onOpenModal }) {
                             text={"Tendencia"}
                         />
                         <LinkIcon
-                            name={"icon3"}
-                            href={"/comunidades"}
+                            name={"icon12"}
+                            href={"#"}
                             classname={"navicon"}
-                            text={"Comunidad"}
+                            text={"MD"}
                         />
+                        <LinkIcon
+                            name={"icon1"}
+                            href={"#"}
+                            classname={"navicon"}
+                            text={"Perfil"}
+                        />
+                        <Footer footerType={1} />
                     </div>
                 </nav>
             )}
@@ -56,7 +63,7 @@ function Navbar({ navbarType, onOpenModal }) {
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
-                        <Footer />
+                        <Footer footerType={2} />
                         <Button
                             onClick={onOpenModal}
                             classButton="button-navbar-open-modal"
@@ -87,7 +94,6 @@ function Navbar({ navbarType, onOpenModal }) {
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
-                        <Footer />
                     </div>
                 </nav>
             )}

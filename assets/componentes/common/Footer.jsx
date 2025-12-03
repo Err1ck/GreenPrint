@@ -1,9 +1,15 @@
+import LinkIcon from "../ui/LinkIcon";
 
-function Footer() {
+function Footer({ footerType }) {
     return (
-        <div className="footer">
-            ©2025 GreenPrint.co, Todos los derechos reservados
-        </div>
+        <>
+            {footerType === 1 && <LinkIcon name={"imagen2"} />}
+            {footerType === 2 && (
+                <div className="footer">
+                    ©2025 GreenPrint.co, Todos los derechos reservados
+                </div>
+            )}
+        </>
     );
 }
 

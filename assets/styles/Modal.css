@@ -27,15 +27,15 @@
     z-index: 1001;
 }
 .modal-content button {
-    margin-top: 20px;
+    margin-bottom: 20px;
     padding: 10px 15px;
     cursor: pointer;
 }
 .post-header {
     display: flex;
     justify-content: flex-end;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    /* padding-bottom: 10px; */
+    border-bottom: 1px solid #32b356;
 }
 .close-x-button {
     background: none;
@@ -55,11 +55,14 @@
     padding: 10px;
     box-sizing: border-box;
 }
+textarea:focus {
+    outline: 0;
+}
 .post-media-tools {
     display: flex;
     gap: 15px;
-    padding: 10px 0;
-    border-top: 1px solid #eee;
+    padding-top: 10px;
+    border-top: 1px solid #32b356;
 }
 .pool-icon {
     font-size: 1.5rem;
@@ -69,14 +72,17 @@
 .post-actions {
     display: flex;
     justify-content: flex-end;
-    padding-top: 15px;
+    /* padding-top: 15px; */
 }
 .post-button {
-    opacity: 0.5;
+    background-color: #32b356;
     pointer-events: none;
+    border-radius: var(--border-radius-md);
+    border: none;
+    font-size: 1rem;
 }
 .post-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: lightgray !important;
+    background-color: #32b356 !important;
 }
