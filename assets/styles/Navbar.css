@@ -78,7 +78,7 @@
     border-radius: var(--border-radius-md);
     width: 100%;
     transition: background-color 0.2s ease, color 0.2s ease;
-    font-size: var(--font-size-500);
+    font-size: var(--font-size-400);
     font-weight: var(--font-weight-500);
     font-family: var(--font-family);
 }
@@ -111,6 +111,10 @@
     justify-content: flex-end;
     grid-column-start: 4;
     grid-column-end: 7;
+}
+.footer1:hover {
+    border-radius: var(--border-radius-md);
+    background-color: #ecfce7;
 }
 .footer1-container {
     display: flex;
@@ -148,7 +152,7 @@
     );
 }
 .button-text {
-    font-size: var(--font-size-500);
+    font-size: var(--font-size-400);
     font-weight: var(--font-weight-500);
     font-family: var(--font-family);
 }
@@ -157,7 +161,7 @@
     padding: 0.4rem 0.8rem;
     border: none;
     border-radius: var(--border-radius-md);
-    font-size: var(--font-size-500);
+    font-size: var(--font-size-400);
     font-weight: var(--font-weight-500);
     font-family: var(--font-family);
     outline: none;

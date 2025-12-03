@@ -26,22 +26,46 @@ function Navbar({ navbarType, onOpenModal }) {
                                 <SvgComponente name="imagen4" />
                             </div>
                             <LinkIcon
-                                name={"icon1"}
-                                href={"#"}
+                                name={"icon3"}
+                                href={"/comunidades"}
                                 classname={"navicon"}
-                                text={"Mi perfil"}
-                            />
-                            <LinkIcon
-                                name={"icon7"}
-                                href={"/tendencias"}
-                                classname={"navicon"}
-                                text={"Tendencia"}
+                                text={"Inicio"}
                             />
                             <LinkIcon
                                 name={"icon5"}
+                                href={"#"}
+                                classname={"navicon"}
+                                text={"Comunidades"}
+                            />
+                            <LinkIcon
+                                name={"icon31"}
                                 href={"/comunidades"}
                                 classname={"navicon"}
-                                text={"Comunidad1"}
+                                text={"Notificaciones"}
+                            />
+                            <LinkIcon
+                                name={"icon31"}
+                                href={"/tendencias"}
+                                classname={"navicon"}
+                                text={"Guardados"}
+                            />
+                            <LinkIcon
+                                name={"icon31"}
+                                href={"/comunidades"}
+                                classname={"navicon"}
+                                text={"Mensajes"}
+                            />
+                            <LinkIcon
+                                name={"icon1"}
+                                href={"/comunidades"}
+                                classname={"navicon"}
+                                text={"Perfil"}
+                            />
+                            <LinkIcon
+                                name={"icon1"}
+                                href={"/comunidades"}
+                                classname={"navicon"}
+                                text={"Más Opciones"}
                             />
                         </div>
                     </div>
@@ -67,13 +91,6 @@ function Navbar({ navbarType, onOpenModal }) {
                             href={"/tendencias"}
                             classname={"navicon"}
                             text={"Tendencias"}
-                        />
-                        <LinkIcon
-                            name={"icon11"}
-                            anchor={false}
-                            href={"/comunidades"}
-                            classname={"navicon"}
-                            text={"Comunidades"}
                         />
 
                         <Footer footerType={2} />
