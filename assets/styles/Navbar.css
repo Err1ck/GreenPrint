@@ -170,7 +170,9 @@
     font-family: var(--font-family);
     outline: none;
 }
-
+input::placeholder {
+    color: var(--color-text);
+}
 .input-buscador:focus {
     border-color: #74c88a; /* verde suave */
 }
