@@ -136,7 +136,7 @@
 }
 .button-navbar-open-modal {
     width: 10rem;
-    height: 5rem;
+    height: 3rem;
     border-radius: var(--border-radius-lg);
     border: none;
     display: flex;

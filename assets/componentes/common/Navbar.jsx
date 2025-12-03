@@ -99,8 +99,7 @@ function Navbar({ navbarType, onOpenModal }) {
                             onClick={onOpenModal}
                             classButton="button-navbar-open-modal"
                         >
-                            <div className="button-text">Nuevo Post</div>
-                            <LinkIcon name={"icon13"} />
+                            <div className="button-text">Postear</div>
                         </Button>
                     </div>
                 </nav>
