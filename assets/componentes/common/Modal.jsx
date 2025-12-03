@@ -41,19 +41,19 @@ function Modal({ children, onClose }) {
                 </div>
                 <div className="post-media-tools">
                     <LinkIcon
-                        name={"icon15"}
+                        name={"icon29"}
                         anchor={false}
                         classname={"media-tool"}
                         text={""}
                     />
                     <LinkIcon
-                        name={"icon14"}
+                        name={"icon27"}
                         anchor={false}
                         classname={"media-tool"}
                         text={""}
                     />
                     <LinkIcon
-                        name={"icon13"}
+                        name={"icon25"}
                         anchor={false}
                         classname={"media-tool"}
                         text={""}

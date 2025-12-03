@@ -32,6 +32,10 @@ import Icono31 from "../../img/31_message.svg";
 import Icono32 from "../../img/32_message-white.svg";
 import Icono33 from "../../img/33_share.svg";
 import Icono34 from "../../img/34_share-white.svg";
+import Icono35 from "../../img/35_more.svg";
+import Icono36 from "../../img/36_more-white.svg"
+import Icono37 from "../../img/37_exit.svg"
+import Icono38 from "../../img/38_exit-white.svg"
 
 import Imagen1 from "../../img/logo.jpg";
 import Imagen2 from "../../img/avatar-test.jpg";
@@ -74,6 +78,10 @@ const RECURSOS = {
         icon32: Icono32,
         icon33: Icono33,
         icon34: Icono34,
+        icon35: Icono35,
+        icon36: Icono36,
+        icon37: Icono37,
+        icon38: Icono38
     },
     img: {
         imagen1: Imagen1,

@@ -54,7 +54,7 @@ const MainSection = ({
                     <div className="container-left">
                         <div className="nonaction-group">
                             <Button classButton="nonaction-button">
-                                <SvgComponente name="icon8" />
+                                <SvgComponente name="icon15" />
                             </Button>
                             <span className="nonaction-count">
                                 {commentCount}
@@ -67,7 +67,7 @@ const MainSection = ({
                                     setRetweetCount((prev) => prev + 1)
                                 }
                             >
-                                <SvgComponente name="icon11" />
+                                <SvgComponente name="icon21" />
                             </Button>
                             <span className="action-count">{retweetCount}</span>
                         </div>
@@ -80,7 +80,7 @@ const MainSection = ({
                                     setLike1Count((prev) => prev + 1)
                                 }
                             >
-                                <SvgComponente name="icon9" />
+                                <SvgComponente name="icon17" />
                             </Button>
                             <span className="action-count">{like1Count}</span>
                         </div>
@@ -91,7 +91,7 @@ const MainSection = ({
                                     setLike2Count((prev) => prev + 1)
                                 }
                             >
-                                <SvgComponente name="icon10" />
+                                <SvgComponente name="icon19" />
                             </Button>
                             <span className="action-count">{like2Count}</span>
                         </div>
