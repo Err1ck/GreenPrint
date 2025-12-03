@@ -64,7 +64,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 0.5rem;
+    /* padding: 0.5rem; */
     width: fit-content;
 }
 
@@ -168,45 +168,3 @@ input::placeholder {
 .input-buscador:focus {
     border-color: #74c88a; /* verde suave */
 }
-
-/* [class^="imagen"]:hover {
-  transform: scale(1.05);
-} */
-
-/* @media (max-width: 768px) {
-  .navbarLeft,
-  .navbarRight,
-  .navbarRight2 {
-    position: fixed;
-    top: auto;
-    bottom: 0;
-    height: 60px;
-    width: 100%;
-    padding: 0 10px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    border: none;
-
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-
-    right: 0;
-    left: 0;
-  }
-
-  .navicon span {
-    display: none;
-  }
-
-  [class^="icon"] {
-    width: 24px;
-    height: 24px;
-  }
-  [class^="imagen"] {
-    display: none;
-  }
-
-  .navicon {
-    padding: 6px;
-  }
-} */

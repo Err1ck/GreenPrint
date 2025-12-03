@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
-import MainSection from "../componentes/common/MainSection";
 import Modal from "../componentes/common/Modal";
+import Publication from "../componentes/common/Publication";
 function HomePage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -15,7 +15,7 @@ function HomePage() {
             <div className="main-layout-container">
                 <div className="spacer-left"></div>
                 <main className="main-content">
-                    <MainSection
+                    <Publication
                         userName="DanielRoses"
                         userProfileUrl="/perfil/danielroses"
                         date="20 feb"
@@ -28,7 +28,7 @@ function HomePage() {
                         initialLike1={0}
                         initialLike2={0}
                     />
-                    <MainSection
+                    <Publication
                         userName="DanielRoses"
                         userProfileUrl="/perfil/danielroses"
                         date="20 feb"
@@ -41,7 +41,7 @@ function HomePage() {
                         initialLike1={0}
                         initialLike2={0}
                     />
-                    <MainSection
+                    <Publication
                         userName="DanielRoses"
                         userProfileUrl="/perfil/danielroses"
                         date="20 feb"
@@ -54,7 +54,7 @@ function HomePage() {
                         initialLike1={0}
                         initialLike2={0}
                     />
-                    <MainSection
+                    <Publication
                         userName="DanielRoses"
                         userProfileUrl="/perfil/danielroses"
                         date="20 feb"
@@ -67,7 +67,7 @@ function HomePage() {
                         initialLike1={0}
                         initialLike2={0}
                     />
-                    <MainSection
+                    <Publication
                         userName="DanielRoses"
                         userProfileUrl="/perfil/danielroses"
                         date="20 feb"
@@ -80,7 +80,7 @@ function HomePage() {
                         initialLike1={0}
                         initialLike2={0}
                     />
-                    <MainSection
+                    <Publication
                         userName="DanielRoses"
                         userProfileUrl="/perfil/danielroses"
                         date="20 feb"
