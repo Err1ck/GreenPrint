@@ -21,28 +21,31 @@ function Navbar({ navbarType, onOpenModal }) {
             {navbarType === 1 && (
                 <nav className="navbarLeft">
                     <div className="navbarLeft-container">
-                        <div className="navbarImg">
-                            <SvgComponente name="imagen3" />
+                        <div className="navbarLeft-subcontainer">
+                            <div className="navbarImg">
+                                <SvgComponente name="imagen4" />
+                            </div>
+                            <LinkIcon
+                                name={"icon1"}
+                                href={"#"}
+                                classname={"navicon"}
+                                text={"Mi perfil"}
+                            />
+                            <LinkIcon
+                                name={"icon7"}
+                                href={"/tendencias"}
+                                classname={"navicon"}
+                                text={"Tendencia"}
+                            />
+                            <LinkIcon
+                                name={"icon5"}
+                                href={"/comunidades"}
+                                classname={"navicon"}
+                                text={"Comunidad"}
+                            />
                         </div>
-                        <LinkIcon
-                            name={"icon1"}
-                            href={"#"}
-                            classname={"navicon"}
-                            text={"Mi perfil"}
-                        />
-                        <LinkIcon
-                            name={"icon4"}
-                            href={"/tendencias"}
-                            classname={"navicon"}
-                            text={"Tendencia"}
-                        />
-                        <LinkIcon
-                            name={"icon3"}
-                            href={"/comunidades"}
-                            classname={"navicon"}
-                            text={"Comunidad"}
-                        />
                     </div>
+                    <Footer footerType={1} />
                 </nav>
             )}
 
@@ -51,35 +54,36 @@ function Navbar({ navbarType, onOpenModal }) {
                     <div className="navbarRight-container">
                         {/* 🔍 AQUÍ transformamos Buscador en input */}
                         <LinkIcon
-                            name={"icon5"}
-                            anchor={false}          // activa modo "no enlace"
-                            classname={"navicon"}   // misma clase para no romper diseño
+                            name={"icon9"}
+                            anchor={false} // activa modo "no enlace"
+                            classname={"navicon"} // misma clase para no romper diseño
                             onSearch={handleSearch} // ⬅️ NUEVO: lógica al pulsar Enter
-                            text={"Buscador"}       // este texto ya no se usa en modo buscador, pero no molesta
+                            text={"Buscador"} // este texto ya no se usa en modo buscador, pero no molesta
                         />
 
                         <LinkIcon
-                            name={"icon4"}
+                            name={"icon7"}
                             anchor={false}
                             href={"/tendencias"}
                             classname={"navicon"}
                             text={"Tendencias"}
                         />
                         <LinkIcon
-                            name={"icon6"}
+                            name={"icon11"}
                             anchor={false}
                             href={"/comunidades"}
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
 
-                        <Footer />
+                        <Footer footerType={2} />
 
                         <Button
                             onClick={onOpenModal}
                             classButton="button-navbar-open-modal"
                         >
-                            <LinkIcon name={"icon7"} />
+                            <div className="button-text">Nuevo Post</div>
+                            <LinkIcon name={"icon13"} />
                         </Button>
                     </div>
                 </nav>
@@ -106,7 +110,7 @@ function Navbar({ navbarType, onOpenModal }) {
                             classname={"navicon"}
                             text={"Comunidades"}
                         />
-                        <Footer />
+                        <Footer footerType={2} />
                     </div>
                 </nav>
             )}

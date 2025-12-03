@@ -3,7 +3,7 @@
     --color-bg: #ffffff;
     --color-bg-alt: #ecfce7;
     --color-text: #1b4332;
-    --color-text-secondary: #6c757d;
+    --color-text-secondary: #000000;
     --color-text-anchor: #25a244;
     --color-primary: #3cb371;
     --color-secondary: #4da3d9;
@@ -26,7 +26,7 @@
     /*Font Weight*/
     --font-weight-500: 500;
     /*Typography*/
-
+    --font-family: "Public Sans", sans-serif;
     /*Spacing*/
     --spacing-0: 0;
     --spacing-xs: 0.25rem;
@@ -45,6 +45,7 @@
     --border-radius-none: 0rem;
     --border-radius-sm: 0.4rem;
     --border-radius-md: 0.5rem;
+    --border-radius-lg: 1rem;
     --border-radius-full: 50%;
 
     --border-width-default: 1px;
