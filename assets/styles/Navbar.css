@@ -139,16 +139,8 @@
     justify-content: center;
     align-items: center;
 
-    /* background-color: #ecfce7; */
     margin-top: 5rem;
     cursor: pointer;
-
-    /* background: linear-gradient(
-        90deg,
-        rgba(37, 162, 68, 1) 0%,
-        rgba(60, 179, 113, 1) 100%,
-        rgba(236, 252, 231, 1) 100%
-    ); */
     background: linear-gradient(
         90deg,
         rgb(155 202 77) 0%,

@@ -33,7 +33,6 @@
 .post-header {
     display: flex;
     justify-content: flex-end;
-    padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
 .close-x-button {
@@ -57,7 +56,6 @@
 .post-media-tools {
     display: flex;
     gap: 15px;
-    padding-top: 10px;
     border-top: 1px solid #eee;
 }
 .pool-icon {
