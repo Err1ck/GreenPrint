@@ -27,14 +27,12 @@
     z-index: 1001;
 }
 .modal-content button {
-    margin-top: 20px;
     padding: 10px 15px;
     cursor: pointer;
 }
 .post-header {
     display: flex;
     justify-content: flex-end;
-    padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
 .close-x-button {
@@ -58,7 +56,6 @@
 .post-media-tools {
     display: flex;
     gap: 15px;
-    padding: 10px 0;
     border-top: 1px solid #eee;
 }
 .pool-icon {
@@ -69,14 +66,25 @@
 .post-actions {
     display: flex;
     justify-content: flex-end;
-    padding-top: 15px;
 }
 .post-button {
-    opacity: 0.5;
+    background: linear-gradient(
+        90deg,
+        rgb(155 202 77) 0%,
+        rgb(49 128 65) 100% 100%
+    );
+
     pointer-events: none;
+    border-radius: var(--border-radius-lg);
+    border: var(--border-width-default) var(--border-style-default)
+        var(--color-border);
 }
 .post-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: lightgray !important;
+}
+.post-button-text {
+    font-size: var(--font-size-400);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-500);
 }
