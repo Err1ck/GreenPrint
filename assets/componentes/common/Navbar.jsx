@@ -41,7 +41,7 @@ function Navbar({ navbarType, onOpenModal }) {
                                 name={"icon5"}
                                 href={"/comunidades"}
                                 classname={"navicon"}
-                                text={"Comunidad"}
+                                text={"Comunidad1"}
                             />
                         </div>
                     </div>
