@@ -98,8 +98,8 @@
 }
 
 [class^="imagen"] {
-    width: calc(2 * var(--font-size-800));
-    height: calc(2 * var(--font-size-800));
+    width: 48px;
+    height: 48px;
     border-radius: var(--border-radius-full);
     box-shadow: var(--box-shadow-lvl-2);
     object-fit: cover;
@@ -121,8 +121,8 @@
 }
 
 .footer1-container > a > .imagen2 {
-    width: calc(2 * var(--font-size-500));
-    height: calc(2 * var(--font-size-500));
+    width: 60px;
+    height: 60px;
 }
 .footer2 {
     padding-left: 5px;
