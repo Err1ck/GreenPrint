@@ -15,7 +15,7 @@ const LinkIcon = ({
     onSearch, // función opcional, se usa solo en modo buscador
 }) => {
     // ⭐ MODO BUSCADOR: icon5 + anchor=false
-    if (name === "icon5" && anchor === false) {
+    if (name === "icon9" && anchor === false) {
         const handleKeyDown = (e) => {
             if (e.key === "Enter" && typeof onSearch === "function") {
                 onSearch(e.target.value); // mandamos el texto al padre (Navbar)
