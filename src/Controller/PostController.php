@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Entity\UserPostLeaf;
+use App\Entity\UserRepost;
 use App\Repository\PostRepository;
 use App\Repository\UserPostLeafRepository;
 use App\Repository\UserRepository;
@@ -97,7 +98,6 @@ final class PostController extends AbstractController
                 type: 'object',
                 properties: [
                     new OA\Property(property: 'user', type: 'int', example: '1 (user_id)'),
-                    new OA\Property(property: 'title', type: 'string', example: 'Title'),
                     new OA\Property(property: 'content', type: 'string', example: 'Lorem ipsum...'),
                     new OA\Property(property: 'image', type: 'string', example: 'path/img'),
                 ]
@@ -126,15 +126,6 @@ final class PostController extends AbstractController
         } else {
             return new JsonResponse(
                 ['error' => 'El post necesita el campo: user (user_id).'],
-                JsonResponse::HTTP_NOT_ACCEPTABLE
-            );
-        }
-
-        if (isset($data['title'])) {
-            $post->setTitle($data['title']);
-        } else {
-            return new JsonResponse(
-                ['error' => 'El post necesita el campo: title.'],
                 JsonResponse::HTTP_NOT_ACCEPTABLE
             );
         }
@@ -193,7 +184,6 @@ final class PostController extends AbstractController
             content: new OA\JsonContent(
                 type: 'object',
                 properties: [
-                    new OA\Property(property: 'title', type: 'string', example: 'Title'),
                     new OA\Property(property: 'content', type: 'string', example: 'Lorem ipsum...'),
                     new OA\Property(property: 'image', type: 'string', example: 'path/img'),
                 ]
@@ -212,10 +202,6 @@ final class PostController extends AbstractController
                 ['error' => 'El post no existe.'],
                 JsonResponse::HTTP_NOT_FOUND
             );
-        }
-
-        if (isset($data['title'])) {
-            $post->setTitle($data['title']);
         }
 
         if (isset($data['image'])) {
@@ -358,7 +344,7 @@ final class PostController extends AbstractController
             );
         }
 
-        $likedPost = $likeLeafs->findBy(['user'=> $user, 'post'=> $post]);
+        $likedPost = $likeLeafs->findBy(['user' => $user, 'post' => $post]);
 
         $entityManager->remove($post);
 
@@ -368,6 +354,135 @@ final class PostController extends AbstractController
         return new JsonResponse(
             ['message' => "Se ha quitado el like (leaf) al post correctamente."],
             JsonResponse::HTTP_OK, // 201 es más apropiado para creación
+        );
+    }
+
+    #[Route('/{id<\d+>}/repost', name: 'post_user_repost', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['PostController'],
+        summary: 'Hacer repost del post. ID de la URL -> post.'
+    )]
+    public function repost(int $id, Request $request, PostRepository $posts, UserRepository $users, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['user'])) {
+            return new JsonResponse(
+                ['error' => 'La petición necesita el campo: user (user_id).'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user = $users->find($data['user']);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $repostRepository = $entityManager->getRepository(UserRepost::class);
+        $existingRepost = $repostRepository->findOneBy([
+            'user' => $user,
+            'post' => $post
+        ]);
+
+        if ($existingRepost) {
+            return new JsonResponse(
+                ['error' => 'Ya has hecho repost de este post.'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $repost = new UserRepost();
+        $repost->setUser($user);
+        $repost->setPost($post);
+        $repost->setCreatedAt(new \DateTimeImmutable());
+        $repost->setUpdatedAt(new \DateTimeImmutable());
+
+        $errors = $validator->validate($repost);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $entityManager->persist($repost);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "Se ha hecho repost correctamente."],
+            JsonResponse::HTTP_CREATED,
+        );
+    }
+
+    #[Route('/{id<\d+>}/unrepost', name: 'post_user_unrepost', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['PostController'],
+        summary: 'Quitar repost del post. ID de la URL -> post.'
+    )]
+    public function unrepost(int $id, Request $request, PostRepository $posts, UserRepository $users, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND,
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['user'])) {
+            return new JsonResponse(
+                ['error' => 'La petición necesita el campo: user (user_id).'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user = $users->find($data['user']);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND,
+            );
+        }
+
+        $repostRepository = $entityManager->getRepository(UserRepost::class);
+        $repost = $repostRepository->findOneBy(['user' => $user, 'post' => $post]);
+
+        if (!$repost) {
+            return new JsonResponse(
+                ['error' => 'No has hecho repost de este post.'],
+                JsonResponse::HTTP_NOT_FOUND,
+            );
+        }
+
+        $entityManager->remove($repost);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "Se ha quitado el repost correctamente."],
+            JsonResponse::HTTP_OK,
         );
     }
 }
