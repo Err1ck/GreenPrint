@@ -8,7 +8,7 @@ function HomePage() {
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
     return (
-        <>
+        <div className="home-container">
             <div className="navbarLeft-content">
                 <Navbar navbarType={1} />
             </div>
@@ -100,7 +100,7 @@ function HomePage() {
                 <Navbar navbarType={2} onOpenModal={openModal} />
             </div>
             {isModalOpen && <Modal onClose={closeModal} />}
-        </>
+        </div>
     );
 }
 

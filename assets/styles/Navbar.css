@@ -1,41 +1,58 @@
-.navbarLeft {
+/* .navbarLeft {
     height: 100vh;
-    /* background-color: #ecfce7; */
     box-shadow: var(--box-shadow-lvl-2);
     border-right: var(--border-width-default) var(--border-style-default)
         var(--color-bg);
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center; */
-
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     width: 100%;
 }
 .navbarLeft-container {
     display: flex;
-    /* flex-direction: column;
-    justify-content: space-between; */
     justify-content: center;
     align-items: center;
-    /* padding-top: 20vh; */
-
     grid-column-start: 4;
     grid-column-end: 7;
+} */
+.navbarLeft {
+    height: 100vh;
+    box-shadow: var(--box-shadow-lvl-2);
+    border-right: var(--border-width-default) var(--border-style-default)
+        var(--color-bg);
+
+    /* --- CAMBIADO: Ahora es flex --- */
+    display: flex;
+    justify-content: flex-end; /* Para empujar el contenido al lado derecho (simulando 4 a 6) */
+    width: 100%;
+}
+.navbarLeft-container {
+    display: flex;
+    flex-direction: column; /* Lo he cambiado a column porque los elementos están apilados */
+    justify-content: center;
+    align-items: center;
+
+    /* grid-column-start: 4; */
+    /* grid-column-end: 7; */
+
+    /* Agregamos un ancho para que ocupe las 3 columnas de las 7 (aproximadamente) */
+    width: calc(
+        100% / 7 * 3
+    ); /* 3/7 del ancho total de la navbarLeft (que ya es 2/7 del viewport) */
+    padding-left: 1rem; /* Pequeño ajuste visual */
+    padding-right: 1rem;
 }
 
-.navbarRight-container {
+/* .navbarRight-container {
     display: flex;
     flex-direction: column;
     padding-top: 32vh;
 
     grid-column-start: 2;
     grid-column-end: 4;
-}
-.navbarRight,
+} */
+/* .navbarRight,
 .navbarRight2 {
     height: 100vh;
-    /* background-color: #ecfce7; */
     box-shadow: var(--box-shadow-lvl-2);
     border-left: var(--border-width-default) var(--border-style-default)
         var(--color-bg);
@@ -44,7 +61,32 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     width: 100%;
+} */
+.navbarRight,
+.navbarRight2 {
+    height: 100vh;
+    box-shadow: var(--box-shadow-lvl-2);
+    border-left: var(--border-width-default) var(--border-style-default)
+        var(--color-bg);
+
+    /* --- CAMBIADO: Ahora es flex --- */
+    display: flex;
+    justify-content: flex-start; /* Para empujar el contenido al lado izquierdo (simulando 2 a 4) */
+    width: 100%;
 }
+.navbarRight-container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 32vh;
+
+    /* grid-column-start: 2; */
+    /* grid-column-end: 4; */
+
+    /* Agregamos un ancho para que ocupe 2 de las 7 columnas (aproximadamente) */
+    width: calc(100% / 7 * 2); /* 2/7 del ancho total de la navbarRight */
+    padding-left: 1rem;
+}
+
 .navbarImg {
     /* margin-bottom: var(--spacing-xl); */
     display: flex;
@@ -82,6 +124,11 @@
     font-weight: var(--font-weight-500);
     font-family: var(--font-family);
 }
+.navbarLeft-subcontainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
 .navbarLeft-container > .navbarLeft-subcontainer > .link-icon:hover {
     border-radius: var(--border-radius-md);
     background-color: #ecfce7;
@@ -105,12 +152,23 @@
     object-fit: cover;
     transition: transform 0.3s ease;
 }
-.footer1 {
+/* .footer1 {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     grid-column-start: 4;
     grid-column-end: 7;
+} */
+.footer1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* grid-column-start: 4; */
+    /* grid-column-end: 7; */
+
+    /* Ocupará el mismo espacio que el navbarLeft-container */
+    width: calc(100% / 7 * 3); /* Ocupa 3/7 del ancho de la navbarLeft */
+    align-self: flex-end; /* Lo movemos al final del eje transversal (abajo) */
 }
 .footer1-container {
     display: flex;
