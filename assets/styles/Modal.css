@@ -4,87 +4,481 @@
     left: 0;
     right: 0;
     bottom: 0;
-
-    background-color: rgba(0, 0, 0, 0.75);
-    /* background-color: rgba(44 55 34 / 84%); */
+    background-color: rgba(91, 112, 131, 0.4);
     z-index: 1000;
-
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 5vh;
+    overflow-y: auto;
 }
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 
+.modal-content {
+    background: #ffffff;
+    padding: 0;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
-    min-height: 200px;
+    min-height: 300px;
     max-width: 600px;
     width: 90%;
+    max-height: 90vh;
     z-index: 1001;
+    animation: modalSlideIn 0.3s ease-out;
 }
-.modal-content button {
-    padding: 10px 15px;
-    cursor: pointer;
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
+
+.post-modal-content {
+    overflow: hidden;
+}
+
 .post-header {
     display: flex;
-    justify-content: flex-end;
-    border-bottom: 1px solid #eee;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid #eff3f4;
+    min-height: 53px;
 }
+
 .close-x-button {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 20px;
     cursor: pointer;
-    color: #333;
+    color: #0f1419;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    padding: 0;
+    line-height: 1;
+    font-weight: 300;
 }
-.post-input-area {
-    padding: 15px 0;
+
+.close-x-button:hover {
+    background-color: rgba(15, 20, 25, 0.1);
 }
+
+.post-body {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 60vh;
+}
+
+.post-user-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.post-avatar {
+    flex-shrink: 0;
+}
+
+.post-avatar img,
+.post-avatar .avatar-icon img,
+.avatar-icon img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.post-input-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
 .post-textarea {
     width: 100%;
     border: none;
     resize: none;
-    font-size: 1.2rem;
-    padding: 10px;
+    font-size: 20px;
+    padding: 12px 0;
     box-sizing: border-box;
+    font-family: var(--font-family);
+    color: #0f1419;
+    line-height: 24px;
+    min-height: 120px;
+    outline: none;
 }
+
+.post-textarea::placeholder {
+    color: #536471;
+    font-size: 20px;
+}
+
+/* Previsualización de imagen */
+.image-preview-container {
+    position: relative;
+    margin: 16px 0;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #eff3f4;
+    max-height: 400px;
+}
+
+.image-preview {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.remove-image-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(15, 20, 25, 0.75);
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.remove-image-button:hover {
+    background-color: rgba(15, 20, 25, 0.9);
+}
+
+/* Selector de emojis */
+.emoji-picker {
+    background: white;
+    border: 1px solid #eff3f4;
+    border-radius: 16px;
+    margin: 16px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+.emoji-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eff3f4;
+}
+
+.emoji-picker-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f1419;
+}
+
+.emoji-close-button,
+.gif-close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #536471;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.emoji-close-button:hover,
+.gif-close-button:hover {
+    background-color: rgba(15, 20, 25, 0.1);
+}
+
+.emoji-picker-content {
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.emoji-category {
+    margin-bottom: 16px;
+}
+
+.emoji-category-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #536471;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 4px;
+}
+
+.emoji-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.emoji-button:hover {
+    background-color: #f7f9f9;
+}
+
+/* Selector de GIFs */
+.gif-picker {
+    background: white;
+    border: 1px solid #eff3f4;
+    border-radius: 16px;
+    margin: 16px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.gif-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eff3f4;
+}
+
+.gif-picker-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f1419;
+}
+
+.gif-picker-content {
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 350px;
+}
+
+.gif-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.gif-item {
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1;
+    transition: transform 0.2s ease;
+}
+
+.gif-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gif-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.post-footer {
+    border-top: 1px solid #eff3f4;
+    padding: 12px 16px;
+}
+
 .post-media-tools {
     display: flex;
-    gap: 15px;
-    border-top: 1px solid #eee;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
-.pool-icon {
-    font-size: 1.5rem;
+
+.media-tools-left {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.media-tools-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.media-tool {
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    color: var(--color-primary, #1da1f2);
+    transition: background-color 0.2s ease;
+    background: none;
+    border: none;
+    padding: 0;
 }
+
+.media-tool:hover {
+    background-color: rgba(29, 155, 240, 0.1);
+}
+
+.media-tool svg,
+.media-tool img,
+.media-tool [class^="icon"] {
+    width: 20px;
+    height: 20px;
+    fill: #1d9bf0;
+    color: #1d9bf0;
+}
+
+.char-counter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.char-circle {
+    transform: rotate(-90deg);
+}
+
+.char-count {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 600;
+    color: #536471;
+    font-family: var(--font-family);
+}
+
+.char-count.over-limit {
+    color: #f4212e;
+}
+
 .post-actions {
     display: flex;
     justify-content: flex-end;
 }
+
 .post-button {
     background: linear-gradient(
         90deg,
         rgb(155 202 77) 0%,
         rgb(49 128 65) 100% 100%
     );
-
-    pointer-events: none;
-    border-radius: var(--border-radius-lg);
-    border: var(--border-width-default) var(--border-style-default)
-        var(--color-border);
+    border-radius: 9999px;
+    border: none;
+    padding: 8px 24px;
+    min-width: 80px;
+    min-height: 36px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    pointer-events: auto;
 }
+
+.post-button:hover:not(.disabled) {
+    background: linear-gradient(
+        90deg,
+        rgb(140 187 62) 0%,
+        rgb(40 113 56) 100% 100%
+    );
+    transform: scale(1.02);
+}
+
 .post-button.disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
 .post-button-text {
-    font-size: var(--font-size-400);
+    font-size: 15px;
     font-family: var(--font-family);
-    font-weight: var(--font-weight-500);
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Scrollbar personalizada */
+.post-body::-webkit-scrollbar,
+.emoji-picker-content::-webkit-scrollbar,
+.gif-picker-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.post-body::-webkit-scrollbar-track,
+.emoji-picker-content::-webkit-scrollbar-track,
+.gif-picker-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.post-body::-webkit-scrollbar-thumb,
+.emoji-picker-content::-webkit-scrollbar-thumb,
+.gif-picker-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.post-body::-webkit-scrollbar-thumb:hover,
+.emoji-picker-content::-webkit-scrollbar-thumb:hover,
+.gif-picker-content::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .modal-overlay {
+        padding-top: 0;
+    }
+
+    .gif-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .emoji-grid {
+        grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    }
 }
