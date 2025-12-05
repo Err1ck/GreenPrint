@@ -1,33 +1,37 @@
 :root {
-    /*Colors*/
+    /* Colors - Paleta inspirada en X.com */
     --color-bg: #ffffff;
-    --color-bg-alt: #d3fac7;
-    --color-text: #1b4332;
-    --color-text-secondary: #6c757d;
-    --color-text-anchor: #25a244;
-    --color-primary: #3cb371;
-    --color-secondary: #4da3d9;
-    /*--color-secondary: #155D27*/
-    --color-alert: #ffd166;
-    --color-border: #dadada;
-    --color-hover: #a98467;
-    /*Tamaños de fuente*/
-    /*Textos*/
+    --color-bg-alt: #f7f9f9;
+    --color-text: #0f1419;
+    --color-text-secondary: #536471;
+    --color-text-anchor: #1d9bf0;
+    --color-primary: #1d9bf0;
+    --color-secondary: #1a8cd8;
+    --color-alert: #ffd400;
+    --color-border: #eff3f4;
+    --color-hover: #f7f9f9;
+    --color-hover-blue: #e8f5fd;
+
+    /* Tamaños de fuente */
     --font-size-100: 0.5rem;
     --font-size-200: 0.75rem;
-    --font-size-300: 1rem; /*default*/
-    /*Titulos*/
-    --font-size-400: 1.25rem; /* h5*/
-    --font-size-500: 1.5rem; /* h4*/
-    --font-size-600: 2rem; /* h2-h3*/
-    --font-size-700: 2.5rem; /* h1*/
-    --font-size-800: 3rem; /* Titulos de pagina*/
+    --font-size-300: 1rem;
+    --font-size-400: 1.25rem;
+    --font-size-500: 1.5rem;
+    --font-size-600: 2rem;
+    --font-size-700: 2.5rem;
+    --font-size-800: 3rem;
 
-    /*Font Weight*/
+    /* Font Weight */
+    --font-weight-400: 400;
+    --font-weight-500: 500;
+    --font-weight-700: 700;
 
-    /*Typography*/
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
 
-    /*Spacing*/
+    /* Spacing */
     --spacing-0: 0;
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
@@ -35,51 +39,69 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 4rem;
-
+    --spacing-3xl: 8rem;
     --spacing-gap-sm: 0.5rem;
     --spacing-gap-default: 1rem;
     --spacing-gap-lg: 2rem;
 
-    /*Borders And Shadows*/
+    /* Borders And Shadows */
     --border-radius-none: 0rem;
     --border-radius-sm: 0.4rem;
     --border-radius-md: 0.5rem;
+    --border-radius-lg: 1rem;
     --border-radius-full: 50%;
-
     --border-width-default: 1px;
     --border-width-thick: 3px;
-
     --border-style-default: solid;
-
     --box-shadow-lvl-1: 0 1px 3px rgba(0, 0, 0, 0.1);
     --box-shadow-lvl-2: 0 4px 6px rgba(0, 0, 0, 0.1),
         0 1px 3px rgba(0, 0, 0, 0.08);
     --box-shadow-lvl-3: 0 10px 20px rgba(0, 0, 0, 0.19),
         0 6px 6px rgba(0, 0, 0, 0.23);
 
-    /*Breakpoints*/
-    --breackpoint-sm: 576px;
-    --breackpoint-md: 768px;
-    --breackpoint-lg: 992px;
-    --breackpoint-xl: 1200px;
+    /* Breakpoints */
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
 }
-@media (min-width: var(--breackpoint-sm)) {
+
+* {
+    box-sizing: border-box;
 }
-@media (min-width: var(--breackpoint-md)) {
-}
-@media (min-width: var(--breackpoint-lg)) {
-}
-@media (min-width: var(--breackpoint-xl)) {
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 [data-theme="dark"] {
-    /*Colors*/
-    --color-bg: #121715;
-    --color-bg-alt: #1e2420;
-    --color-text: #e9ecef;
-    --color-text-secondary: #adb5bd;
-    --color-primary: #4ade80;
-    --color-secondary: #5bc0eb;
-    --color-alert: #ffe97f;
-    --color-border: #2a2a2a;
+    --color-bg: #000000;
+    --color-bg-alt: #16181c;
+    --color-text: #e7e9ea;
+    --color-text-secondary: #71767b;
+    --color-text-anchor: #1d9bf0;
+    --color-primary: #1d9bf0;
+    --color-secondary: #1a8cd8;
+    --color-alert: #ffd400;
+    --color-border: #2f3336;
+    --color-hover: #16181c;
+    --color-hover-blue: #031018;
+}
+
+@media (min-width: var(--breakpoint-sm)) {
+}
+
+@media (min-width: var(--breakpoint-md)) {
+}
+
+@media (min-width: var(--breakpoint-lg)) {
+}
+
+@media (min-width: var(--breakpoint-xl)) {
 }

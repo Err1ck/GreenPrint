@@ -1,17 +1,22 @@
 import React from "react";
-
-function TestTendenciasPage() {
+import Navbar from "../componentes/common/Navbar";
+import "../styles/Tendencias.css";
+function TendenciasPage() {
     return (
-        <div
-            style={{
-                textAlign: "center",
-                padding: "50px",
-                fontFamily: "Arial, sans-serif",
-            }}
-        >
-            <h1>TEST TENDENCIAS</h1>
-        </div>
+        <>
+            <div className="navbarLeft-content">
+                <Navbar navbarType={1} />
+            </div>
+            <div className="main-layout-container">
+                <div className="spacer-left"></div>
+                <main className="main-content"></main>
+                <div className="spacer-right"></div>
+            </div>
+            <div className="navbarRight-content">
+                <Navbar navbarType={2} />
+            </div>
+        </>
     );
 }
 
-export default TestTendenciasPage;
+export default TendenciasPage;

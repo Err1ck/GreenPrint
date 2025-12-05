@@ -1,17 +1,22 @@
-import React from "react";
+import "../styles/Cartera.css";
+import Navbar from "../componentes/common/Navbar";
 
-function TestCarteraPage() {
+function CarteraPage() {
     return (
-        <div
-            style={{
-                textAlign: "center",
-                padding: "50px",
-                fontFamily: "Arial, sans-serif",
-            }}
-        >
-            <h1>TEST CARTERA</h1>
-        </div>
+        <>
+            <div className="navbarLeft-content">
+                <Navbar navbarType={1} />
+            </div>
+            <div className="main-layout-container">
+                <div className="spacer-left"></div>
+                <main className="main-content"></main>
+                <div className="spacer-right"></div>
+            </div>
+            <div className="navbarRight-content">
+                <Navbar navbarType={2} />
+            </div>
+        </>
     );
 }
 
-export default TestCarteraPage;
+export default CarteraPage;
