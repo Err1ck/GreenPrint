@@ -9,10 +9,11 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3.10.3",
+        "doctrine/dbal": "^3.10.4",
         "doctrine/doctrine-bundle": "^2.18.1",
         "doctrine/doctrine-migrations-bundle": "^3.7",
-        "doctrine/orm": "^3.5.7",
+        "doctrine/orm": "^3.5.8",
+        "firebase/php-jwt": "^6.11",
         "nelmio/api-doc-bundle": "^5.8.2",
         "phpdocumentor/reflection-docblock": "^5.6.5",
         "phpstan/phpdoc-parser": "^2.3",
@@ -44,10 +45,10 @@
         "symfony/ux-turbo": "^2.31",
         "symfony/validator": "7.3.*",
         "symfony/web-link": "7.3.*",
-        "symfony/webpack-encore-bundle": "^2.3",
+        "symfony/webpack-encore-bundle": "^2.4",
         "symfony/yaml": "7.3.*",
         "twig/extra-bundle": "^2.12|^3.22.1",
-        "twig/twig": "^2.12|^3.22"
+        "twig/twig": "^2.12|^3.22.1"
     },
     "config": {
         "allow-plugins": {
@@ -101,13 +102,13 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "doctrine/doctrine-fixtures-bundle": "^4.3.1",
         "fakerphp/faker": "^1.24.1",
-        "phpunit/phpunit": "^11.5.44",
+        "phpunit/phpunit": "^11.5.45",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",
-        "symfony/maker-bundle": "^1.65",
+        "symfony/maker-bundle": "^1.65.1",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*"
     }

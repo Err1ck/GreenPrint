@@ -3,46 +3,45 @@
 namespace App\Entity;
 
 use App\Entity\Trait\TimestampableTrait;
-use App\Repository\PostRepository;
+use App\Repository\PostReplyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: PostRepository::class)]
-#[ORM\HasLifecycleCallbacks]
-#[ORM\Table(name: 'posts')]
-class Post
+#[ORM\Entity(repositoryClass: PostReplyRepository::class)]
+#[ORM\Table(name: 'post_replies')]
+#[ORM\UniqueConstraint(columns: ['user_id', 'post_id'])]
+class PostReply
 {
     use TimestampableTrait;
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees'])]
+    #[Groups(['reply'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', nullable: false)]
-    #[Groups(['post'])]
+    #[Groups(['reply'])]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(targetEntity: Post::class)]
+    #[ORM\JoinColumn(name: "post_id", referencedColumnName: "id", onDelete: "CASCADE", nullable: false)]
+    #[Groups(['reply'])]
+    private ?Post $post = null;
+
     #[ORM\Column]
-    #[Groups(['post'])]
+    #[Groups(['reply'])]
     private ?int $leaf = 0;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['post'])]
+    #[Groups(['reply'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['post'])]
+    #[Groups(['reply'])]
     private ?string $content = null;
-
-    // public function __construct()
-    // {
-    //     $this->leaf = '';
-    //     $this->fecha_publicacion = new \DateTime();
-    // }
 
     public function getId(): ?int
     {
@@ -90,6 +89,17 @@ class Post
     public function setUser(User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getPost(): ?Post
+    {
+        return $this->post;
+    }
+
+    public function setPost(Post $post): static
+    {
+        $this->post = $post;
         return $this;
     }
 }
