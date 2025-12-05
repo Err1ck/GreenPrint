@@ -7,7 +7,7 @@ function Footer({ footerType }) {
                 <div className="footer1">
                     <div className="footer1-container">
                         <LinkIcon name={"imagen2"} />
-                        <span class="info-username">DanielRoses</span>
+                        <span className="info-username">DanielRoses</span>
                         <LinkIcon name={"icon37"} />
                     </div>
                 </div>

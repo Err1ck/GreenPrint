@@ -235,16 +235,37 @@ function Modal({ children, onClose }) {
         }
     };
 
-    const handlePostSubmit = () => {
-        if (postText.trim() !== "" || selectedImage) {
-            console.log("Post enviado:", {
-                text: postText,
-                image: selectedImage,
+const handlePostSubmit = async () => {
+    if (postText.trim() !== "" || selectedImage) {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyMiwiZW1haWwiOiJlcmljbXVudGFzQGdtYWlsLmNvbSIsInJvbGVzIjpbInVzZXIiLCJST0xFX1VTRVIiXSwiaWF0IjoxNzY0OTUzNjIwLCJleHAiOjE3NjQ5NTcyMjB9.CKQczWuNJwrCac-XJzDxmxifaJMTZNyOYLZWYoLQOHk'
+                },
+                body: JSON.stringify({
+                    user: 22,
+                    content: postText,
+                    image: selectedImage || null
+                })
             });
-            // Aquí iría la llamada a tu API
-            onClose();
+
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log("Post creado exitosamente:", data);
+                onClose();
+            } else {
+                console.error("Error al crear el post:", data);
+                alert(data.error || "Error al crear el post");
+            }
+        } catch (error) {
+            console.error("Error de red:", error);
+            alert("Error al conectar con el servidor");
         }
-    };
+    }
+};
 
     const handleOverlayClick = (e) => {
         if (e.target.className === "modal-overlay") {
