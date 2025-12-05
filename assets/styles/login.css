@@ -1,0 +1,211 @@
+.login-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-content {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100vh;
+}
+
+.login-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 2rem;
+}
+
+.login-logo-large {
+  color: #1d9bf0;
+  opacity: 0.9;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.login-logo-small {
+  color: #1d9bf0;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f1419;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  position: relative;
+}
+
+.login-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.0625rem;
+  border: 1px solid #cfd9de;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.2s;
+  background-color: #ffffff;
+  color: #0f1419;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.login-input:focus {
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 1px #1d9bf0;
+}
+
+.login-input::placeholder {
+  color: #536471;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #1d9bf0;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem;
+}
+
+.login-button:hover {
+  background-color: #1a8cd8;
+}
+
+.login-button:active {
+  background-color: #1781c4;
+}
+
+.forgot-password {
+  display: inline-block;
+  color: #1d9bf0;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+}
+
+.forgot-password:hover {
+  color: #1a8cd8;
+  text-decoration: underline;
+}
+
+.login-divider {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.login-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #eff3f4;
+}
+
+.login-divider span {
+  position: relative;
+  background-color: #ffffff;
+  padding: 0 1rem;
+  color: #536471;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.login-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.footer-text {
+  color: #536471;
+  font-size: 0.9375rem;
+}
+
+.toggle-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1d9bf0;
+  background-color: #ffffff;
+  border: 1px solid #cfd9de;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-button:hover {
+  background-color: #f7f9f9;
+}
+
+.toggle-button:active {
+  background-color: #eff3f4;
+}
+
+@media (max-width: 1024px) {
+  .login-left {
+    display: none;
+  }
+
+  .login-content {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-right {
+    padding: 1rem;
+  }
+
+  .login-box {
+    padding: 1rem;
+  }
+
+  .login-title {
+    font-size: 1.75rem;
+  }
+
+  .login-logo-small {
+    margin-bottom: 1.5rem;
+  }
+}
