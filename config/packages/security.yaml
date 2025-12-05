@@ -43,5 +43,6 @@ security:
         # Permite acceso público al login.
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         # Requiere autenticación para el resto de las rutas API.
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }

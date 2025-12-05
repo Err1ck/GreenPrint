@@ -75,14 +75,13 @@ class LoginController extends AbstractController
     // }
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(
-        Request $request, 
+        Request $request,
         UserRepository $userRepository,
         UserPasswordHasherInterface $passwordHasher
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // Decodificar los datos JSON del request
         $data = json_decode($request->getContent(), true);
-        
+
         // Validar que existan email y password
         if (!$data || !isset($data['email']) || !isset($data['password'])) {
             return $this->json([
@@ -92,7 +91,7 @@ class LoginController extends AbstractController
 
         // Buscar el usuario por email
         $user = $userRepository->findOneBy(['email' => $data['email']]);
-        
+
         if (!$user) {
             return $this->json([
                 'message' => 'Credenciales inválidas'
@@ -129,7 +128,7 @@ class LoginController extends AbstractController
             ]
         ]);
     }
-    
+
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
     #[OA\Post(
         tags: ['LoginController'],
@@ -150,7 +149,7 @@ class LoginController extends AbstractController
     }
 
     #[Route('/api/user', name: 'api_current_user', methods: ['GET'])]
-        #[OA\Get(
+    #[OA\Get(
         tags: ['LoginController'],
         summary: 'Obtener usuario actual.',
     )]
@@ -171,5 +170,53 @@ class LoginController extends AbstractController
                 'roles' => $user->getRoles()
             ]
         ]);
+    }
+
+    #[Route('/api/password/reset', name: 'api_password_reset', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['LoginController'],
+        summary: 'Restablecer contraseña.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', example: 'test@gmail.com'),
+                    new OA\Property(property: 'new_password', type: 'string', example: 'nueva_contraseña'),
+                ]
+            )
+        ),
+    )]
+    public function resetPassword(
+        Request $request,
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data['email']) || !isset($data['new_password'])) {
+            return $this->json([
+                'message' => 'Email y nueva contraseña son requeridos'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $userRepository->findOneBy(['email' => $data['email']]);
+
+        if (!$user) {
+            return $this->json([
+                'message' => 'Usuario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Hash de la nueva contraseña
+        $hashedPassword = $passwordHasher->hashPassword($user, $data['new_password']);
+        $user->setPassword($hashedPassword);
+
+        // Guardar en base de datos
+        $userRepository->save($user, true);
+
+        return $this->json([
+            'message' => 'Contraseña actualizada exitosamente'
+        ], Response::HTTP_OK);
     }
 }
