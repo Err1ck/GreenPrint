@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 
-#[Route('/api/community', name: 'api_community_')]
+#[Route('/api/communities', name: 'api_community_')]
 final class CommunityController extends AbstractController
 {
 
