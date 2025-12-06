@@ -12,6 +12,7 @@ function Modal({ children, onClose }) {
     const fileInputRef = useRef(null);
     const textareaRef = useRef(null);
     const maxChars = 280;
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Emojis populares organizados por categorías
     const emojiCategories = {
@@ -235,37 +236,57 @@ function Modal({ children, onClose }) {
         }
     };
 
-const handlePostSubmit = async () => {
-    if (postText.trim() !== "" || selectedImage) {
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyMiwiZW1haWwiOiJlcmljbXVudGFzQGdtYWlsLmNvbSIsInJvbGVzIjpbInVzZXIiLCJST0xFX1VTRVIiXSwiaWF0IjoxNzY0OTUzNjIwLCJleHAiOjE3NjQ5NTcyMjB9.CKQczWuNJwrCac-XJzDxmxifaJMTZNyOYLZWYoLQOHk'
-                },
-                body: JSON.stringify({
-                    user: 22,
-                    content: postText,
-                    image: selectedImage || null
-                })
-            });
+    const handlePostSubmit = async () => {
+        if (postText.trim() !== "" || selectedImage) {
+            try {
+                setIsSubmitting(true);
+                // Obtener token y usuario de localStorage
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
 
-            const data = await response.json();
+                if (!token || !userStr) {
+                    alert("Debes iniciar sesión para crear un post");
+                    return;
+                }
 
-            if (response.ok) {
-                console.log("Post creado exitosamente:", data);
-                onClose();
-            } else {
-                console.error("Error al crear el post:", data);
-                alert(data.error || "Error al crear el post");
+                const user = JSON.parse(userStr);
+
+                const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        user: user.id,
+                        content: postText,
+                        image: selectedImage || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log("Post creado exitosamente:", data);
+                    // Limpiar el formulario
+                    setPostText("");
+                    setCharCount(0);
+                    setSelectedImage(null);
+                    onClose();
+                    // Opcional: recargar la página para ver el nuevo post
+                    window.location.reload();
+                } else {
+                    console.error("Error al crear el post:", data);
+                    alert(data.error || "Error al crear el post");
+                }
+            } catch (error) {
+                console.error("Error de red:", error);
+                alert("Error al conectar con el servidor");
+            } finally {
+                setIsSubmitting(false);
             }
-        } catch (error) {
-            console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
         }
-    }
-};
+    };
 
     const handleOverlayClick = (e) => {
         if (e.target.className === "modal-overlay") {
@@ -536,23 +557,21 @@ const handlePostSubmit = async () => {
                                                 charPercentage >= 100
                                                     ? "#f4212e"
                                                     : charPercentage >= 90
-                                                    ? "#ffd400"
-                                                    : "#318041"
+                                                        ? "#ffd400"
+                                                        : "#318041"
                                             }
                                             strokeWidth="2"
-                                            strokeDasharray={`${
-                                                (charPercentage / 100) * 75.4
-                                            } 75.4`}
+                                            strokeDasharray={`${(charPercentage / 100) * 75.4
+                                                } 75.4`}
                                             transform="rotate(-90 15 15)"
                                         />
                                     </svg>
                                     {charCount >= maxChars - 20 && (
                                         <span
-                                            className={`char-count ${
-                                                charCount >= maxChars
-                                                    ? "over-limit"
-                                                    : ""
-                                            }`}
+                                            className={`char-count ${charCount >= maxChars
+                                                ? "over-limit"
+                                                : ""
+                                                }`}
                                         >
                                             {maxChars - charCount}
                                         </span>
@@ -565,12 +584,13 @@ const handlePostSubmit = async () => {
                     <div className="post-actions">
                         <Button
                             onClick={handlePostSubmit}
-                            classButton={`post-button ${
-                                !isPostButtonEnabled ? "disabled" : ""
-                            }`}
-                            disabled={!isPostButtonEnabled}
+                            classButton={`post-button ${!isPostButtonEnabled ? "disabled" : ""
+                                }`}
+                            disabled={!isPostButtonEnabled || isSubmitting}
                         >
-                            <span className="post-button-text">Postear</span>
+                            <span className="post-button-text">
+                                {isSubmitting ? "Posteando..." : "Postear"}
+                            </span>
                         </Button>
                     </div>
                 </div>

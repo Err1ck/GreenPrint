@@ -13,6 +13,7 @@
 
 ## DATABASES ### ATENCION!!!! ANTES DE TODO ESTO VE A MIGRATIONS Y ELIMINA TODAS LAS VERSIONES `EXCEPTO EL GITIGNORE`
 
+0. Eliminar las migraciones existentes en /backend/migrations
 
 1. Eliminar la base de datos
 `php bin/console doctrine:database:drop --force`
