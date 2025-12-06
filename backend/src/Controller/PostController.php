@@ -28,7 +28,10 @@ final class PostController extends AbstractController
     )]
     public function index(PostRepository $postsRepository, SerializerInterface $serializer): JsonResponse
     {
-        $all = $postsRepository->findAll();
+        $all = $postsRepository->findBy(
+            [],                 // criterios (vacío = todos los registros)
+            ['createdAt' => 'DESC']  // orden
+        );
 
         return new JsonResponse(
             $serializer->serialize($all, 'json', ['groups' => 'post']),
@@ -483,6 +486,40 @@ final class PostController extends AbstractController
         return new JsonResponse(
             ['message' => "Se ha quitado el repost correctamente."],
             JsonResponse::HTTP_OK,
+        );
+    }
+    // En PostController.php
+    #[Route('/user/{id<\d+>}', name: 'api_posts_by_user', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['PostController'],
+        summary: 'Obtiene todos los posts de un usuario ordenados por fecha.'
+    )]
+    public function getPostsByUser(
+        int $id,
+        UserRepository $userRepository,
+        PostRepository $postRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $user = $userRepository->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Opción 1: Usar findBy con ordenamiento
+        $posts = $postRepository->findBy(
+            ['user' => $user],
+            ['createdAt' => 'DESC'] // Usar camelCase
+        );
+
+        return new JsonResponse(
+            $serializer->serialize($posts, 'json', ['groups' => 'post']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
         );
     }
 }
