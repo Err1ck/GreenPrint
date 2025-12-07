@@ -23,44 +23,51 @@ function Navbar({ navbarType, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <SvgComponente name="imagen4" />
+                <div>
+                  <SvgComponente name="imagen4" />
+                </div>
               </div>
-              <LinkIcon
-                name={"icon3"}
-                href={"#"}
-                classname={"navicon"}
-                text={"Inicio"}
-              />
-              <LinkIcon
-                name={"icon31"}
-                href={"/comunidades"}
-                classname={"navicon"}
-                text={"Mensajes"}
-              />
-              <LinkIcon
-                name={"icon31"}
-                href={"/comunidades"}
-                classname={"navicon"}
-                text={"Guardados"}
-              />
-              <LinkIcon
-                name={"icon5"}
-                href={"/comunidades"}
-                classname={"navicon"}
-                text={"Comunidades"}
-              />
-              <LinkIcon
-                name={"icon5"}
-                href={"/comunidades"}
-                classname={"navicon"}
-                text={"Perfil"}
-              />
-              <LinkIcon
-                name={"icon33"}
-                href={"/comunidades"}
-                classname={"navicon"}
-                text={"Opciones"}
-              />
+              <div className="navbar-links">
+                
+                <div className="navbar-links-right">
+                  <LinkIcon
+                    name={"icon3"}
+                    href={"#"}
+                    classname={"navicon"}
+                    text={"Inicio"}
+                  />
+                  <LinkIcon
+                    name={"icon31"}
+                    href={"/comunidades"}
+                    classname={"navicon"}
+                    text={"Mensajes"}
+                  />
+                  <LinkIcon
+                    name={"icon31"}
+                    href={"/comunidades"}
+                    classname={"navicon"}
+                    text={"Guardados"}
+                  />
+                  <LinkIcon
+                    name={"icon5"}
+                    href={"/comunidades"}
+                    classname={"navicon"}
+                    text={"Comunidades"}
+                  />
+                  <LinkIcon
+                    name={"icon5"}
+                    href={"/comunidades"}
+                    classname={"navicon"}
+                    text={"Perfil"}
+                  />
+                  <LinkIcon
+                    name={"icon33"}
+                    href={"/comunidades"}
+                    classname={"navicon"}
+                    text={"Opciones"}
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <Footer footerType={1} />
