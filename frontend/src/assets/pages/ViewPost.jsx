@@ -5,7 +5,7 @@ import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 
 function ViewPost() {
-    const { id } = useParams(); // Obtener el ID del post desde la URL
+    const { id } = useParams();
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -18,17 +18,23 @@ function ViewPost() {
     const fetchPost = async () => {
         try {
             setLoading(true);
-            
-            // Obtener el token del localStorage
+
             const token = localStorage.getItem("token");
-            
+            const userStr = localStorage.getItem("user");
+
             if (!token) {
-                // Si no hay token, redirigir al login
                 navigate("/login");
                 return;
             }
 
-            const response = await fetch(`http://127.0.0.1:8000/api/posts/${id}`, {
+            // Construir URL con user_id si está autenticado
+            let url = `http://127.0.0.1:8000/api/posts/${id}`;
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                url += `?user_id=${user.id}`;
+            }
+
+            const response = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -37,7 +43,6 @@ function ViewPost() {
             });
 
             if (response.status === 401) {
-                // Token inválido o expirado
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
                 navigate("/login");
@@ -58,7 +63,6 @@ function ViewPost() {
         }
     };
 
-    // Función para formatear la fecha
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const months = [
@@ -68,7 +72,6 @@ function ViewPost() {
         return `${date.getDate()} ${months[date.getMonth()]}`;
     };
 
-    // Función para formatear la hora
     const formatTime = (dateString) => {
         const date = new Date(dateString);
         const hours = date.getHours().toString().padStart(2, "0");
@@ -77,27 +80,31 @@ function ViewPost() {
     };
 
     return (
-        <>
+        <div className="homepage-container">
             <div className="navbarLeft-content">
                 <Navbar navbarType={1} />
             </div>
-            <div className="main-layout-container">
-                <div className="spacer-left"></div>
+
+            <div className="">
                 <main className="main-content">
                     {/* Botón de volver */}
                     <div style={{
                         padding: "16px",
-                        borderBottom: "1px solid #2f3336",
+                        borderBottom: "1px solid #eff3f4",
                         display: "flex",
                         alignItems: "center",
-                        gap: "20px"
+                        gap: "20px",
+                        backgroundColor: "#fff",
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 10
                     }}>
                         <button
                             onClick={() => navigate(-1)}
                             style={{
                                 background: "transparent",
                                 border: "none",
-                                color: "#e7e9ea",
+                                color: "#0f1419",
                                 cursor: "pointer",
                                 fontSize: "20px",
                                 padding: "8px",
@@ -110,7 +117,7 @@ function ViewPost() {
                                 transition: "background-color 0.2s"
                             }}
                             onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = "rgba(231, 233, 234, 0.1)";
+                                e.target.style.backgroundColor = "#f7f9f9";
                             }}
                             onMouseLeave={(e) => {
                                 e.target.style.backgroundColor = "transparent";
@@ -119,7 +126,7 @@ function ViewPost() {
                             ←
                         </button>
                         <h2 style={{
-                            color: "#e7e9ea",
+                            color: "#0f1419",
                             fontSize: "20px",
                             fontWeight: "700",
                             margin: 0
@@ -129,68 +136,91 @@ function ViewPost() {
                     </div>
 
                     {loading && (
-                        <div
-                            style={{
-                                textAlign: "center",
-                                padding: "40px",
-                                fontSize: "16px",
-                                color: "#666",
-                            }}
-                        >
+                        <div style={{
+                            textAlign: "center",
+                            padding: "40px",
+                            fontSize: "16px",
+                            color: "#666",
+                        }}>
                             Cargando post...
                         </div>
                     )}
 
                     {error && (
-                        <div
-                            style={{
-                                textAlign: "center",
-                                padding: "40px",
-                                fontSize: "16px",
-                                color: "#e74c3c",
-                            }}
-                        >
+                        <div style={{
+                            textAlign: "center",
+                            padding: "40px",
+                            fontSize: "16px",
+                            color: "#e74c3c",
+                        }}>
                             Error: {error}
                         </div>
                     )}
 
                     {!loading && !error && post && (
+                        //   <Publication
+                        //     key={post.id}
+                        //     postId={post.id}
+                        //     userId={post.user?.id}
+                        //     userName={post.user?.username || "Usuario"}
+                        //     userProfileUrl={`/perfil/${post.user?.username}`}
+                        //     communityId={post.community?.id}
+                        //     communityName={post.community?.name}
+                        //     communityPhotoUrl={post.community?.photo_url} // ✨ Nueva prop
+                        //     date={formatDate(post.created_at)}
+                        //     time={formatTime(post.created_at)}
+                        //     text={post.content}
+                        //     postImage={post.image}
+                        //     postType={post.postType} // Asegúrate de que esto viene del backend
+                        //     comments={0}
+                        //     retweets={0}
+                        //     like1={0}
+                        //     like2={0}
+                        //     clickable={false}  
+                        //   />
                         <Publication
                             key={post.id}
                             postId={post.id}
+                            userId={post.user?.id}
                             userName={post.user?.username || "Usuario"}
-                            userProfileUrl={`/perfil/${post.user?.username}`}
+                            userProfileUrl={post.user?.photo_url}
+                            communityId={post.community?.id}
+                            communityName={post.community?.name}
+                            communityPhotoUrl={post.community?.photo_url}
                             date={formatDate(post.created_at)}
                             time={formatTime(post.created_at)}
                             text={post.content}
                             postImage={post.image}
+                            postType={post.postType}
                             comments={0}
-                            retweets={0}
-                            like1={0}
-                            like2={0}
-                            clickable={false}  
+                            retweets={post.reposts}
+                            like1={post.leaf}
+                            like2={post.tree}
+                            clickable={true}
+                            // Pasar datos de interacciones del usuario si existen
+                            initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                            initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                            initialHasReposted={post.user_interactions?.has_reposted || false}
                         />
                     )}
 
                     {!loading && !error && !post && (
-                        <div
-                            style={{
-                                textAlign: "center",
-                                padding: "40px",
-                                fontSize: "16px",
-                                color: "#666",
-                            }}
-                        >
+                        <div style={{
+                            textAlign: "center",
+                            padding: "40px",
+                            fontSize: "16px",
+                            color: "#666",
+                        }}>
                             Post no encontrado
                         </div>
                     )}
                 </main>
-                <div className="spacer-right"></div>
             </div>
+
             <div className="navbarRight-content">
                 <Navbar navbarType={2} />
             </div>
-        </>
+        </div>
     );
 }
 

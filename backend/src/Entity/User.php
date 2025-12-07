@@ -32,6 +32,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post'])]
     private ?string $username = null;
 
+
+    /**
+     * @var string profile photo url
+     */
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['user','post'])]
+    private ?string $photo_url = null;
+
+    /**
+     * @var string banner photo url
+     */
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['user', 'post'])]
+    private ?string $banner_url = null;
+
+
     /**
      * @var list<string> The user roles
      */
@@ -191,7 +207,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->community = $community;
         return $this;
     }
+  public function getPhotoURL(): ?string
+    {
+        return $this->photo_url;
+    }
 
+    public function setPhotoURL(string $photo_url): static
+    {
+        $this->photo_url = $photo_url;
+        return $this;
+    }
+
+    public function getBannerURL(): ?string
+    {
+        return $this->banner_url;
+    }
+
+    public function setBannerURL(string $banner_url): static
+    {
+        $this->banner_url = $banner_url;
+        return $this;
+    }
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */

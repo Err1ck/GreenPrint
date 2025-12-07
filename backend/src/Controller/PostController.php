@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Entity\UserPostLeaf;
+use App\Entity\UserPostTree;
 use App\Entity\UserRepost;
 use App\Repository\CommunityRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserPostLeafRepository;
+use App\Repository\UserPostTreeRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,13 +29,90 @@ final class PostController extends AbstractController
         tags: ['PostController'],
         summary: 'Muestra todos los posts.'
     )]
-    public function index(PostRepository $postsRepository, SerializerInterface $serializer): JsonResponse
-    {
+    public function index(
+        Request $request,
+        PostRepository $postsRepository, 
+        UserRepository $userRepository,
+        UserPostLeafRepository $likeLeafs,
+        UserPostTreeRepository $likeTrees,
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer
+    ): JsonResponse {
         $all = $postsRepository->findBy(
             [],                 // criterios (vacío = todos los registros)
             ['createdAt' => 'DESC']  // orden
         );
 
+        // Obtener user_id opcional de los query params
+        $userId = $request->query->get('user_id');
+        
+        // Si hay user_id, incluir las interacciones del usuario
+        if ($userId) {
+            $user = $userRepository->find($userId);
+            
+            if ($user) {
+                // Obtener todas las interacciones del usuario de una vez
+                $postIds = array_map(fn($post) => $post->getId(), $all);
+                
+                // Consultas optimizadas para obtener todas las interacciones
+                $userLeafLikes = $likeLeafs->createQueryBuilder('l')
+                    ->where('l.user = :user')
+                    ->andWhere('l.post IN (:posts)')
+                    ->setParameter('user', $user)
+                    ->setParameter('posts', $postIds)
+                    ->getQuery()
+                    ->getResult();
+                
+                $userTreeLikes = $likeTrees->createQueryBuilder('t')
+                    ->where('t.user = :user')
+                    ->andWhere('t.post IN (:posts)')
+                    ->setParameter('user', $user)
+                    ->setParameter('posts', $postIds)
+                    ->getQuery()
+                    ->getResult();
+                
+                $repostRepository = $entityManager->getRepository(UserRepost::class);
+                $userReposts = $repostRepository->createQueryBuilder('r')
+                    ->where('r.user = :user')
+                    ->andWhere('r.post IN (:posts)')
+                    ->setParameter('user', $user)
+                    ->setParameter('posts', $postIds)
+                    ->getQuery()
+                    ->getResult();
+                
+                // Crear mapas para búsqueda rápida
+                $leafLikesMap = [];
+                foreach ($userLeafLikes as $like) {
+                    $leafLikesMap[$like->getPost()->getId()] = true;
+                }
+                
+                $treeLikesMap = [];
+                foreach ($userTreeLikes as $like) {
+                    $treeLikesMap[$like->getPost()->getId()] = true;
+                }
+                
+                $repostsMap = [];
+                foreach ($userReposts as $repost) {
+                    $repostsMap[$repost->getPost()->getId()] = true;
+                }
+                
+                // Serializar posts y agregar interacciones
+                $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
+                
+                foreach ($postsData as &$postData) {
+                    $postId = $postData['id'];
+                    $postData['user_interactions'] = [
+                        'has_liked_leaf' => isset($leafLikesMap[$postId]),
+                        'has_liked_tree' => isset($treeLikesMap[$postId]),
+                        'has_reposted' => isset($repostsMap[$postId])
+                    ];
+                }
+                
+                return new JsonResponse($postsData, JsonResponse::HTTP_OK);
+            }
+        }
+        
+        // Si no hay user_id o el usuario no existe, devolver posts sin interacciones
         return new JsonResponse(
             $serializer->serialize($all, 'json', ['groups' => 'post']),
             JsonResponse::HTTP_OK,
@@ -47,8 +126,16 @@ final class PostController extends AbstractController
         summary: 'Muestra el post por ID dada por URL.'
     )]
     #[Route('/{id<\d+>}', name: 'api_post_show', methods: ['GET'])]
-    public function show(int $id, PostRepository $postRepository, SerializerInterface $serializer): JsonResponse
-    {
+    public function show(
+        int $id, 
+        Request $request,
+        PostRepository $postRepository, 
+        UserRepository $userRepository,
+        UserPostLeafRepository $likeLeafs,
+        UserPostTreeRepository $likeTrees,
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer
+    ): JsonResponse {
         $post = $postRepository->find($id);
 
         if (!$post) {
@@ -56,6 +143,33 @@ final class PostController extends AbstractController
                 ['error' => 'No existe este post.'],
                 JsonResponse::HTTP_NOT_ACCEPTABLE
             );
+        }
+
+        // Obtener user_id opcional de los query params
+        $userId = $request->query->get('user_id');
+        
+        // Si hay user_id, incluir las interacciones del usuario
+        if ($userId) {
+            $user = $userRepository->find($userId);
+            
+            if ($user) {
+                // Verificar interacciones del usuario con este post
+                $hasLikedLeaf = $likeLeafs->findOneBy(['user' => $user, 'post' => $post]) !== null;
+                $hasLikedTree = $likeTrees->findOneBy(['user' => $user, 'post' => $post]) !== null;
+                
+                $repostRepository = $entityManager->getRepository(UserRepost::class);
+                $hasReposted = $repostRepository->findOneBy(['user' => $user, 'post' => $post]) !== null;
+                
+                // Serializar post y agregar interacciones
+                $postData = json_decode($serializer->serialize($post, 'json', ['groups' => 'post']), true);
+                $postData['user_interactions'] = [
+                    'has_liked_leaf' => $hasLikedLeaf,
+                    'has_liked_tree' => $hasLikedTree,
+                    'has_reposted' => $hasReposted
+                ];
+                
+                return new JsonResponse($postData, JsonResponse::HTTP_OK);
+            }
         }
 
         return new JsonResponse(
@@ -310,15 +424,20 @@ final class PostController extends AbstractController
         );
     }
 
-
-
     #[Route('/{id<\d+>}/like-leaf', name: 'post_user_liked_leaf', methods: ['POST'])]
     #[OA\Post(
         tags: ['PostController'],
         summary: 'Darle like (leaf) al post. ID de la URL -> post.'
     )]
-    public function likePostLeaf(int $id, Request $request, PostRepository $posts, UserRepository $users, UserPostLeafRepository $likeLeafs, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
-    {
+    public function likePostLeaf(
+        int $id, 
+        Request $request, 
+        PostRepository $posts, 
+        UserRepository $users, 
+        UserPostLeafRepository $likeLeafs, 
+        EntityManagerInterface $entityManager, 
+        ValidatorInterface $validator
+    ): JsonResponse {
         $post = $posts->find($id);
 
         if (!$post) {
@@ -341,7 +460,7 @@ final class PostController extends AbstractController
 
         if (!$user) {
             return new JsonResponse(
-                ['error' => 'Usario no encontrado.'],
+                ['error' => 'Usuario no encontrado.'],
                 JsonResponse::HTTP_BAD_REQUEST
             );
         }
@@ -364,7 +483,6 @@ final class PostController extends AbstractController
         $postLikeLeaf->setCreatedAt(new \DateTimeImmutable());
         $postLikeLeaf->setUpdatedAt(new \DateTimeImmutable());
 
-        // ⚠️ Deberías validar $follow, no $user
         $errors = $validator->validate($postLikeLeaf);
 
         if (count($errors) > 0) {
@@ -379,12 +497,18 @@ final class PostController extends AbstractController
             );
         }
 
+        // Incrementar contador en el post
+        $post->setLeaf($post->getLeaf() + 1);
+
         $entityManager->persist($postLikeLeaf);
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "Se ha dado el like (leaf) al post correctamente."],
-            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+            [
+                'message' => 'Se ha dado el like (leaf) al post correctamente.',
+                'leaf_count' => $post->getLeaf()
+            ],
+            JsonResponse::HTTP_CREATED
         );
     }
 
@@ -393,39 +517,221 @@ final class PostController extends AbstractController
         tags: ['PostController'],
         summary: 'Quitar like (leaf) al post. ID de la URL -> post.'
     )]
-    public function unlikePostLeaf(int $id, Request $request, PostRepository $posts, UserRepository $users, UserPostLeafRepository $likeLeafs, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
-    {
-
+    public function unlikePostLeaf(
+        int $id, 
+        Request $request, 
+        PostRepository $posts, 
+        UserRepository $users, 
+        UserPostLeafRepository $likeLeafs, 
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
         $post = $posts->find($id);
 
         if (!$post) {
             return new JsonResponse(
-                ['error' => 'Post no encotrado.'],
-                JsonResponse::HTTP_NOT_FOUND,
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
             );
         }
 
         $data = json_decode($request->getContent(), true);
 
+        if (!isset($data['user'])) {
+            return new JsonResponse(
+                ['error' => 'El campo user (user_id) es requerido.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
         $user = $users->find($data['user']);
 
         if (!$user) {
             return new JsonResponse(
-                ['error' => 'Usuario no encotrado.'],
-                JsonResponse::HTTP_NOT_FOUND,
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
             );
         }
 
-        $likedPost = $likeLeafs->findBy(['user' => $user, 'post' => $post]);
+        $likedPost = $likeLeafs->findOneBy(['user' => $user, 'post' => $post]);
 
-        $entityManager->remove($post);
+        if (!$likedPost) {
+            return new JsonResponse(
+                ['error' => 'No has dado like (leaf) a este post.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
 
+        // Decrementar contador en el post
+        $post->setLeaf(max(0, $post->getLeaf() - 1));
+
+        $entityManager->remove($likedPost);
         $entityManager->flush();
 
+        return new JsonResponse(
+            [
+                'message' => 'Se ha quitado el like (leaf) al post correctamente.',
+                'leaf_count' => $post->getLeaf()
+            ],
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    #[Route('/{id<\d+>}/like-tree', name: 'post_user_liked_tree', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['PostController'],
+        summary: 'Darle like (tree) al post de comunidad. ID de la URL -> post.'
+    )]
+    public function likePostTree(
+        int $id, 
+        Request $request, 
+        PostRepository $posts, 
+        UserRepository $users, 
+        UserPostTreeRepository $likeTrees, 
+        EntityManagerInterface $entityManager, 
+        ValidatorInterface $validator
+    ): JsonResponse {
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        if ($post->getPostType() !== 'community') {
+            return new JsonResponse(
+                ['error' => 'Solo los posts de comunidad pueden recibir likes de árbol.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['user'])) {
+            return new JsonResponse(
+                ['error' => 'El post necesita el campo: user (user_id).'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user = $users->find($data['user']);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $existingLikeTree = $likeTrees->findOneBy([
+            'user' => $user,
+            'post' => $post
+        ]);
+
+        if ($existingLikeTree) {
+            return new JsonResponse(
+                ['error' => 'Ya has dado like (tree) a este post.'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $postLikeTree = new UserPostTree();
+        $postLikeTree->setUser($user);
+        $postLikeTree->setPost($post);
+        $postLikeTree->setCreatedAt(new \DateTimeImmutable());
+        $postLikeTree->setUpdatedAt(new \DateTimeImmutable());
+
+        $errors = $validator->validate($postLikeTree);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // Incrementar contador en el post
+        $post->setTree($post->getTree() + 1);
+
+        $entityManager->persist($postLikeTree);
+        $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "Se ha quitado el like (leaf) al post correctamente."],
-            JsonResponse::HTTP_OK, // 201 es más apropiado para creación
+            [
+                'message' => 'Se ha dado el like (tree) al post correctamente.',
+                'tree_count' => $post->getTree()
+            ],
+            JsonResponse::HTTP_CREATED
+        );
+    }
+
+    #[Route('/{id<\d+>}/unlike-tree', name: 'post_user_unliked_tree', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['PostController'],
+        summary: 'Quitar like (tree) al post. ID de la URL -> post.'
+    )]
+    public function unlikePostTree(
+        int $id, 
+        Request $request, 
+        PostRepository $posts, 
+        UserRepository $users, 
+        UserPostTreeRepository $likeTrees, 
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['user'])) {
+            return new JsonResponse(
+                ['error' => 'El campo user (user_id) es requerido.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user = $users->find($data['user']);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $likedPost = $likeTrees->findOneBy(['user' => $user, 'post' => $post]);
+
+        if (!$likedPost) {
+            return new JsonResponse(
+                ['error' => 'No has dado like (tree) a este post.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Decrementar contador en el post
+        $post->setTree(max(0, $post->getTree() - 1));
+
+        $entityManager->remove($likedPost);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            [
+                'message' => 'Se ha quitado el like (tree) al post correctamente.',
+                'tree_count' => $post->getTree()
+            ],
+            JsonResponse::HTTP_OK
         );
     }
 
@@ -434,8 +740,14 @@ final class PostController extends AbstractController
         tags: ['PostController'],
         summary: 'Hacer repost del post. ID de la URL -> post.'
     )]
-    public function repost(int $id, Request $request, PostRepository $posts, UserRepository $users, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-    {
+    public function repost(
+        int $id, 
+        Request $request, 
+        PostRepository $posts, 
+        UserRepository $users, 
+        EntityManagerInterface $entityManager, 
+        ValidatorInterface $validator
+    ): JsonResponse {
         $post = $posts->find($id);
 
         if (!$post) {
@@ -496,12 +808,18 @@ final class PostController extends AbstractController
             );
         }
 
+        // Incrementar contador en el post
+        $post->setReposts($post->getReposts() + 1);
+
         $entityManager->persist($repost);
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "Se ha hecho repost correctamente."],
-            JsonResponse::HTTP_CREATED,
+            [
+                'message' => 'Se ha hecho repost correctamente.',
+                'repost_count' => $post->getReposts()
+            ],
+            JsonResponse::HTTP_CREATED
         );
     }
 
@@ -510,14 +828,19 @@ final class PostController extends AbstractController
         tags: ['PostController'],
         summary: 'Quitar repost del post. ID de la URL -> post.'
     )]
-    public function unrepost(int $id, Request $request, PostRepository $posts, UserRepository $users, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function unrepost(
+        int $id, 
+        Request $request, 
+        PostRepository $posts, 
+        UserRepository $users, 
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
         $post = $posts->find($id);
 
         if (!$post) {
             return new JsonResponse(
                 ['error' => 'Post no encontrado.'],
-                JsonResponse::HTTP_NOT_FOUND,
+                JsonResponse::HTTP_NOT_FOUND
             );
         }
 
@@ -535,7 +858,7 @@ final class PostController extends AbstractController
         if (!$user) {
             return new JsonResponse(
                 ['error' => 'Usuario no encontrado.'],
-                JsonResponse::HTTP_NOT_FOUND,
+                JsonResponse::HTTP_NOT_FOUND
             );
         }
 
@@ -545,17 +868,84 @@ final class PostController extends AbstractController
         if (!$repost) {
             return new JsonResponse(
                 ['error' => 'No has hecho repost de este post.'],
-                JsonResponse::HTTP_NOT_FOUND,
+                JsonResponse::HTTP_NOT_FOUND
             );
         }
+
+        // Decrementar contador en el post
+        $post->setReposts(max(0, $post->getReposts() - 1));
 
         $entityManager->remove($repost);
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "Se ha quitado el repost correctamente."],
-            JsonResponse::HTTP_OK,
+            [
+                'message' => 'Se ha quitado el repost correctamente.',
+                'repost_count' => $post->getReposts()
+            ],
+            JsonResponse::HTTP_OK
         );
+    }
+
+    #[Route('/{id<\d+>}/interactions', name: 'post_user_interactions', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['PostController'],
+        summary: 'Obtiene las interacciones del usuario actual con el post (likes y repost).'
+    )]
+    public function getUserInteractions(
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
+        UserPostLeafRepository $likeLeafs,
+        UserPostTreeRepository $likeTrees,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $post = $posts->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Obtener user_id de los query params
+        $userId = $request->query->get('user_id');
+
+        if (!$userId) {
+            return new JsonResponse(
+                ['error' => 'El parámetro user_id es requerido.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $user = $users->find($userId);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Verificar interacciones
+        $hasLikedLeaf = $likeLeafs->findOneBy(['user' => $user, 'post' => $post]) !== null;
+        $hasLikedTree = $likeTrees->findOneBy(['user' => $user, 'post' => $post]) !== null;
+        
+        $repostRepository = $entityManager->getRepository(UserRepost::class);
+        $hasReposted = $repostRepository->findOneBy(['user' => $user, 'post' => $post]) !== null;
+
+        return new JsonResponse([
+            'post_id' => $post->getId(),
+            'user_id' => $user->getId(),
+            'has_liked_leaf' => $hasLikedLeaf,
+            'has_liked_tree' => $hasLikedTree,
+            'has_reposted' => $hasReposted,
+            'leaf_count' => $post->getLeaf(),
+            'tree_count' => $post->getTree(),
+            'repost_count' => $post->getReposts()
+        ], JsonResponse::HTTP_OK);
     }
     // En PostController.php
     #[Route('/user/{id<\d+>}', name: 'api_posts_by_user', methods: ['GET'])]
@@ -565,8 +955,12 @@ final class PostController extends AbstractController
     )]
     public function getPostsByUser(
         int $id,
+        Request $request,
         UserRepository $userRepository,
         PostRepository $postRepository,
+        UserPostLeafRepository $likeLeafs,
+        UserPostTreeRepository $likeTrees,
+        EntityManagerInterface $entityManager,
         SerializerInterface $serializer
     ): JsonResponse {
         $user = $userRepository->find($id);
@@ -578,11 +972,82 @@ final class PostController extends AbstractController
             );
         }
 
-        // Opción 1: Usar findBy con ordenamiento
+        // Obtener posts del usuario
         $posts = $postRepository->findBy(
             ['user' => $user],
-            ['createdAt' => 'DESC'] // Usar camelCase
+            ['createdAt' => 'DESC']
         );
+
+        // Obtener current_user_id opcional de los query params
+        $currentUserId = $request->query->get('current_user_id');
+        
+        // Si hay current_user_id, incluir las interacciones del usuario actual
+        if ($currentUserId) {
+            $currentUser = $userRepository->find($currentUserId);
+            
+            if ($currentUser) {
+                // Obtener todas las interacciones del usuario de una vez
+                $postIds = array_map(fn($post) => $post->getId(), $posts);
+                
+                if (!empty($postIds)) {
+                    // Consultas optimizadas para obtener todas las interacciones
+                    $userLeafLikes = $likeLeafs->createQueryBuilder('l')
+                        ->where('l.user = :user')
+                        ->andWhere('l.post IN (:posts)')
+                        ->setParameter('user', $currentUser)
+                        ->setParameter('posts', $postIds)
+                        ->getQuery()
+                        ->getResult();
+                    
+                    $userTreeLikes = $likeTrees->createQueryBuilder('t')
+                        ->where('t.user = :user')
+                        ->andWhere('t.post IN (:posts)')
+                        ->setParameter('user', $currentUser)
+                        ->setParameter('posts', $postIds)
+                        ->getQuery()
+                        ->getResult();
+                    
+                    $repostRepository = $entityManager->getRepository(UserRepost::class);
+                    $userReposts = $repostRepository->createQueryBuilder('r')
+                        ->where('r.user = :user')
+                        ->andWhere('r.post IN (:posts)')
+                        ->setParameter('user', $currentUser)
+                        ->setParameter('posts', $postIds)
+                        ->getQuery()
+                        ->getResult();
+                    
+                    // Crear mapas para búsqueda rápida
+                    $leafLikesMap = [];
+                    foreach ($userLeafLikes as $like) {
+                        $leafLikesMap[$like->getPost()->getId()] = true;
+                    }
+                    
+                    $treeLikesMap = [];
+                    foreach ($userTreeLikes as $like) {
+                        $treeLikesMap[$like->getPost()->getId()] = true;
+                    }
+                    
+                    $repostsMap = [];
+                    foreach ($userReposts as $repost) {
+                        $repostsMap[$repost->getPost()->getId()] = true;
+                    }
+                    
+                    // Serializar posts y agregar interacciones
+                    $postsData = json_decode($serializer->serialize($posts, 'json', ['groups' => 'post']), true);
+                    
+                    foreach ($postsData as &$postData) {
+                        $postId = $postData['id'];
+                        $postData['user_interactions'] = [
+                            'has_liked_leaf' => isset($leafLikesMap[$postId]),
+                            'has_liked_tree' => isset($treeLikesMap[$postId]),
+                            'has_reposted' => isset($repostsMap[$postId])
+                        ];
+                    }
+                    
+                    return new JsonResponse($postsData, JsonResponse::HTTP_OK);
+                }
+            }
+        }
 
         return new JsonResponse(
             $serializer->serialize($posts, 'json', ['groups' => 'post']),

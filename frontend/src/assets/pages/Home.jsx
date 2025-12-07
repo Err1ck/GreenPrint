@@ -21,7 +21,19 @@ function HomePage() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8000/api/posts");
+
+      // Obtener usuario autenticado del localStorage
+      const userStr = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+
+      // Construir URL con user_id si está autenticado
+      let url = "http://127.0.0.1:8000/api/posts";
+      if (userStr && token) {
+        const user = JSON.parse(userStr);
+        url += `?user_id=${user.id}`;
+      }
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error("Error al cargar los posts");
@@ -124,18 +136,26 @@ function HomePage() {
               <Publication
                 key={post.id}
                 postId={post.id}
-                userId={post.user?.id} // 👈 Añadir userId
+                userId={post.user?.id}
                 userName={post.user?.username || "Usuario"}
-                userProfileUrl={`/perfil/${post.user?.username}`}
+                userProfileUrl={post.user?.photo_url}
+                communityId={post.community?.id}
+                communityName={post.community?.name}
+                communityPhotoUrl={post.community?.photo_url}
                 date={formatDate(post.created_at)}
                 time={formatTime(post.created_at)}
                 text={post.content}
                 postImage={post.image}
+                postType={post.postType}
                 comments={0}
-                retweets={0}
-                like1={0}
-                like2={0}
+                retweets={post.reposts}
+                like1={post.leaf}
+                like2={post.tree}
                 clickable={true}
+                // Pasar datos de interacciones del usuario si existen
+                initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                initialHasReposted={post.user_interactions?.has_reposted || false}
               />
             ))}
         </main>

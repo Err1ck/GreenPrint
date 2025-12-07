@@ -17,11 +17,11 @@ class Community
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['community', 'member', 'getAllCommunityFollowers'])]
+    #[Groups(['community', 'member', 'getAllCommunityFollowers', 'post'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['community', 'member', 'getAllCommunityFollowers'])]
+    #[Groups(['community', 'member', 'getAllCommunityFollowers', 'post'])]
     private ?string $name = null;
 
     /**
@@ -44,14 +44,14 @@ class Community
      * @var string profile photo url
      */
     #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['community'])]
+    #[Groups(['community', 'post'])]
     private ?string $photo_url = null;
 
     /**
      * @var string banner photo url
      */
     #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['community'])]
+    #[Groups(['community', 'post'])]
     private ?string $banner_url = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]

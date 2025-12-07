@@ -1,458 +1,472 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
-import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 
 function ViewProfile() {
-    const { userId } = useParams();
-    const navigate = useNavigate();
-    
-    const [user, setUser] = useState(null);
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [loadingPosts, setLoadingPosts] = useState(false);
-    const [error, setError] = useState(null);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [isFollowing, setIsFollowing] = useState(false);
-    
-    const observer = useRef();
-    const lastPostRef = useCallback(node => {
-        if (loadingPosts) return;
-        if (observer.current) observer.current.disconnect();
-        
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setPage(prevPage => prevPage + 1);
-            }
-        });
-        
-        if (node) observer.current.observe(node);
-    }, [loadingPosts, hasMore]);
+  const { userId } = useParams();
+  const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
 
-    useEffect(() => {
-        fetchUserData();
-    }, [userId]);
+  useEffect(() => {
+    fetchUserData();
+    fetchUserPosts();
+  }, [userId]);
 
-    useEffect(() => {
-        if (page > 1) {
-            fetchMorePosts();
-        }
-    }, [page]);
-
-    const fetchUserData = async () => {
-        try {
-            setLoading(true);
-            const token = localStorage.getItem("token");
-            
-            if (!token) {
-                navigate("/login");
-                return;
-            }
-
-            // Obtener datos del usuario
-            const userResponse = await fetch(`http://127.0.0.1:8000/api/users/${userId}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (!userResponse.ok) throw new Error("Error al cargar usuario");
-            
-            const userData = await userResponse.json();
-            setUser(userData);
-
-            // Obtener posts del usuario
-            const postsResponse = await fetch(`http://127.0.0.1:8000/api/posts/user/${userId}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (!postsResponse.ok) throw new Error("Error al cargar posts");
-            
-            const postsData = await postsResponse.json();
-            
-            // Simular paginación (tomar primeros 10 posts)
-            const initialPosts = postsData.slice(0, 10);
-            setPosts(initialPosts);
-            setHasMore(postsData.length > 10);
-            
-            setLoading(false);
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-        }
-    };
-
-    const fetchMorePosts = async () => {
-        try {
-            setLoadingPosts(true);
-            const token = localStorage.getItem("token");
-            
-            const response = await fetch(`http://127.0.0.1:8000/api/posts/user/${userId}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) throw new Error("Error al cargar más posts");
-            
-            const allPosts = await response.json();
-            const start = page * 10;
-            const end = start + 10;
-            const newPosts = allPosts.slice(start, end);
-            
-            setPosts(prev => [...prev, ...newPosts]);
-            setHasMore(end < allPosts.length);
-            setLoadingPosts(false);
-        } catch (err) {
-            console.error(err);
-            setLoadingPosts(false);
-        }
-    };
-
-    const handleFollow = async () => {
-        // Implementar lógica de seguir/dejar de seguir
-        setIsFollowing(!isFollowing);
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-        return `${date.getDate()} ${months[date.getMonth()]}`;
-    };
-
-    const formatTime = (dateString) => {
-        const date = new Date(dateString);
-        return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-    };
-
-    if (loading) {
-        return (
-            <div style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "100vh",
-                backgroundColor: "#000"
-            }}>
-                <div className="spinner"></div>
-            </div>
-        );
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/users/${userId}`);
+      if (!response.ok) {
+        throw new Error("Error al cargar el usuario");
+      }
+      const data = await response.json();
+      setUser(data);
+    } catch (err) {
+      setError(err.message);
     }
+  };
 
-    if (error) {
-        return (
-            <div style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "100vh",
-                backgroundColor: "#000",
-                color: "#e74c3c",
-                fontSize: "16px"
-            }}>
-                Error: {error}
-            </div>
-        );
+  const fetchUserPosts = async () => {
+    try {
+      setLoading(true);
+
+      // Obtener usuario autenticado del localStorage
+      const userStr = localStorage.getItem('user');
+
+      // Construir URL con current_user_id si está autenticado
+      let url = `http://127.0.0.1:8000/api/posts/user/${userId}`;
+      if (userStr) {
+        const currentUser = JSON.parse(userStr);
+        url += `?current_user_id=${currentUser.id}`;
+      }
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Error al cargar los posts");
+      }
+
+      const data = await response.json();
+
+      const sortedPosts = data.sort((a, b) => {
+        const dateA = new Date(a.created_at);
+        const dateB = new Date(b.created_at);
+        return dateB - dateA;
+      });
+
+      setPosts(sortedPosts);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
     }
+  };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+    return `${date.getDate()} ${months[date.getMonth()]}`;
+  };
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
+  const handleFollowClick = () => {
+    setIsFollowing(!isFollowing);
+    // Aquí irá la lógica para seguir/dejar de seguir
+  };
+
+  if (error) {
     return (
-        <>
-            <style>{`
-                .spinner {
-                    border: 3px solid rgba(29, 155, 240, 0.3);
-                    border-top: 3px solid #1d9bf0;
-                    border-radius: 50%;
-                    width: 40px;
-                    height: 40px;
-                    animation: spin 0.8s linear infinite;
-                }
-                
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                
-                .profile-banner {
-                    width: 100%;
-                    height: 200px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    position: relative;
-                }
-                
-                .profile-content {
-                    padding: 0 16px;
-                    position: relative;
-                }
-                
-                .profile-avatar-container {
-                    margin-top: -75px;
-                    margin-bottom: 12px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-end;
-                }
-                
-                .profile-avatar {
-                    width: 140px;
-                    height: 140px;
-                    border-radius: 50%;
-                    border: 4px solid #000;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 48px;
-                    color: white;
-                    font-weight: bold;
-                }
-                
-                .follow-button {
-                    padding: 8px 24px;
-                    border-radius: 9999px;
-                    font-weight: 700;
-                    font-size: 15px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    border: 1px solid #536471;
-                }
-                
-                .follow-button.following {
-                    background: transparent;
-                    color: #e7e9ea;
-                }
-                
-                .follow-button.not-following {
-                    background: #eff3f4;
-                    color: #0f1419;
-                    border: none;
-                }
-                
-                .follow-button:hover {
-                    opacity: 0.9;
-                }
-            `}</style>
-
-            <div className="navbarLeft-content">
-                <Navbar navbarType={1} />
-            </div>
-            
-            <div className="main-layout-container">
-                <div className="spacer-left"></div>
-                
-                <main className="main-content" style={{ padding: 0 }}>
-                    {/* Header con botón de volver */}
-                    <div style={{
-                        padding: "16px",
-                        borderBottom: "1px solid #2f3336",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "20px",
-                        position: "sticky",
-                        top: 0,
-                        backgroundColor: "rgba(0, 0, 0, 0.65)",
-                        backdropFilter: "blur(12px)",
-                        zIndex: 10
-                    }}>
-                        <button
-                            onClick={() => navigate(-1)}
-                            style={{
-                                background: "transparent",
-                                border: "none",
-                                color: "#e7e9ea",
-                                cursor: "pointer",
-                                fontSize: "20px",
-                                padding: "8px",
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                width: "36px",
-                                height: "36px",
-                                transition: "background-color 0.2s"
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(231, 233, 234, 0.1)"}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
-                        >
-                            ←
-                        </button>
-                        <div>
-                            <h2 style={{
-                                color: "#e7e9ea",
-                                fontSize: "20px",
-                                fontWeight: "700",
-                                margin: 0
-                            }}>
-                                {user?.username || "Usuario"}
-                            </h2>
-                            <p style={{
-                                color: "#71767b",
-                                fontSize: "13px",
-                                margin: 0
-                            }}>
-                                {posts.length} posts
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Banner */}
-                    <div className="profile-banner"></div>
-
-                    {/* Info del perfil */}
-                    <div className="profile-content">
-                        <div className="profile-avatar-container">
-                            <div className="profile-avatar">
-                                {user?.username?.charAt(0).toUpperCase() || "U"}
-                            </div>
-                            <button
-                                onClick={handleFollow}
-                                className={`follow-button ${isFollowing ? 'following' : 'not-following'}`}
-                            >
-                                {isFollowing ? "Siguiendo" : "Seguir"}
-                            </button>
-                        </div>
-
-                        {/* Nombre y username */}
-                        <div style={{ marginBottom: "12px" }}>
-                            <h2 style={{
-                                color: "#e7e9ea",
-                                fontSize: "20px",
-                                fontWeight: "700",
-                                margin: 0
-                            }}>
-                                {user?.username || "Usuario"}
-                            </h2>
-                            <p style={{
-                                color: "#71767b",
-                                fontSize: "15px",
-                                margin: 0
-                            }}>
-                                @{user?.username || "usuario"}
-                            </p>
-                        </div>
-
-                        {/* Biografía */}
-                        {user?.biography && (
-                            <p style={{
-                                color: "#e7e9ea",
-                                fontSize: "15px",
-                                marginBottom: "12px"
-                            }}>
-                                {user.biography}
-                            </p>
-                        )}
-
-                        {/* Stats */}
-                        <div style={{
-                            display: "flex",
-                            gap: "20px",
-                            marginBottom: "16px",
-                            paddingBottom: "16px",
-                            borderBottom: "1px solid #2f3336"
-                        }}>
-                            <div>
-                                <span style={{ color: "#e7e9ea", fontWeight: "700" }}>
-                                    {user?.follower_count || 0}
-                                </span>
-                                <span style={{ color: "#71767b", marginLeft: "4px" }}>
-                                    Seguidores
-                                </span>
-                            </div>
-                            <div>
-                                <span style={{ color: "#e7e9ea", fontWeight: "700" }}>
-                                    {user?.leaf_coins_user || 0}
-                                </span>
-                                <span style={{ color: "#71767b", marginLeft: "4px" }}>
-                                    🍃 Leaf Coins
-                                </span>
-                            </div>
-                            <div>
-                                <span style={{ color: "#e7e9ea", fontWeight: "700" }}>
-                                    {user?.tree_coins_community || 0}
-                                </span>
-                                <span style={{ color: "#71767b", marginLeft: "4px" }}>
-                                    🌳 Tree Coins
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Posts */}
-                    <div>
-                        {posts.length === 0 ? (
-                            <div style={{
-                                textAlign: "center",
-                                padding: "40px",
-                                color: "#71767b"
-                            }}>
-                                Este usuario aún no tiene posts
-                            </div>
-                        ) : (
-                            posts.map((post, index) => {
-                                if (posts.length === index + 1) {
-                                    return (
-                                        <div ref={lastPostRef} key={post.id}>
-                                            <Publication
-                                                postId={post.id}
-                                                userName={post.user?.username || "Usuario"}
-                                                userId={post.user?.id}
-                                                date={formatDate(post.created_at)}
-                                                time={formatTime(post.created_at)}
-                                                text={post.content}
-                                                postImage={post.image}
-                                                comments={0}
-                                                retweets={0}
-                                                like1={0}
-                                                like2={0}
-                                                clickable={true}
-                                            />
-                                        </div>
-                                    );
-                                } else {
-                                    return (
-                                        <Publication
-                                            key={post.id}
-                                            postId={post.id}
-                                            userName={post.user?.username || "Usuario"}
-                                            userId={post.user?.id}
-                                            date={formatDate(post.created_at)}
-                                            time={formatTime(post.created_at)}
-                                            text={post.content}
-                                            postImage={post.image}
-                                            comments={0}
-                                            retweets={0}
-                                            like1={0}
-                                            like2={0}
-                                            clickable={true}
-                                        />
-                                    );
-                                }
-                            })
-                        )}
-                        
-                        {loadingPosts && (
-                            <div style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                padding: "20px"
-                            }}>
-                                <div className="spinner"></div>
-                            </div>
-                        )}
-                    </div>
-                </main>
-                
-                <div className="spacer-right"></div>
-            </div>
-            
-            <div className="navbarRight-content">
-                <Navbar navbarType={2} />
-            </div>
-        </>
+      <div style={{ display: "flex", width: "100%" }}>
+        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+          <Navbar navbarType={1} />
+        </div>
+        <div style={{ flex: 1, minHeight: "100vh" }}>
+          <div style={{ textAlign: "center", padding: "40px", color: "#e74c3c" }}>
+            Error: {error}
+          </div>
+        </div>
+        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+          <Navbar navbarType={2} />
+        </div>
+      </div>
     );
+  }
+
+  if (!user) {
+    return (
+      <div style={{ display: "flex", width: "100%" }}>
+        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+          <Navbar navbarType={1} />
+        </div>
+        <div style={{ flex: 1, minHeight: "100vh" }}>
+          <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
+            Cargando perfil...
+          </div>
+        </div>
+        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+          <Navbar navbarType={2} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", width: "100%" }}>
+      {/* Navbar Left */}
+      <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0, zIndex: 100 }}>
+        <Navbar navbarType={1} />
+      </div>
+
+      {/* Main Content */}
+      <div style={{ flex: 1, minHeight: "100vh" }}>
+        <main style={{ width: "100%", maxWidth: "600px", margin: "0 auto" }}>
+          {/* Header with back button */}
+          <div style={{
+            position: "sticky",
+            top: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.85)",
+            backdropFilter: "blur(12px)",
+            borderBottom: "1px solid #eff3f4",
+            padding: "12px 16px",
+            zIndex: 10
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+              <button
+                onClick={() => window.history.back()}
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#f7f9f9"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#0f1419">
+                  <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z" />
+                </svg>
+              </button>
+              <div>
+                <h2 style={{
+                  fontSize: "20px",
+                  fontWeight: "700",
+                  color: "#0f1419",
+                  margin: 0
+                }}>
+                  {user.username}
+                </h2>
+                <p style={{
+                  fontSize: "13px",
+                  color: "#536471",
+                  margin: 0
+                }}>
+                  {posts.length} posts
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Banner */}
+          <div style={{
+            width: "100%",
+            height: "200px",
+            backgroundColor: user.banner_url ? "transparent" : "#cfd9de",
+            backgroundImage: user.banner_url ? `url(${user.banner_url})` : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          }} />
+
+          {/* Profile Info Section */}
+          <div style={{ padding: "12px 16px", borderBottom: "1px solid #eff3f4" }}>
+            {/* Avatar and Follow Button */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              marginTop: "-68px",
+              marginBottom: "12px"
+            }}>
+              {/* Avatar */}
+              <div style={{
+                width: "134px",
+                height: "134px",
+                borderRadius: "50%",
+                border: "4px solid #ffffff",
+                backgroundColor: "#cfd9de",
+                backgroundImage: user.photo_url ? `url(${user.photo_url})` : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center"
+              }} />
+
+              {/* Follow Button */}
+              <button
+                onClick={handleFollowClick}
+                style={{
+                  marginTop: "72px",
+                  padding: "8px 24px",
+                  borderRadius: "9999px",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  border: isFollowing ? "1px solid #cfd9de" : "1px solid #0f1419",
+                  backgroundColor: isFollowing ? "transparent" : "#0f1419",
+                  color: isFollowing ? "#0f1419" : "#ffffff",
+                  cursor: "pointer",
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={(e) => {
+                  if (isFollowing) {
+                    e.target.style.backgroundColor = "#fee";
+                    e.target.style.borderColor = "#f4212e";
+                    e.target.style.color = "#f4212e";
+                    e.target.textContent = "Dejar de seguir";
+                  } else {
+                    e.target.style.backgroundColor = "#272c30";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isFollowing) {
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.borderColor = "#cfd9de";
+                    e.target.style.color = "#0f1419";
+                    e.target.textContent = "Siguiendo";
+                  } else {
+                    e.target.style.backgroundColor = "#0f1419";
+                  }
+                }}
+              >
+                {isFollowing ? "Siguiendo" : "Seguir"}
+              </button>
+            </div>
+
+            {/* Username */}
+            <div style={{ marginBottom: "12px" }}>
+              <h1 style={{
+                fontSize: "20px",
+                fontWeight: "700",
+                color: "#0f1419",
+                margin: 0,
+                marginBottom: "2px"
+              }}>
+                {user.username}
+              </h1>
+            </div>
+
+            {/* Biography */}
+            {user.biography && (
+              <div style={{ marginBottom: "12px" }}>
+                <p style={{
+                  fontSize: "15px",
+                  color: "#0f1419",
+                  margin: 0,
+                  lineHeight: "20px",
+                  whiteSpace: "pre-wrap"
+                }}>
+                  {user.biography}
+                </p>
+              </div>
+            )}
+
+            {/* Coins Section */}
+            <div style={{
+              display: "flex",
+              gap: "24px",
+              marginTop: "12px"
+            }}>
+              {/* Leaf Coins */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                backgroundColor: "#ecfce7",
+                borderRadius: "16px"
+              }}>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#00ba7c">
+                  <path d="M12 2C8.69 2 6 4.69 6 8c0 1.89.88 3.57 2.25 4.66C6.94 13.82 6 15.79 6 18c0 3.31 2.69 6 6 6s6-2.69 6-6c0-2.21-.94-4.18-2.25-5.34C17.12 11.57 18 9.89 18 8c0-3.31-2.69-6-6-6z" />
+                </svg>
+                <div>
+                  <p style={{
+                    fontSize: "13px",
+                    color: "#536471",
+                    margin: 0,
+                    lineHeight: "1"
+                  }}>
+                    Leaf Coins
+                  </p>
+                  <p style={{
+                    fontSize: "17px",
+                    fontWeight: "700",
+                    color: "#00ba7c",
+                    margin: 0,
+                    lineHeight: "1.3"
+                  }}>
+                    {user.leaf_coins_user || 0}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tree Coins */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                backgroundColor: "#e8f5fd",
+                borderRadius: "16px"
+              }}>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#1d9bf0">
+                  <path d="M12 2L9 8H4l5 4-2 6 5-3 5 3-2-6 5-4h-5z" />
+                </svg>
+                <div>
+                  <p style={{
+                    fontSize: "13px",
+                    color: "#536471",
+                    margin: 0,
+                    lineHeight: "1"
+                  }}>
+                    Tree Coins
+                  </p>
+                  <p style={{
+                    fontSize: "17px",
+                    fontWeight: "700",
+                    color: "#1d9bf0",
+                    margin: 0,
+                    lineHeight: "1.3"
+                  }}>
+                    {user.tree_coins_community || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Followers Count */}
+            <div style={{
+              display: "flex",
+              gap: "20px",
+              marginTop: "12px"
+            }}>
+              <div>
+                <span style={{ fontWeight: "700", color: "#0f1419" }}>
+                  {user.follower_count || 0}
+                </span>
+                <span style={{ color: "#536471", marginLeft: "4px", fontSize: "15px" }}>
+                  Seguidores
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div style={{
+            display: "flex",
+            borderBottom: "1px solid #eff3f4",
+            position: "sticky",
+            top: "53px",
+            backgroundColor: "#ffffff",
+            zIndex: 9
+          }}>
+            {/* <div style={{
+              flex: 1,
+              padding: "16px",
+              textAlign: "center",
+              cursor: "pointer",
+              position: "relative",
+              fontWeight: "700",
+              fontSize: "15px",
+              color: "#0f1419",
+              transition: "background-color 0.2s"
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = "#f7f9f9"}
+            onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+            >
+              Posts
+              <div style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                backgroundColor: "#1d9bf0",
+                borderRadius: "9999px"
+              }} />
+            </div> */}
+          </div>
+
+          {/* Posts List */}
+          <div>
+            {loading && (
+              <div style={{
+                textAlign: "center",
+                padding: "40px",
+                fontSize: "16px",
+                color: "#666"
+              }}>
+                Cargando posts...
+              </div>
+            )}
+
+            {!loading && posts.length === 0 && (
+              <div style={{
+                textAlign: "center",
+                padding: "40px",
+                fontSize: "16px",
+                color: "#666"
+              }}>
+                Este usuario aún no ha publicado nada
+              </div>
+            )}
+
+            {!loading && posts.map((post) => (
+              <Publication
+                key={post.id}
+                postId={post.id}
+                userId={post.user?.id}
+                userName={post.user?.username || "Usuario"}
+                userProfileUrl={post.user?.photo_url}
+                communityId={post.community?.id}
+                communityName={post.community?.name}
+                communityPhotoUrl={post.community?.photo_url}
+                date={formatDate(post.created_at)}
+                time={formatTime(post.created_at)}
+                text={post.content}
+                postImage={post.image}
+                postType={post.postType}
+                comments={0}
+                retweets={post.reposts}
+                like1={post.leaf}
+                like2={post.tree}
+                clickable={true}
+                // Pasar datos de interacciones del usuario si existen
+                initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                initialHasReposted={post.user_interactions?.has_reposted || false}
+              />
+            ))}
+          </div>
+        </main>
+      </div>
+
+      {/* Navbar Right */}
+      <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0, zIndex: 100 }}>
+        <Navbar navbarType={2} />
+      </div>
+    </div>
+  );
 }
 
 export default ViewProfile;

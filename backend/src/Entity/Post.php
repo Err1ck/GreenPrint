@@ -39,6 +39,14 @@ class Post
     #[Groups(['post'])]
     private ?int $leaf = 0;
 
+    #[ORM\Column]
+    #[Groups(['post'])]
+    private ?int $tree = 0;
+
+    #[ORM\Column]
+    #[Groups(['post'])]
+    private ?int $reposts = 0;
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['post'])]
     private ?string $image = null;
@@ -60,6 +68,28 @@ class Post
     public function setLeaf(?int $leaf): static
     {
         $this->leaf = $leaf;
+        return $this;
+    }
+
+        public function getTree(): ?int
+    {
+        return $this->tree;
+    }
+
+    public function setTree(?int $tree): static
+    {
+        $this->tree = $tree;
+        return $this;
+    }
+
+        public function getReposts(): ?int
+    {
+        return $this->reposts;
+    }
+
+    public function setReposts(?int $reposts): static
+    {
+        $this->reposts = $reposts;
         return $this;
     }
 
