@@ -4,7 +4,8 @@
 :root {
   /* Colores principales */
   --color-bg: #ffffff;
-  --color-bg-secondary: #f7f9f9;
+  /* --color-bg-secondary: #f7f9f9; */
+  --color-bg-secondary: #ecfce7;
   --color-text-primary: #0f1419;
   --color-text-secondary: #536471;
   --color-text-tertiary: #8b98a5;
@@ -121,5 +122,4 @@ button {
 
 img {
   max-width: 100%;
-  /* display: block; */
 }

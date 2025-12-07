@@ -14,7 +14,8 @@ function Footer({ footerType }) {
       )}
       {footerType === 2 && (
         <div className="footer2">
-          ©2025 GreenPrint.co, Todos los derechos reservados
+          <div>©2025 GreenPrint.co,</div>
+          <div>Todos los derechos reservados</div>
         </div>
       )}
     </>

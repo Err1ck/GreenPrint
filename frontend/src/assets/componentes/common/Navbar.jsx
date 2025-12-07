@@ -28,7 +28,6 @@ function Navbar({ navbarType, onOpenModal }) {
                 </div>
               </div>
               <div className="navbar-links">
-                
                 <div className="navbar-links-right">
                   <LinkIcon
                     name={"icon3"}
@@ -77,38 +76,43 @@ function Navbar({ navbarType, onOpenModal }) {
       {navbarType === 2 && (
         <nav className="navbarRight">
           <div className="navbarRight-container">
-            {/* 🔍 AQUÍ transformamos Buscador en input */}
-            <LinkIcon
-              name={"icon9"}
-              anchor={false} // activa modo "no enlace"
-              classname={"navicon"} // misma clase para no romper diseño
-              onSearch={handleSearch} // ⬅️ NUEVO: lógica al pulsar Enter
-              text={"Buscador"} // este texto ya no se usa en modo buscador, pero no molesta
-            />
+            <div className="navbarRight-container-section">
+              <div className="section-buscador">
+                <LinkIcon
+                  name={"icon9"}
+                  anchor={false}
+                  classname={"navicon"}
+                  onSearch={handleSearch}
+                  text={"Buscador"}
+                />
+              </div>
+              <div className="seccion-trend">
+                <LinkIcon
+                  name={"icon7"}
+                  anchor={false}
+                  href={"/tendencias"}
+                  classname={"navicon"}
+                  text={"Tendencias"}
+                />
+                <LinkIcon
+                  name={"icon11"}
+                  anchor={false}
+                  href={"/comunidades"}
+                  classname={"navicon"}
+                  text={"Comunidades"}
+                />
+              </div>
+            </div>
 
-            <LinkIcon
-              name={"icon7"}
-              anchor={false}
-              href={"/tendencias"}
-              classname={"navicon"}
-              text={"Tendencias"}
-            />
-            <LinkIcon
-              name={"icon11"}
-              anchor={false}
-              href={"/comunidades"}
-              classname={"navicon"}
-              text={"Comunidades"}
-            />
-
-            <Footer footerType={2} />
-
-            <Button
-              onClick={onOpenModal}
-              classButton="button-navbar-open-modal"
-            >
-              <div className="button-text">Nuevo Post</div>
-            </Button>
+            <div className="navbarRight-container-footer">
+              <Footer footerType={2} />
+              <Button
+                onClick={onOpenModal}
+                classButton="button-navbar-open-modal"
+              >
+                <div className="button-text">Nuevo Post</div>
+              </Button>
+            </div>
           </div>
         </nav>
       )}
