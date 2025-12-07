@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Post
 {
     use TimestampableTrait;
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,6 +25,15 @@ class Post
     #[ORM\JoinColumn(name: 'user_id', nullable: false)]
     #[Groups(['post'])]
     private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Community::class)]
+    #[ORM\JoinColumn(name: 'community_id', nullable: true)]
+    #[Groups(['post'])]
+    private ?Community $community = null;
+
+    #[ORM\Column(length: 50)]
+    #[Groups(['post'])]
+    private ?string $postType = 'user';
 
     #[ORM\Column]
     #[Groups(['post'])]
@@ -37,12 +46,6 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['post'])]
     private ?string $content = null;
-
-    // public function __construct()
-    // {
-    //     $this->leaf = '';
-    //     $this->fecha_publicacion = new \DateTime();
-    // }
 
     public function getId(): ?int
     {
@@ -90,6 +93,28 @@ class Post
     public function setUser(User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getCommunity(): ?Community
+    {
+        return $this->community;
+    }
+
+    public function setCommunity(?Community $community): static
+    {
+        $this->community = $community;
+        return $this;
+    }
+
+    public function getPostType(): ?string
+    {
+        return $this->postType;
+    }
+
+    public function setPostType(?string $postType): static
+    {
+        $this->postType = $postType;
         return $this;
     }
 }

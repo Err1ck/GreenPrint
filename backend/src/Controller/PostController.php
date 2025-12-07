@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Entity\UserPostLeaf;
 use App\Entity\UserRepost;
+use App\Repository\CommunityRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserPostLeafRepository;
 use App\Repository\UserRepository;
@@ -91,7 +92,7 @@ final class PostController extends AbstractController
         );
     }
 
-    #[Route('/create', name: 'api_posts_create', methods: ['POST'])]
+     #[Route('/create', name: 'api_posts_create', methods: ['POST'])]
     #[OA\Post(
         tags: ['PostController'],
         summary: 'Crea un nuevo post.',
@@ -101,21 +102,26 @@ final class PostController extends AbstractController
                 type: 'object',
                 properties: [
                     new OA\Property(property: 'user', type: 'int', example: '1 (user_id)'),
+                    new OA\Property(property: 'community', type: 'int', example: '1 (community_id)', nullable: true),
+                    new OA\Property(property: 'postType', type: 'string', example: 'user or community'),
                     new OA\Property(property: 'content', type: 'string', example: 'Lorem ipsum...'),
                     new OA\Property(property: 'image', type: 'string', example: 'path/img'),
                 ]
             )
         ),
     )]
-    public function create(Request $request, UserRepository $users, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-    {
-
+    public function create(
+        Request $request, 
+        UserRepository $users, 
+        CommunityRepository $communities,
+        EntityManagerInterface $entityManager, 
+        ValidatorInterface $validator
+    ): JsonResponse {
         $post = new Post();
-
         $data = json_decode($request->getContent(), true);
 
+        // Validar y asignar usuario
         if (isset($data['user'])) {
-
             $user = $users->find($data['user']);
 
             if (!$user) {
@@ -133,10 +139,42 @@ final class PostController extends AbstractController
             );
         }
 
+        // Validar y asignar comunidad (si existe)
+        if (isset($data['community'])) {
+            $community = $communities->find($data['community']);
+
+            if (!$community) {
+                return new JsonResponse(
+                    ['error' => 'Comunidad no encontrada.'],
+                    JsonResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            $post->setCommunity($community);
+            $post->setPostType('community'); // Establecer tipo automáticamente
+        } else {
+            // Si no hay comunidad, es un post de usuario
+            $post->setPostType('user');
+        }
+
+        // Validar postType manual si se proporciona
+        if (isset($data['postType'])) {
+            $validTypes = ['user', 'community'];
+            if (!in_array($data['postType'], $validTypes)) {
+                return new JsonResponse(
+                    ['error' => 'postType debe ser "user" o "community".'],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+            $post->setPostType($data['postType']);
+        }
+
+        // Asignar imagen si existe
         if (isset($data['image'])) {
             $post->setImage($data['image']);
         }
 
+        // Validar y asignar contenido
         if (isset($data['content'])) {
             $post->setContent($data['content']);
         } else {
@@ -147,11 +185,10 @@ final class PostController extends AbstractController
         }
 
         $post->setLeaf(0);
-
         $post->setCreatedAt(new \DateTimeImmutable());
         $post->setUpdatedAt(new \DateTimeImmutable());
 
-        // 4. Validar la entidad antes de guardar
+        // Validar la entidad antes de guardar
         $errors = $validator->validate($post);
 
         if (count($errors) > 0) {
@@ -167,13 +204,45 @@ final class PostController extends AbstractController
         }
 
         $entityManager->persist($post);
-
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "El post ha sido creado."],
+            ['message' => "El post ha sido creado.", 'post_id' => $post->getId()],
+            JsonResponse::HTTP_CREATED,
+        );
+    }
+
+    // Nuevo método para obtener posts de una comunidad
+    #[Route('/community/{id<\d+>}', name: 'api_posts_by_community', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['PostController'],
+        summary: 'Obtiene todos los posts de una comunidad ordenados por fecha.'
+    )]
+    public function getPostsByCommunity(
+        int $id,
+        CommunityRepository $communityRepository,
+        PostRepository $postRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $community = $communityRepository->find($id);
+
+        if (!$community) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $posts = $postRepository->findBy(
+            ['community' => $community],
+            ['createdAt' => 'DESC']
+        );
+
+        return new JsonResponse(
+            $serializer->serialize($posts, 'json', ['groups' => 'post']),
             JsonResponse::HTTP_OK,
             [],
+            true
         );
     }
 
