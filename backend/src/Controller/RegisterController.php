@@ -19,11 +19,12 @@ class RegisterController extends AbstractController
     #[OA\Post(
         tags: ['RegisterController'],
         summary: 'Registrar usuarios.',
-         requestBody: new OA\RequestBody(
+        requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
                 properties: [
+                    new OA\Property(property: 'username', type: 'string', example: 'johndoe'),
                     new OA\Property(property: 'email', type: 'string', example: 'test@gmail.com'),
                     new OA\Property(property: 'password', type: 'string', example: '*****'),
                 ]
@@ -38,11 +39,23 @@ class RegisterController extends AbstractController
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['email']) || !isset($data['password'])) {
+        if (!isset($data['email']) || !isset($data['password']) || !isset($data['username'])) {
             return $this->json([
-                'message' => 'Email y password son requeridos'
+                'message' => 'Email, username y password son requeridos'
             ], Response::HTTP_BAD_REQUEST);
         }
+
+
+        // Verificar si el username ya existe (después de verificar email):
+        $existingUsername = $entityManager->getRepository(User::class)
+            ->findOneBy(['username' => $data['username']]);
+
+        if ($existingUsername) {
+            return $this->json([
+                'message' => 'El nombre de usuario ya está registrado'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
 
         // Verificar si el usuario ya existe
         $existingUser = $entityManager->getRepository(User::class)
@@ -55,6 +68,7 @@ class RegisterController extends AbstractController
         }
 
         $user = new User();
+        $user->setUsername($data['username']);
         $user->setEmail($data['email']);
         $user->setRoles(['user']);
 
@@ -87,9 +101,11 @@ class RegisterController extends AbstractController
 
         return $this->json([
             'message' => 'Usuario registrado exitosamente',
+            // En la respuesta final, añadir username:
             'user' => [
                 'id' => $user->getId(),
                 'email' => $user->getEmail(),
+                'username' => $user->getUsername(),
                 'createdAt' => $user->getCreatedAt()->format('Y-m-d H:i:s')
             ]
         ], Response::HTTP_CREATED);
