@@ -3,30 +3,31 @@
 namespace App\Entity;
 
 use App\Entity\Trait\TimestampableTrait;
+use App\Repository\SavedPostsRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'community_follows')]
-class CommunityFollows
+#[ORM\Entity(repositoryClass: SavedPostsRepository::class)]
+#[ORM\Table(name: 'saved_posts')]
+class SavedPosts
 {
     use TimestampableTrait;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCommunityFollowers', 'getAllCommunityFollowers', 'getCommunityFollowers'])]
+    #[Groups(['saved_posts'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['getAllCommunityFollowers', 'getAllCommunityFollowers',  'getCommunityFollowers'])]
+    #[Groups(['saved_posts'])]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Community::class)]
+    #[ORM\ManyToOne(targetEntity: Post::class)]
     #[ORM\JoinColumn(nullable: false)]
-     #[Groups(['getAllCommunityFollowers', 'getCommunityFollowers'])]
-    private ?Community $community = null;
+    #[Groups(['saved_posts'])]
+    private ?Post $post = null;
 
     public function getId(): ?int
     {
@@ -44,14 +45,14 @@ class CommunityFollows
         return $this;
     }
 
-    public function getCommunity(): ?Community
+    public function getPost(): ?Post
     {
-        return $this->community;
+        return $this->post;
     }
 
-    public function setCommunity(Community $community): static
+    public function setPost(Post $post): static
     {
-        $this->community = $community;
+        $this->post = $post;
         return $this;
     }
 }

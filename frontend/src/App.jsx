@@ -8,6 +8,7 @@ import ViewPost from "./assets/pages/ViewPost";
 import ViewProfile from "./assets/pages/ViewProfile";
 import ViewCommunity from "./assets/pages/ViewCommunity";
 import Search from "./assets/pages/Search";
+import SavedPosts from "./assets/pages/SavedPosts";
 function App() {
   return (
     <>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/post/:id" element={<ViewPost />} />
         <Route path="/profile/:userId" element={<ViewProfile />} />
         <Route path="/community/:communityId" element={<ViewCommunity />} />
+        <Route path="/saved" element={<SavedPosts />} />
       </Routes>
     </>
   );

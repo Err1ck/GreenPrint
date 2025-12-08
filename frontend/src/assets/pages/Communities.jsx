@@ -14,6 +14,7 @@ function CommunityPage() {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+    const [followedCommunities, setFollowedCommunities] = useState(new Set());
     const communitiesPerPage = 10;
 
     const openModal = () => setIsModalOpen(true);
@@ -21,7 +22,39 @@ function CommunityPage() {
 
     useEffect(() => {
         fetchCommunities();
+        checkFollowedCommunities();
     }, []);
+
+    const checkFollowedCommunities = async () => {
+        try {
+            const currentUserStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (!currentUserStr || !token) return;
+
+            const currentUser = JSON.parse(currentUserStr);
+
+            const response = await fetch(
+                `http://127.0.0.1:8000/api/users/${currentUser.id}/followed-communities`,
+                {
+                    headers: { "Authorization": `Bearer ${token}` }
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    const followedIds = new Set(
+                        data.map(item => item.community?.id).filter(id => id !== undefined)
+                    );
+                    setFollowedCommunities(followedIds);
+                }
+            }
+        } catch (err) {
+            console.error("Error checking follow status:", err);
+        }
+    };
 
     const fetchCommunities = async () => {
         try {
@@ -222,12 +255,14 @@ function CommunityPage() {
                             <div key={community.id} onClick={() => handleCommunityClick(community.id)}>
                                 <FollowCard
                                     type="community"
+                                    id={community.id}
                                     name={community.name}
                                     bio={community.biography}
                                     members={community.member_count || 0}
                                     followers={community.follower_count || 0}
                                     photoUrl={community.photo_url}
                                     maxBioLength={100}
+                                    initialIsFollowing={followedCommunities.has(community.id)}
                                 />
                             </div>
                         ))}

@@ -17,11 +17,11 @@ class Community
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['community', 'member', 'getAllCommunityFollowers', 'post'])]
+    #[Groups(['community', 'member', 'getAllCommunityFollowers', 'getCommunityFollowers', 'post'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['community', 'member', 'getAllCommunityFollowers', 'post'])]
+    #[Groups(['community', 'member', 'getAllCommunityFollowers', 'getCommunityFollowers', 'post'])]
     private ?string $name = null;
 
     /**

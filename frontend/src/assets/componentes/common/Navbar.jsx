@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
@@ -8,6 +9,22 @@ import { ThemeToggle } from "./ThemeToggle";
 
 function Navbar({ navbarType, onOpenModal }) {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState(null);
+
+
+  // Obtener el ID del usuario desde localStorage
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setUserId(user.id);
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
+    }
+  }, []);
+
 
   // 🔹 Lógica de búsqueda cuando se pulsa Enter en el buscador
   const handleSearch = (textoBuscado) => {
@@ -42,7 +59,7 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"save"}
-                    href={"/guardados"}
+                    href={"/saved"}
                     classname={"navicon"}
                     text={"Guardados"}
                   />
@@ -54,7 +71,7 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"perfil"}
-                    href={"/perfil"}
+                    href={userId ? `/profile/${userId}` : "/perfil"}
                     classname={"navicon"}
                     text={"Perfil"}
                   />

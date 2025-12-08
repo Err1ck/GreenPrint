@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, Repeat2, Leaf, TreeDeciduous } from "lucide-react";
+import { MessageCircle, Repeat2, Leaf, TreeDeciduous, Bookmark } from "lucide-react";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/MainSection.css";
@@ -28,6 +28,7 @@ const Publication = ({
     initialHasLikedLeaf = false,
     initialHasLikedTree = false,
     initialHasReposted = false,
+    initialIsSaved = false,
 }) => {
     const navigate = useNavigate();
     const [commentCount, setCommentCount] = useState(comments);
@@ -38,11 +39,13 @@ const Publication = ({
     const [isLike1Active, setIsLike1Active] = useState(initialHasLikedLeaf);
     const [isLike2Active, setIsLike2Active] = useState(initialHasLikedTree);
     const [isRetweetActive, setIsRetweetActive] = useState(initialHasReposted);
+    const [isSaved, setIsSaved] = useState(initialIsSaved);
 
     const [commentHover, setCommentHover] = useState(false);
     const [retweetHover, setRetweetHover] = useState(false);
     const [like1Hover, setLike1Hover] = useState(false);
     const [like2Hover, setLike2Hover] = useState(false);
+    const [saveHover, setSaveHover] = useState(false);
     const [profileHover, setProfileHover] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -205,6 +208,54 @@ const Publication = ({
             } else {
                 console.error("Error:", data.error);
                 if (data.error && !data.error.includes("Ya has hecho repost")) {
+                    alert(data.error);
+                }
+            }
+        } catch (error) {
+            console.error("Error de red:", error);
+            alert("Error al conectar con el servidor");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Handler para guardar/desguardar post
+    const handleSave = async (e) => {
+        e.stopPropagation();
+
+        const auth = getCurrentUser();
+        if (!auth) {
+            alert("Debes iniciar sesión para guardar posts");
+            return;
+        }
+
+        if (isLoading) return;
+        setIsLoading(true);
+
+        try {
+            const endpoint = isSaved
+                ? `http://127.0.0.1:8000/api/users/${auth.user.id}/unsave-post`
+                : `http://127.0.0.1:8000/api/users/${auth.user.id}/save-post`;
+
+            const method = isSaved ? 'DELETE' : 'POST';
+
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`
+                },
+                body: JSON.stringify({
+                    post_id: postId
+                })
+            });
+
+            if (response.ok) {
+                setIsSaved(!isSaved);
+            } else {
+                const data = await response.json();
+                console.error("Error:", data.error);
+                if (data.error && !data.error.includes("Ya has guardado") && !data.error.includes("No has guardado")) {
                     alert(data.error);
                 }
             }
@@ -438,6 +489,25 @@ const Publication = ({
                                         </span>
                                     </div>
                                 )}
+
+                                {/* Save/Bookmark */}
+                                <div
+                                    className="action-group"
+                                    onClick={handleSave}
+                                    onMouseEnter={() => setSaveHover(true)}
+                                    onMouseLeave={() => setSaveHover(false)}
+                                    style={{
+                                        backgroundColor: saveHover || isSaved ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                                        cursor: isLoading ? 'wait' : 'pointer'
+                                    }}
+                                >
+                                    <Bookmark
+                                        size={18}
+                                        color={(saveHover || isSaved) ? '#ffa500' : '#536471'}
+                                        strokeWidth={1.5}
+                                        fill={isSaved ? '#ffa500' : 'none'}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </footer>
