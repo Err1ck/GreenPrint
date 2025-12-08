@@ -11,6 +11,15 @@
   flex-shrink: 0;
   z-index: 100;
 }
+.navbar-links-right .link-icon:first-child {
+  background-color: var(--color-bg-secondary);
+}
+.navbar-links-right:hover .link-icon:first-child {
+  background-color: transparent;
+}
+.navbar-links-right:hover .link-icon:hover {
+  background-color: var(--color-bg-secondary);
+}
 
 .main-layout-container {
   flex: 1;
