@@ -25,7 +25,7 @@ class CommunityFollows
 
     #[ORM\ManyToOne(targetEntity: Community::class)]
     #[ORM\JoinColumn(nullable: false)]
-     #[Groups(['getAllCommunityFollowers', 'getAllCommunityFollowers'])]
+     #[Groups(['getAllCommunityFollowers', 'getCommunityFollowers'])]
     private ?Community $community = null;
 
     public function getId(): ?int
