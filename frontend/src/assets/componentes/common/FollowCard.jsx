@@ -99,15 +99,39 @@ const FollowCard = ({
             {/* Contenido debajo */}
             <div>
                 {/* Nombre */}
-                <h3
-                    style={{
-                        margin: "0 0 4px 0",
-                        fontSize: "16px",
-                        fontWeight: "bold"
-                    }}
-                >
-                    {name}
-                </h3>
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "4px"
+                }}>
+                    <h3
+                        style={{
+                            margin: 0,
+                            fontSize: "16px",
+                            fontWeight: "bold"
+                        }}
+                    >
+                        {name}
+                    </h3>
+                    {/* Badge de comunidad */}
+                    {type === "community" && (
+                        <span style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                            color: "#1d9bf0",
+                            backgroundColor: "rgba(29, 155, 240, 0.1)",
+                            padding: "2px 8px",
+                            borderRadius: "8px",
+                            letterSpacing: "0.3px"
+                        }}>
+                            🌳 COMUNIDAD
+                        </span>
+                    )}
+                </div>
 
                 {/* Username (solo para usuarios) */}
                 {type === "user" && username && (

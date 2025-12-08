@@ -35,31 +35,31 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"icon31"}
-                    href={"/comunidades"}
+                    href={"/communities"}
                     classname={"navicon"}
                     text={"Mensajes"}
                   />
                   <LinkIcon
                     name={"icon31"}
-                    href={"/comunidades"}
+                    href={"/communities"}
                     classname={"navicon"}
                     text={"Guardados"}
                   />
                   <LinkIcon
                     name={"icon5"}
-                    href={"/comunidades"}
+                    href={"/communities"}
                     classname={"navicon"}
                     text={"Comunidades"}
                   />
                   <LinkIcon
                     name={"icon5"}
-                    href={"/comunidades"}
+                    href={"/communities"}
                     classname={"navicon"}
                     text={"Perfil"}
                   />
                   <LinkIcon
                     name={"icon33"}
-                    href={"/comunidades"}
+                    href={"/communities"}
                     classname={"navicon"}
                     text={"Opciones"}
                   />
@@ -95,7 +95,7 @@ function Navbar({ navbarType, onOpenModal }) {
                 <LinkIcon
                   name={"icon11"}
                   anchor={false}
-                  href={"/comunidades"}
+                  href={"/communities"}
                   classname={"navicon"}
                   text={"Comunidades"}
                 />
