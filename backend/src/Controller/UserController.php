@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\CommunityFollows;
 use App\Entity\CommunityMembers;
+use App\Entity\SavedPosts;
 use App\Entity\User;
 use App\Entity\UserFollows;
 use App\Repository\CommunityFollowsRepository;
 use App\Repository\CommunityMembersRepository;
 use App\Repository\CommunityRepository;
 use App\Repository\PostRepository;
+use App\Repository\SavedPostsRepository;
 use App\Repository\UserFollowsRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -810,6 +812,171 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             $serializer->serialize($userPosts, 'json', ['groups' => 'post']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    #[Route('/{id<\d+>}/save-post', name: 'user_save_post', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['UserController'],
+        summary: 'Guardar un post. ID de la URL -> tu usuario / ID pasado por JS -> post a guardar.'
+    )]
+    public function savePost(int $id, Request $request, UserRepository $users, PostRepository $posts, SavedPostsRepository $savedPostsRepo, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['post_id'])) {
+            return new JsonResponse(
+                ['error' => 'post_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $post_id = $data['post_id'];
+        $post = $posts->find($post_id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingSave = $savedPostsRepo->findOneBy([
+            'user' => $user,
+            'post' => $post
+        ]);
+
+        if ($existingSave) {
+            return new JsonResponse(
+                ['error' => 'Ya has guardado este post'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $savedPost = new SavedPosts();
+        $savedPost->setUser($user);
+        $savedPost->setPost($post);
+        $savedPost->setCreatedAt(new \DateTimeImmutable());
+        $savedPost->setUpdatedAt(new \DateTimeImmutable());
+
+        $errors = $validator->validate($savedPost);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            return new JsonResponse(
+                ['errors' => $errorMessages],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $entityManager->persist($savedPost);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha guardado el post $post_id."],
+            JsonResponse::HTTP_CREATED
+        );
+    }
+
+    #[Route('/{id<\d+>}/unsave-post', name: 'user_unsave_post', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['UserController'],
+        summary: 'Dejar de guardar un post. ID de la URL -> tu usuario / ID pasado por JS -> post a desguardar.'
+    )]
+    public function unsavePost(int $id, Request $request, UserRepository $users, PostRepository $posts, SavedPostsRepository $savedPostsRepo, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['post_id'])) {
+            return new JsonResponse(
+                ['error' => 'post_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $post_id = $data['post_id'];
+        $post = $posts->find($post_id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingSave = $savedPostsRepo->findOneBy([
+            'user' => $user,
+            'post' => $post
+        ]);
+
+        if (!$existingSave) {
+            return new JsonResponse(
+                ['error' => 'No has guardado este post'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $entityManager->remove($existingSave);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha dejado de guardar el post $post_id."],
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    #[Route('/{id<\d+>}/saved-posts', name: 'user_show_saved_posts', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra todos los posts guardados por el usuario.'
+    )]
+    public function showSavedPosts(int $id, UserRepository $users, SavedPostsRepository $savedPostsRepo, SerializerInterface $serializer): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $savedPosts = $savedPostsRepo->findBy(['user' => $user], ['createdAt' => 'DESC']);
+
+        if (empty($savedPosts)) {
+            return new JsonResponse(
+                [],
+                JsonResponse::HTTP_OK
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($savedPosts, 'json', ['groups' => 'saved_posts']),
             JsonResponse::HTTP_OK,
             [],
             true

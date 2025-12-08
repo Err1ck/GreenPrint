@@ -18,41 +18,41 @@ class Post
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees'])]
+    #[Groups(['post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees', 'saved_posts'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', nullable: false)]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Community::class)]
     #[ORM\JoinColumn(name: 'community_id', nullable: true)]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?Community $community = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?string $postType = 'user';
 
     #[ORM\Column]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?int $leaf = 0;
 
     #[ORM\Column]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?int $tree = 0;
 
     #[ORM\Column]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?int $reposts = 0;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['post'])]
+    #[Groups(['post', 'saved_posts'])]
     private ?string $content = null;
 
     public function getId(): ?int
