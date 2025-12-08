@@ -23,9 +23,7 @@ function Navbar({ navbarType, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <div>
-                  <SvgComponente name="imagen4" />
-                </div>
+                <SvgComponente name="imagen1" />
               </div>
               <div className="navbar-links">
                 <div className="navbar-links-right">
@@ -37,13 +35,13 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"icon31"}
-                    href={"/comunidades"}
+                    href={"/mensajes"}
                     classname={"navicon"}
                     text={"Mensajes"}
                   />
                   <LinkIcon
-                    name={"icon31"}
-                    href={"/comunidades"}
+                    name={"icon41"}
+                    href={"/guardados"}
                     classname={"navicon"}
                     text={"Guardados"}
                   />
@@ -54,14 +52,14 @@ function Navbar({ navbarType, onOpenModal }) {
                     text={"Comunidades"}
                   />
                   <LinkIcon
-                    name={"icon5"}
-                    href={"/comunidades"}
+                    name={"icon1"}
+                    href={"/perfil"}
                     classname={"navicon"}
                     text={"Perfil"}
                   />
                   <LinkIcon
-                    name={"icon33"}
-                    href={"/comunidades"}
+                    name={"icon39"}
+                    href={"/opciones"}
                     classname={"navicon"}
                     text={"Opciones"}
                   />

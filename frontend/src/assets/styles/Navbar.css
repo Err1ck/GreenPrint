@@ -2,8 +2,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: var(--space-2) var(--space-3);
-  border-right: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-3);
+  border-right: 1px solid var(--color-bg-secondary);
   justify-content: space-between;
 }
 .navbarLeft-container {
@@ -23,11 +23,11 @@
   align-items: flex-end;
   justify-content: flex-end;
   padding: var(--space-3);
-  margin-bottom: var(--space-2);
+  /* margin-bottom: var(--space-2); */
+  margin-right: var(--space-10);
 }
-
-.navbarImg .imagen4 {
-  width: 140px;
+.navbarImg .imagen1 {
+  width: 160px;
   height: auto;
   object-fit: contain;
 }
@@ -41,7 +41,7 @@
 .link-icon {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-full);
   transition: background-color var(--transition-base);
@@ -79,7 +79,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: var(--space-3);
+  /* padding: var(--space-3); */
+  /* margin-bottom: var(--space-4); */
 }
 
 .footer1-container {
@@ -97,10 +98,19 @@
 .footer1-container:hover {
   background-color: var(--color-bg-secondary);
 }
-
+.footer1-container .link-icon {
+  padding: var(--space-2);
+  min-width: 0;
+}
 .footer1-container .imagen2 {
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
+}
+.info-username {
+  font-size: var(--font-xl);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-primary);
+  white-space: nowrap;
 }
 .navbarRight,
 .navbarRight2 {
@@ -109,7 +119,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: var(--space-4) var(--space-3);
-  border-left: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-bg-secondary);
 }
 
 .navbarRight-container {
@@ -140,7 +150,7 @@
 
 .input-buscador:focus {
   background-color: var(--color-bg);
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-bg-secondary);
 }
 
 .input-buscador::placeholder {
