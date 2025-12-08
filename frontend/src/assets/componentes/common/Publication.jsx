@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/MainSection.css";
+import defaultAvatar from "../../img/user.png";
 
 const Publication = ({
     postId,
@@ -250,19 +251,16 @@ const Publication = ({
                     onClick={handleProfileClick}
                     style={{ cursor: (postType === 'community' ? communityId : userId) ? 'pointer' : 'default' }}
                 >
-                    {displayPhoto ? (
-                        <LinkIcon
-                            name="imagen2"
-                            anchor={false}
-                            classname="header-icon"
-                        />
-                    ) : (
-                        <LinkIcon
-                            name="imagen2"
-                            anchor={false}
-                            classname="header-icon"
-                        />
-                    )}
+                    <img
+                        src={displayPhoto || defaultAvatar}
+                        alt={displayName}
+                        style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            objectFit: 'cover'
+                        }}
+                    />
                 </div>
 
                 {/* Content */}

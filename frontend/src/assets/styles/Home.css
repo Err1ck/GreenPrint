@@ -18,6 +18,13 @@
   min-height: 100vh;
 }
 
+.main-content {
+  flex: 1;
+  max-width: 600px;
+  border-left: 1px solid #eff3f4;
+  border-right: 1px solid #eff3f4;
+}
+
 .navbarRight-content {
   flex: 1;
   position: sticky;

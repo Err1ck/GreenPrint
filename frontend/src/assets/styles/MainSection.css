@@ -23,6 +23,12 @@
 }
 
 /* Avatar a la izquierda */
+.section-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .section-avatar .header-icon img,
 .section-avatar img {
     width: 40px;

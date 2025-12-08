@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
+import Reply from "../componentes/common/Reply";
+import ReplyInput from "../componentes/common/ReplyInput";
 
 function ViewPost() {
     const { id } = useParams();
@@ -10,9 +12,12 @@ function ViewPost() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [replies, setReplies] = useState([]);
+    const [repliesLoading, setRepliesLoading] = useState(false);
 
     useEffect(() => {
         fetchPost();
+        fetchReplies();
     }, [id]);
 
     const fetchPost = async () => {
@@ -63,6 +68,42 @@ function ViewPost() {
         }
     };
 
+    const fetchReplies = async () => {
+        try {
+            setRepliesLoading(true);
+
+            const token = localStorage.getItem("token");
+            const userStr = localStorage.getItem("user");
+
+            let url = `http://127.0.0.1:8000/api/posts/${id}/replies`;
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                url += `?user_id=${user.id}`;
+            }
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setReplies(data);
+            }
+        } catch (err) {
+            console.error("Error fetching replies:", err);
+        } finally {
+            setRepliesLoading(false);
+        }
+    };
+
+    const handleReplySubmitted = () => {
+        fetchReplies();
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const months = [
@@ -85,7 +126,7 @@ function ViewPost() {
                 <Navbar navbarType={1} />
             </div>
 
-            <div className="">
+            <div className="main-layout-container">
                 <main className="main-content">
                     {/* Botón de volver */}
                     <div style={{
@@ -212,6 +253,67 @@ function ViewPost() {
                             color: "#666",
                         }}>
                             Post no encontrado
+                        </div>
+                    )}
+
+                    {/* Reply Input */}
+                    {!loading && !error && post && (
+                        <ReplyInput postId={id} onReplySubmitted={handleReplySubmitted} />
+                    )}
+
+                    {/* Replies Section */}
+                    {!loading && !error && post && (
+                        <div style={{
+                            borderTop: "1px solid #eff3f4",
+                            paddingTop: "16px"
+                        }}>
+                            <h3 style={{
+                                padding: "0 16px",
+                                fontSize: "20px",
+                                fontWeight: "700",
+                                color: "#0f1419",
+                                marginBottom: "12px"
+                            }}>
+                                Respuestas
+                            </h3>
+
+                            {repliesLoading && (
+                                <div style={{
+                                    textAlign: "center",
+                                    padding: "20px",
+                                    fontSize: "14px",
+                                    color: "#666",
+                                }}>
+                                    Cargando respuestas...
+                                </div>
+                            )}
+
+                            {!repliesLoading && replies.length === 0 && (
+                                <div style={{
+                                    textAlign: "center",
+                                    padding: "20px",
+                                    fontSize: "14px",
+                                    color: "#666",
+                                }}>
+                                    No hay respuestas aún. ¡Sé el primero en responder!
+                                </div>
+                            )}
+
+                            {!repliesLoading && replies.map((reply) => (
+                                <Reply
+                                    key={reply.id}
+                                    replyId={reply.id}
+                                    userId={reply.user?.id}
+                                    userName={reply.user?.username || "Usuario"}
+                                    userProfileUrl={reply.user?.photo_url}
+                                    date={formatDate(reply.created_at)}
+                                    time={formatTime(reply.created_at)}
+                                    text={reply.content}
+                                    replyImage={reply.image}
+                                    like1={reply.leaf}
+                                    initialHasLikedLeaf={reply.user_interactions?.has_liked_leaf || false}
+                                />
+                            ))}
                         </div>
                     )}
                 </main>

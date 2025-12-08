@@ -99,6 +99,9 @@ final class PostController extends AbstractController
                 // Serializar posts y agregar interacciones
                 $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
                 
+                // Obtener repositorio de replies
+                $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
+                
                 foreach ($postsData as &$postData) {
                     $postId = $postData['id'];
                     $postData['user_interactions'] = [
@@ -106,19 +109,23 @@ final class PostController extends AbstractController
                         'has_liked_tree' => isset($treeLikesMap[$postId]),
                         'has_reposted' => isset($repostsMap[$postId])
                     ];
+                    // Agregar contador de replies
+                    $postData['replies'] = $replyRepository->count(['post' => $postId]);
                 }
                 
                 return new JsonResponse($postsData, JsonResponse::HTTP_OK);
             }
         }
         
-        // Si no hay user_id o el usuario no existe, devolver posts sin interacciones
-        return new JsonResponse(
-            $serializer->serialize($all, 'json', ['groups' => 'post']),
-            JsonResponse::HTTP_OK,
-            [],
-            true
-        );
+        // Si no hay user_id o el usuario no existe, devolver posts sin interacciones pero con reply count
+        $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
+        $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
+        
+        foreach ($postsData as &$postData) {
+            $postData['replies'] = $replyRepository->count(['post' => $postData['id']]);
+        }
+        
+        return new JsonResponse($postsData, JsonResponse::HTTP_OK);
     }
 
     #[OA\Get(
@@ -168,16 +175,20 @@ final class PostController extends AbstractController
                     'has_reposted' => $hasReposted
                 ];
                 
+                // Agregar contador de replies
+                $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
+                $postData['replies'] = $replyRepository->count(['post' => $post]);
+                
                 return new JsonResponse($postData, JsonResponse::HTTP_OK);
             }
         }
 
-        return new JsonResponse(
-            $serializer->serialize($post, 'json', ['groups' => 'post']),
-            JsonResponse::HTTP_OK,
-            [],
-            true
-        );
+        // Si no hay user_id, devolver post sin interacciones pero con reply count
+        $postData = json_decode($serializer->serialize($post, 'json', ['groups' => 'post']), true);
+        $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
+        $postData['replies'] = $replyRepository->count(['post' => $post]);
+        
+        return new JsonResponse($postData, JsonResponse::HTTP_OK);
     }
 
     #[OA\Delete(
@@ -947,6 +958,91 @@ final class PostController extends AbstractController
             'repost_count' => $post->getReposts()
         ], JsonResponse::HTTP_OK);
     }
+    #[Route('/{id<\d+>}/replies', name: 'api_post_replies', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['PostController'],
+        summary: 'Obtiene todas las respuestas de un post.'
+    )]
+    public function getReplies(
+        int $id,
+        Request $request,
+        PostRepository $postRepository,
+        UserRepository $userRepository,
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $post = $postRepository->find($id);
+
+        if (!$post) {
+            return new JsonResponse(
+                ['error' => 'Post no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Obtener repositorio de replies
+        $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
+        
+        // Obtener todas las respuestas del post
+        $replies = $replyRepository->findBy(
+            ['post' => $post],
+            ['createdAt' => 'ASC']
+        );
+
+        // Obtener user_id opcional de los query params
+        $userId = $request->query->get('user_id');
+        
+        // Si hay user_id, incluir las interacciones del usuario
+        if ($userId) {
+            $user = $userRepository->find($userId);
+            
+            if ($user) {
+                // Obtener repositorio de likes de replies
+                $replyLeafRepository = $entityManager->getRepository(\App\Entity\UserPostReplyLeaf::class);
+                
+                // Obtener IDs de replies
+                $replyIds = array_map(fn($reply) => $reply->getId(), $replies);
+                
+                if (!empty($replyIds)) {
+                    // Consulta optimizada para obtener todos los likes del usuario
+                    $userReplyLikes = $replyLeafRepository->createQueryBuilder('l')
+                        ->where('l.user = :user')
+                        ->andWhere('l.reply IN (:replies)')
+                        ->setParameter('user', $user)
+                        ->setParameter('replies', $replyIds)
+                        ->getQuery()
+                        ->getResult();
+                    
+                    // Crear mapa para búsqueda rápida
+                    $likesMap = [];
+                    foreach ($userReplyLikes as $like) {
+                        $likesMap[$like->getReply()->getId()] = true;
+                    }
+                    
+                    // Serializar replies y agregar interacciones
+                    $repliesData = json_decode($serializer->serialize($replies, 'json', ['groups' => 'reply']), true);
+                    
+                    foreach ($repliesData as &$replyData) {
+                        $replyId = $replyData['id'];
+                        $replyData['user_interactions'] = [
+                            'has_liked_leaf' => isset($likesMap[$replyId])
+                        ];
+                    }
+                    
+                    return new JsonResponse($repliesData, JsonResponse::HTTP_OK);
+                }
+            }
+        }
+        
+        // Si no hay user_id o el usuario no existe, devolver replies sin interacciones
+        return new JsonResponse(
+            $serializer->serialize($replies, 'json', ['groups' => 'reply']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
     // En PostController.php
     #[Route('/user/{id<\d+>}', name: 'api_posts_by_user', methods: ['GET'])]
     #[OA\Get(

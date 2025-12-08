@@ -29,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post'])]
+    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply'])]
     private ?string $username = null;
 
 
@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string profile photo url
      */
     #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['user','post'])]
+    #[Groups(['user','post','reply'])]
     private ?string $photo_url = null;
 
     /**
