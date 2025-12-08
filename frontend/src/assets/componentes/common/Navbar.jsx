@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
@@ -5,15 +6,12 @@ import Footer from "./Footer";
 import Button from "../ui/Button";
 
 function Navbar({ navbarType, onOpenModal }) {
+  const navigate = useNavigate();
+
   // 🔹 Lógica de búsqueda cuando se pulsa Enter en el buscador
   const handleSearch = (textoBuscado) => {
-    // De momento, solo mostramos en consola:
-    console.log("Buscando:", textoBuscado);
-
-    // Más adelante aquí puedes:
-    // - filtrar posts
-    // - navegar a otra ruta
-    // - llamar a una API, etc.
+    // Navegar a la página de búsqueda
+    navigate("/search");
   };
 
   return (

@@ -7,6 +7,7 @@ import Register from "./assets/pages/Register";
 import ViewPost from "./assets/pages/ViewPost";
 import ViewProfile from "./assets/pages/ViewProfile";
 import ViewCommunity from "./assets/pages/ViewCommunity";
+import Search from "./assets/pages/Search";
 function App() {
   return (
     <>
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/communities" element={<CommunityPage />} />
         <Route path="/users" element={<SuggestedUsersPage />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/post/:id" element={<ViewPost />} />
