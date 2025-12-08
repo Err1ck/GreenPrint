@@ -427,6 +427,61 @@ final class UserController extends AbstractController
         );
     }
 
+    #[Route('/{id<\d+>}/unfollow-community', name: 'user_unfollow_community', methods: ['DELETE'])]
+    #[OA\Delete(
+        tags: ['UserController'],
+        summary: 'Dejar de seguir comunidad. ID de la URL -> tu usuario / ID pasado por JS -> comunidad a dejar de seguir.'
+    )]
+    public function unfollowCommunity(int $id, Request $request, UserRepository $users, CommunityRepository $communities, CommunityFollowsRepository $followEntity, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['community_id'])) {
+            return new JsonResponse(
+                ['error' => 'community_id es requerido'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $community_id = $data['community_id'];
+        $community = $communities->find($community_id);
+
+        if (!$community) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingFollow = $followEntity->findOneBy([
+            'user' => $user,
+            'community' => $community
+        ]);
+
+        if (!$existingFollow) {
+            return new JsonResponse(
+                ['error' => 'No sigues esta comunidad.'],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
+
+        $entityManager->remove($existingFollow);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => "El usuario $id ha dejado de seguir a la comunidad $community_id."],
+            JsonResponse::HTTP_OK
+        );
+    }
 
     #[Route('/{id<\d+>}/join', name: 'user_join_community', methods: ['POST'])]
     #[OA\Post(

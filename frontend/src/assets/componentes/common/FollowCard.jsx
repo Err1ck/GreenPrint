@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const FollowCard = ({
@@ -11,11 +11,18 @@ const FollowCard = ({
     followers = 0,
     photoUrl,
     maxBioLength = 100,
+    initialIsFollowing = false, // Estado inicial de seguimiento
 }) => {
     const navigate = useNavigate();
-    const [isFollowing, setIsFollowing] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
     const [followerCount, setFollowerCount] = useState(followers);
     const [isHovered, setIsHovered] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Actualizar isFollowing cuando cambie initialIsFollowing
+    useEffect(() => {
+        setIsFollowing(initialIsFollowing);
+    }, [initialIsFollowing]);
 
     // Truncar biografía si excede el límite
     const truncatedBio =
@@ -23,14 +30,62 @@ const FollowCard = ({
             ? bio.substring(0, maxBioLength) + "..."
             : bio || "Sin descripción";
 
-    const handleFollowClick = (e) => {
+    const handleFollowClick = async (e) => {
         e.stopPropagation();
-        if (isFollowing) {
-            setFollowerCount(followerCount - 1);
-        } else {
-            setFollowerCount(followerCount + 1);
+
+        if (isLoading) return;
+
+        try {
+            setIsLoading(true);
+            const currentUserStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (!currentUserStr || !token) {
+                alert("Debes iniciar sesión para seguir");
+                return;
+            }
+
+            const currentUser = JSON.parse(currentUserStr);
+
+            let endpoint, method, body;
+
+            if (type === "community") {
+                // Seguir/dejar de seguir comunidad
+                endpoint = isFollowing
+                    ? `http://127.0.0.1:8000/api/users/${currentUser.id}/unfollow-community`
+                    : `http://127.0.0.1:8000/api/users/${currentUser.id}/follow-community`;
+                method = isFollowing ? 'DELETE' : 'POST';
+                body = { community_id: id };
+            } else {
+                // Seguir/dejar de seguir usuario
+                endpoint = isFollowing
+                    ? `http://127.0.0.1:8000/api/users/${currentUser.id}/unfollow`
+                    : `http://127.0.0.1:8000/api/users/${currentUser.id}/follow`;
+                method = isFollowing ? 'DELETE' : 'POST';
+                body = { following_user_id: id };
+            }
+
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                setIsFollowing(!isFollowing);
+                setFollowerCount(isFollowing ? followerCount - 1 : followerCount + 1);
+            } else {
+                const data = await response.json();
+                console.error("Error:", data);
+            }
+        } catch (err) {
+            console.error("Error al seguir/dejar de seguir:", err);
+        } finally {
+            setIsLoading(false);
         }
-        setIsFollowing(!isFollowing);
     };
 
     const handleCardClick = () => {
@@ -96,8 +151,16 @@ const FollowCard = ({
                     style={{
                         padding: "6px 16px",
                         borderRadius: "20px",
-                        border: isFollowing ? "1px solid #ccc" : "1px solid #1da1f2",
-                        backgroundColor: isFollowing ? "#fff" : "#1da1f2",
+                        border: isFollowing
+                            ? "1px solid #ccc"
+                            : type === "community"
+                                ? "1px solid #00ba7c"
+                                : "1px solid #1da1f2",
+                        backgroundColor: isFollowing
+                            ? "#fff"
+                            : type === "community"
+                                ? "#00ba7c"
+                                : "#1da1f2",
                         color: isFollowing ? "#000" : "#fff",
                         fontWeight: "bold",
                         fontSize: "14px",
@@ -105,7 +168,7 @@ const FollowCard = ({
                         transition: "all 0.2s"
                     }}
                 >
-                    {isFollowing ? "Siguiendo" : "Seguir"}
+                    {isLoading ? "..." : isFollowing ? "Siguiendo" : "Seguir"}
                 </button>
             </div>
 

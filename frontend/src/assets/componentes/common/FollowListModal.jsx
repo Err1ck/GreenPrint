@@ -263,6 +263,7 @@ const FollowListModal = ({ isOpen, onClose, userId, type }) => {
                                             followers={community.follower_count || 0}
                                             photoUrl={community.photo_url}
                                             maxBioLength={80}
+                                            initialIsFollowing={type === "following"}
                                         />
                                     ))}
                                 </>
@@ -299,6 +300,7 @@ const FollowListModal = ({ isOpen, onClose, userId, type }) => {
                                             bio={user.biography}
                                             photoUrl={user.photo_url}
                                             maxBioLength={80}
+                                            initialIsFollowing={type === "following"}
                                         />
                                     ))}
                                 </>

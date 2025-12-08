@@ -236,9 +236,9 @@ function ViewCommunity() {
                 }
                 
                 .follow-button.not-following {
-                    background: #0f1419;
+                    background: #00ba7c;
                     color: #fff;
-                    border: none;
+                    border: 1px solid #00ba7c;
                 }
                 
                 .follow-button:hover {
