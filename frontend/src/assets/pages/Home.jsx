@@ -4,6 +4,7 @@ import "../styles/Home.css";
 import "../styles/app.css";
 import Modal from "../componentes/common/Modal";
 import Publication from "../componentes/common/Publication";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +22,19 @@ function HomePage() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://127.0.0.1:8000/api/posts");
+
+      // Obtener usuario autenticado del localStorage
+      const userStr = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+
+      // Construir URL con user_id si está autenticado
+      let url = "http://127.0.0.1:8000/api/posts";
+      if (userStr && token) {
+        const user = JSON.parse(userStr);
+        url += `?user_id=${user.id}`;
+      }
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error("Error al cargar los posts");
@@ -31,8 +44,8 @@ function HomePage() {
 
       // Ordenar por fecha de creación (más recientes primero)
       const sortedPosts = data.sort((a, b) => {
-        const dateA = new Date(a.created_at);
-        const dateB = new Date(b.created_at);
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
         return dateB - dateA;
       });
 
@@ -42,34 +55,6 @@ function HomePage() {
       setError(err.message);
       setLoading(false);
     }
-  };
-
-  // Función para formatear la fecha
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const months = [
-      "ene",
-      "feb",
-      "mar",
-      "abr",
-      "may",
-      "jun",
-      "jul",
-      "ago",
-      "sep",
-      "oct",
-      "nov",
-      "dic",
-    ];
-    return `${date.getDate()} ${months[date.getMonth()]}`;
-  };
-
-  // Función para formatear la hora
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
   };
 
   return (
@@ -124,18 +109,26 @@ function HomePage() {
               <Publication
                 key={post.id}
                 postId={post.id}
-                userId={post.user?.id} // 👈 Añadir userId
+                userId={post.user?.id}
                 userName={post.user?.username || "Usuario"}
-                userProfileUrl={`/perfil/${post.user?.username}`}
-                date={formatDate(post.created_at)}
-                time={formatTime(post.created_at)}
+                userProfileUrl={post.user?.photo_url}
+                communityId={post.community?.id}
+                communityName={post.community?.name}
+                communityPhotoUrl={post.community?.photo_url}
+                date={formatDate(post.createdAt)}
+                time={formatTime(post.createdAt)}
                 text={post.content}
                 postImage={post.image}
-                comments={0}
-                retweets={0}
-                like1={0}
-                like2={0}
+                postType={post.postType}
+                comments={post.replies || 0}
+                retweets={post.reposts}
+                like1={post.leaf}
+                like2={post.tree}
                 clickable={true}
+                // Pasar datos de interacciones del usuario si existen
+                initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                initialHasReposted={post.user_interactions?.has_reposted || false}
               />
             ))}
         </main>

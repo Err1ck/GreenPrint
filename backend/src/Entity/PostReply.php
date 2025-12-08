@@ -10,7 +10,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PostReplyRepository::class)]
 #[ORM\Table(name: 'post_replies')]
-#[ORM\UniqueConstraint(columns: ['user_id', 'post_id'])]
 class PostReply
 {
     use TimestampableTrait;
@@ -35,6 +34,10 @@ class PostReply
     #[Groups(['reply'])]
     private ?int $leaf = 0;
 
+    #[ORM\Column]
+    #[Groups(['reply'])]
+    private ?int $reposts = 0;
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['reply'])]
     private ?string $image = null;
@@ -56,6 +59,17 @@ class PostReply
     public function setLeaf(?int $leaf): static
     {
         $this->leaf = $leaf;
+        return $this;
+    }
+
+    public function getReposts(): ?int
+    {
+        return $this->reposts;
+    }
+
+    public function setReposts(?int $reposts): static
+    {
+        $this->reposts = $reposts;
         return $this;
     }
 

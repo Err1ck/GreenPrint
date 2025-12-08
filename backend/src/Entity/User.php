@@ -29,8 +29,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post'])]
+    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply'])]
     private ?string $username = null;
+
+
+    /**
+     * @var string profile photo url
+     */
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['user','post','reply'])]
+    private ?string $photo_url = null;
+
+    /**
+     * @var string banner photo url
+     */
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['user', 'post'])]
+    private ?string $banner_url = null;
+
 
     /**
      * @var list<string> The user roles
@@ -51,6 +67,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Groups(['user'])]
     private ?int $follower_count = 0;
+
+    /**
+     * @var int Siguiendo
+     */
+    #[ORM\Column]
+    #[Groups(['user'])]
+    private ?int $following_count = 0;
 
     /**
      * @var string Biografia del perfil usuario
@@ -148,6 +171,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getFollowingCount(): ?int
+    {
+        return $this->following_count;
+    }
+
+    public function setFollowingCount(int $following_count): static
+    {
+        $this->following_count = $following_count;
+        return $this;
+    }
+
     public function getBiography(): ?string
     {
         return $this->biography;
@@ -191,7 +225,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->community = $community;
         return $this;
     }
+  public function getPhotoURL(): ?string
+    {
+        return $this->photo_url;
+    }
 
+    public function setPhotoURL(string $photo_url): static
+    {
+        $this->photo_url = $photo_url;
+        return $this;
+    }
+
+    public function getBannerURL(): ?string
+    {
+        return $this->banner_url;
+    }
+
+    public function setBannerURL(string $banner_url): static
+    {
+        $this->banner_url = $banner_url;
+        return $this;
+    }
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */

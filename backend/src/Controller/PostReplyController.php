@@ -313,11 +313,17 @@ final class PostReplyController extends AbstractController
             );
         }
 
+        // Incrementar contador en la respuesta
+        $reply->setLeaf($reply->getLeaf() + 1);
+
         $entityManager->persist($replyLikeLeaf);
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "Se ha dado el like (leaf) a la respuesta correctamente."],
+            [
+                'message' => "Se ha dado el like (leaf) a la respuesta correctamente.",
+                'leaf_count' => $reply->getLeaf()
+            ],
             JsonResponse::HTTP_CREATED,
         );
     }
@@ -365,11 +371,17 @@ final class PostReplyController extends AbstractController
             );
         }
 
+        // Decrementar contador en la respuesta
+        $reply->setLeaf(max(0, $reply->getLeaf() - 1));
+
         $entityManager->remove($likedReply);
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "Se ha quitado el like (leaf) a la respuesta correctamente."],
+            [
+                'message' => "Se ha quitado el like (leaf) a la respuesta correctamente.",
+                'leaf_count' => $reply->getLeaf()
+            ],
             JsonResponse::HTTP_OK,
         );
     }

@@ -135,7 +135,7 @@ function Login() {
                                     transition: "border-color 0.2s",
                                 }}
                                 onFocus={(e) => {
-                                    e.target.style.borderColor = "#1d9bf0";
+                                    e.target.style.borderColor = "#00ba7c";
                                 }}
                                 onBlur={(e) => {
                                     e.target.style.borderColor = "#333639";
@@ -165,7 +165,7 @@ function Login() {
                                     transition: "border-color 0.2s",
                                 }}
                                 onFocus={(e) => {
-                                    e.target.style.borderColor = "#1d9bf0";
+                                    e.target.style.borderColor = "#00ba7c";
                                 }}
                                 onBlur={(e) => {
                                     e.target.style.borderColor = "#333639";
@@ -220,7 +220,7 @@ function Login() {
                         <a
                             href="/forgot-password"
                             style={{
-                                color: "#1d9bf0",
+                                color: "#00ba7c",
                                 textDecoration: "none",
                                 fontSize: "15px",
                                 fontFamily:
@@ -257,7 +257,7 @@ function Login() {
                                 fontSize: "15px",
                                 fontWeight: "700",
                                 backgroundColor: "transparent",
-                                color: "#1d9bf0",
+                                color: "#00ba7c",
                                 border: "1px solid #536471",
                                 borderRadius: "9999px",
                                 cursor: "pointer",
@@ -266,7 +266,7 @@ function Login() {
                                 transition: "background-color 0.2s",
                             }}
                             onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = "rgba(29, 155, 240, 0.1)";
+                                e.target.style.backgroundColor = "rgba(0, 186, 124, 0.1)";
                             }}
                             onMouseLeave={(e) => {
                                 e.target.style.backgroundColor = "transparent";

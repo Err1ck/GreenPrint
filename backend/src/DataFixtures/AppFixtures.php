@@ -84,8 +84,6 @@ class AppFixtures extends Fixture
             $community->setFollowerCount($faker->numberBetween(10, 1000));
             $community->setMemberCount($faker->numberBetween(5, 50));
             // $community->setBiography($faker->paragraph(3));
-            $community->setPhotoURL($faker->imageUrl(200, 200, 'business'));
-            $community->setBannerURL($faker->imageUrl(1200, 400, 'business'));
             $community->setCreatedAt(new \DateTimeImmutable('-' . $faker->numberBetween(30, 365) . ' days'));
             $community->setUpdatedAt(new \DateTimeImmutable());
 
@@ -195,7 +193,6 @@ class AppFixtures extends Fixture
             $post = new Post();
             $post->setUser($faker->randomElement($users));
             $post->setLeaf($faker->numberBetween(0, 500));
-            $post->setImage($faker->boolean(60) ? $faker->imageUrl(640, 480, 'nature') : null);
             $post->setContent($faker->paragraph($faker->numberBetween(1, 5)));
             $post->setCreatedAt(new \DateTimeImmutable('-' . $faker->numberBetween(1, 90) . ' days'));
             $post->setUpdatedAt(new \DateTimeImmutable());

@@ -23,6 +23,12 @@
 }
 
 /* Avatar a la izquierda */
+.section-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .section-avatar .header-icon img,
 .section-avatar img {
     width: 40px;
@@ -129,7 +135,7 @@
 
 .action-group:hover,
 .nonaction-group:hover {
-    color: #1d9bf0;
+    color: #00ba7c;
 }
 
 .action-group svg,
@@ -142,7 +148,7 @@
 
 .action-group:hover svg,
 .nonaction-group:hover svg {
-    fill: #1d9bf0;
+    fill: #00ba7c;
 }
 
 .action-count,
@@ -156,5 +162,5 @@
 
 .action-group:hover .action-count,
 .nonaction-group:hover .nonaction-count {
-    color: #1d9bf0;
+    color: #00ba7c;
 }
