@@ -653,6 +653,41 @@ final class UserController extends AbstractController
         );
     }
 
+    #[Route('/{id<\d+>}/followed-communities', name: 'user_show_followed_communities', methods: ['GET'])]
+    #[OA\Get(
+        tags: ['UserController'],
+        summary: 'Muestra todas las comunidades que el usuario sigue (follows).'
+    )]
+    public function showFollowedCommunities(int $id, Request $request, UserRepository $users, CommunityFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
+    {
+        // Verificar que el usuario existe
+        $user = $users->find($id);
+
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Buscar todos los follows donde user_id = $id
+        $userFollows = $follows->findBy(['user' => $user]);
+
+        if (empty($userFollows)) {
+            return new JsonResponse(
+                [],
+                JsonResponse::HTTP_OK
+            );
+        }
+
+        return new JsonResponse(
+            $serializer->serialize($userFollows, 'json', ['groups' => 'getCommunityFollowers']),
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
     #[Route('/{id<\d+>}/following', name: 'user_show_following', methods: ['GET'])]
     #[OA\Get(
         tags: ['UserController'],
