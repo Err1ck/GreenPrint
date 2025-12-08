@@ -4,6 +4,7 @@ import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
 import Footer from "./Footer";
 import Button from "../ui/Button";
+import { ThemeToggle } from "./ThemeToggle";
 
 function Navbar({ navbarType, onOpenModal }) {
   const navigate = useNavigate();
@@ -21,42 +22,44 @@ function Navbar({ navbarType, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <SvgComponente name="imagen1" />
+                <div className="navbarImg-container">
+                  <SvgComponente name="imagen3" />
+                </div>
               </div>
               <div className="navbar-links">
                 <div className="navbar-links-right">
                   <LinkIcon
-                    name={"icon3"}
+                    name={"home"}
                     href={"#"}
                     classname={"navicon"}
                     text={"Inicio"}
                   />
                   <LinkIcon
-                    name={"icon31"}
+                    name={"message"}
                     href={"/communities"}
                     classname={"navicon"}
                     text={"Mensajes"}
                   />
                   <LinkIcon
-                    name={"icon41"}
+                    name={"save"}
                     href={"/guardados"}
                     classname={"navicon"}
                     text={"Guardados"}
                   />
                   <LinkIcon
-                    name={"icon5"}
+                    name={"comunidadesMias"}
                     href={"/communities"}
                     classname={"navicon"}
                     text={"Comunidades"}
                   />
                   <LinkIcon
-                    name={"icon1"}
+                    name={"perfil"}
                     href={"/perfil"}
                     classname={"navicon"}
                     text={"Perfil"}
                   />
                   <LinkIcon
-                    name={"icon39"}
+                    name={"dots"}
                     href={"/opciones"}
                     classname={"navicon"}
                     text={"Opciones"}
@@ -75,7 +78,7 @@ function Navbar({ navbarType, onOpenModal }) {
             <div className="navbarRight-container-section">
               <div className="section-buscador">
                 <LinkIcon
-                  name={"icon9"}
+                  name={"lupa"}
                   anchor={false}
                   classname={"navicon"}
                   onSearch={handleSearch}
@@ -84,19 +87,20 @@ function Navbar({ navbarType, onOpenModal }) {
               </div>
               <div className="seccion-trend">
                 <LinkIcon
-                  name={"icon7"}
+                  name={"tendencias"}
                   anchor={false}
                   href={"/tendencias"}
                   classname={"navicon"}
                   text={"Tendencias"}
                 />
                 <LinkIcon
-                  name={"icon11"}
+                  name={"comunidadGeneral"}
                   anchor={false}
                   href={"/communities"}
                   classname={"navicon"}
                   text={"Comunidades"}
                 />
+                <ThemeToggle />
               </div>
             </div>
 
@@ -116,24 +120,6 @@ function Navbar({ navbarType, onOpenModal }) {
       {navbarType === 3 && (
         <nav className="navbarRight2">
           <div className="navbarRight2-container">
-            <LinkIcon
-              name={"icon"}
-              anchor={false}
-              classname={"navicon"}
-              text={"Buscador"}
-            />
-            <LinkIcon
-              name={"icon4"}
-              anchor={false}
-              classname={"navicon"}
-              text={"Tendencias"}
-            />
-            <LinkIcon
-              name={"icon6"}
-              anchor={false}
-              classname={"navicon"}
-              text={"Comunidades"}
-            />
             <Footer footerType={2} />
           </div>
         </nav>
