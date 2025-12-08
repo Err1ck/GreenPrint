@@ -190,13 +190,26 @@ function ViewCommunity() {
             });
 
             if (response.ok) {
-                setIsFollowing(!isFollowing);
-                // Actualizar datos de la comunidad para reflejar el nuevo contador
-                fetchCommunityData();
+                // Actualizar estado local sin recargar
+                const newFollowingState = !isFollowing;
+                setIsFollowing(newFollowingState);
+
+                // Actualizar contador de seguidores localmente
+                if (community) {
+                    setCommunity({
+                        ...community,
+                        follower_count: community.follower_count + (newFollowingState ? 1 : -1)
+                    });
+                }
             } else if (response.status === 409) {
                 // Conflicto: ya sigue o ya no sigue - sincronizar estado
                 await checkIfFollowing();
-                fetchCommunityData();
+                // Solo recargar datos de la comunidad (sin posts) en caso de conflicto
+                const communityResponse = await fetch(`http://127.0.0.1:8000/api/communities/${communityId}`);
+                if (communityResponse.ok) {
+                    const communityData = await communityResponse.json();
+                    setCommunity(communityData);
+                }
             } else {
                 const data = await response.json();
                 console.error("Error:", data);

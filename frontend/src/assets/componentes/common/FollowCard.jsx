@@ -75,11 +75,18 @@ const FollowCard = ({
             });
 
             if (response.ok) {
-                setIsFollowing(!isFollowing);
-                setFollowerCount(isFollowing ? followerCount - 1 : followerCount + 1);
+                const newFollowingState = !isFollowing;
+                setIsFollowing(newFollowingState);
+                setFollowerCount(followerCount + (newFollowingState ? 1 : -1));
+            } else if (response.status === 409) {
+                // Conflicto: ya sigue o ya no sigue - invertir el estado actual
+                const newFollowingState = !isFollowing;
+                setIsFollowing(newFollowingState);
+                setFollowerCount(followerCount + (newFollowingState ? 1 : -1));
             } else {
                 const data = await response.json();
                 console.error("Error:", data);
+                alert(data.error || "Error al seguir/dejar de seguir");
             }
         } catch (err) {
             console.error("Error al seguir/dejar de seguir:", err);
