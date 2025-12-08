@@ -56,7 +56,7 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"icon41"}
-                    href={"/guardados"}
+                    href={"/saved"}
                     classname={"navicon"}
                     text={"Guardados"}
                   />
