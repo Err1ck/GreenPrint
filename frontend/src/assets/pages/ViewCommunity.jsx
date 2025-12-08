@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewCommunity() {
     const { communityId } = useParams();
     const navigate = useNavigate();
-    
+
     const [community, setCommunity] = useState(null);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,18 +17,18 @@ function ViewCommunity() {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [isFollowing, setIsFollowing] = useState(false);
-    
+
     const observer = useRef();
     const lastPostRef = useCallback(node => {
         if (loadingPosts) return;
         if (observer.current) observer.current.disconnect();
-        
+
         observer.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && hasMore) {
                 setPage(prevPage => prevPage + 1);
             }
         });
-        
+
         if (node) observer.current.observe(node);
     }, [loadingPosts, hasMore]);
 
@@ -45,7 +46,7 @@ function ViewCommunity() {
         try {
             setLoading(true);
             const token = localStorage.getItem("token");
-            
+
             if (!token) {
                 navigate("/login");
                 return;
@@ -59,7 +60,7 @@ function ViewCommunity() {
             });
 
             if (!communityResponse.ok) throw new Error("Error al cargar comunidad");
-            
+
             const communityData = await communityResponse.json();
             setCommunity(communityData);
 
@@ -71,13 +72,13 @@ function ViewCommunity() {
             });
 
             if (!postsResponse.ok) throw new Error("Error al cargar posts");
-            
+
             const postsData = await postsResponse.json();
-            
+
             const initialPosts = postsData.slice(0, 10);
             setPosts(initialPosts);
             setHasMore(postsData.length > 10);
-            
+
             setLoading(false);
         } catch (err) {
             setError(err.message);
@@ -89,7 +90,7 @@ function ViewCommunity() {
         try {
             setLoadingPosts(true);
             const token = localStorage.getItem("token");
-            
+
             const response = await fetch(`http://127.0.0.1:8000/api/posts/community/${communityId}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -97,12 +98,12 @@ function ViewCommunity() {
             });
 
             if (!response.ok) throw new Error("Error al cargar más posts");
-            
+
             const allPosts = await response.json();
             const start = page * 10;
             const end = start + 10;
             const newPosts = allPosts.slice(start, end);
-            
+
             setPosts(prev => [...prev, ...newPosts]);
             setHasMore(end < allPosts.length);
             setLoadingPosts(false);
@@ -115,17 +116,6 @@ function ViewCommunity() {
     const handleFollow = async () => {
         // Aquí implementarías la lógica para seguir/dejar de seguir
         setIsFollowing(!isFollowing);
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-        return `${date.getDate()} ${months[date.getMonth()]}`;
-    };
-
-    const formatTime = (dateString) => {
-        const date = new Date(dateString);
-        return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
     };
 
     if (loading) {
@@ -272,7 +262,7 @@ function ViewCommunity() {
             <div className="navbarLeft-content">
                 <Navbar navbarType={1} />
             </div>
-            
+
             <div className="main-layout-container">
                 <main className="main-content" style={{ padding: 0 }}>
                     {/* Header */}
@@ -330,9 +320,9 @@ function ViewCommunity() {
 
                     {/* Banner */}
                     {community?.banner_url ? (
-                        <img 
-                            src={community.banner_url} 
-                            alt="Banner de comunidad" 
+                        <img
+                            src={community.banner_url}
+                            alt="Banner de comunidad"
                             className="community-banner"
                         />
                     ) : (
@@ -343,8 +333,8 @@ function ViewCommunity() {
                     <div className="community-content">
                         <div className="community-avatar-container">
                             {community?.photo_url ? (
-                                <img 
-                                    src={community.photo_url} 
+                                <img
+                                    src={community.photo_url}
                                     alt={community.name}
                                     className="community-avatar"
                                 />
@@ -362,9 +352,9 @@ function ViewCommunity() {
                         </div>
 
                         <div style={{ marginBottom: "12px" }}>
-                            <div style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
+                            <div style={{
+                                display: "flex",
+                                alignItems: "center",
                                 gap: "12px",
                                 marginBottom: "8px"
                             }}>
@@ -449,8 +439,8 @@ function ViewCommunity() {
                                                 communityId={community?.id}
                                                 communityName={community?.name}
                                                 communityPhotoUrl={community?.photo_url}
-                                                date={formatDate(post.created_at)}
-                                                time={formatTime(post.created_at)}
+                                                date={formatDate(post.createdAt)}
+                                                time={formatTime(post.createdAt)}
                                                 text={post.content}
                                                 postImage={post.image}
                                                 postType={post.postType}
@@ -472,8 +462,8 @@ function ViewCommunity() {
                                             communityId={community?.id}
                                             communityName={community?.name}
                                             communityPhotoUrl={community?.photo_url}
-                                            date={formatDate(post.created_at)}
-                                            time={formatTime(post.created_at)}
+                                            date={formatDate(post.createdAt)}
+                                            time={formatTime(post.createdAt)}
                                             text={post.content}
                                             postImage={post.image}
                                             postType={post.postType}
@@ -487,7 +477,7 @@ function ViewCommunity() {
                                 }
                             })
                         )}
-                        
+
                         {loadingPosts && (
                             <div style={{
                                 display: "flex",
@@ -501,7 +491,7 @@ function ViewCommunity() {
                     </div>
                 </main>
             </div>
-            
+
             <div className="navbarRight-content">
                 <Navbar navbarType={2} />
             </div>

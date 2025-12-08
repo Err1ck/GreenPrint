@@ -4,6 +4,7 @@ import "../styles/Home.css";
 import "../styles/app.css";
 import Modal from "../componentes/common/Modal";
 import Publication from "../componentes/common/Publication";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,8 +44,8 @@ function HomePage() {
 
       // Ordenar por fecha de creación (más recientes primero)
       const sortedPosts = data.sort((a, b) => {
-        const dateA = new Date(a.created_at);
-        const dateB = new Date(b.created_at);
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
         return dateB - dateA;
       });
 
@@ -54,34 +55,6 @@ function HomePage() {
       setError(err.message);
       setLoading(false);
     }
-  };
-
-  // Función para formatear la fecha
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const months = [
-      "ene",
-      "feb",
-      "mar",
-      "abr",
-      "may",
-      "jun",
-      "jul",
-      "ago",
-      "sep",
-      "oct",
-      "nov",
-      "dic",
-    ];
-    return `${date.getDate()} ${months[date.getMonth()]}`;
-  };
-
-  // Función para formatear la hora
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
   };
 
   return (
@@ -142,12 +115,12 @@ function HomePage() {
                 communityId={post.community?.id}
                 communityName={post.community?.name}
                 communityPhotoUrl={post.community?.photo_url}
-                date={formatDate(post.created_at)}
-                time={formatTime(post.created_at)}
+                date={formatDate(post.createdAt)}
+                time={formatTime(post.createdAt)}
                 text={post.content}
                 postImage={post.image}
                 postType={post.postType}
-                comments={0}
+                comments={post.replies || 0}
                 retweets={post.reposts}
                 like1={post.leaf}
                 like2={post.tree}

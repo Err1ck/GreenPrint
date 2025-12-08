@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewProfile() {
   const { userId } = useParams();
@@ -52,8 +53,8 @@ function ViewProfile() {
       const data = await response.json();
 
       const sortedPosts = data.sort((a, b) => {
-        const dateA = new Date(a.created_at);
-        const dateB = new Date(b.created_at);
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
         return dateB - dateA;
       });
 
@@ -63,19 +64,6 @@ function ViewProfile() {
       setError(err.message);
       setLoading(false);
     }
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-    return `${date.getDate()} ${months[date.getMonth()]}`;
-  };
-
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
   };
 
   const handleFollowClick = () => {
@@ -441,12 +429,12 @@ function ViewProfile() {
                 communityId={post.community?.id}
                 communityName={post.community?.name}
                 communityPhotoUrl={post.community?.photo_url}
-                date={formatDate(post.created_at)}
-                time={formatTime(post.created_at)}
+                date={formatDate(post.createdAt)}
+                time={formatTime(post.createdAt)}
                 text={post.content}
                 postImage={post.image}
                 postType={post.postType}
-                comments={0}
+                comments={post.replies || 0}
                 retweets={post.reposts}
                 like1={post.leaf}
                 like2={post.tree}

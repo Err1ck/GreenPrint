@@ -5,6 +5,7 @@ import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 import Reply from "../componentes/common/Reply";
 import ReplyInput from "../componentes/common/ReplyInput";
+import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewPost() {
     const { id } = useParams();
@@ -102,22 +103,6 @@ function ViewPost() {
 
     const handleReplySubmitted = () => {
         fetchReplies();
-    };
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const months = [
-            "ene", "feb", "mar", "abr", "may", "jun",
-            "jul", "ago", "sep", "oct", "nov", "dic"
-        ];
-        return `${date.getDate()} ${months[date.getMonth()]}`;
-    };
-
-    const formatTime = (dateString) => {
-        const date = new Date(dateString);
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
-        return `${hours}:${minutes}`;
     };
 
     return (
@@ -228,12 +213,12 @@ function ViewPost() {
                             communityId={post.community?.id}
                             communityName={post.community?.name}
                             communityPhotoUrl={post.community?.photo_url}
-                            date={formatDate(post.created_at)}
-                            time={formatTime(post.created_at)}
+                            date={formatDate(post.createdAt)}
+                            time={formatTime(post.createdAt)}
                             text={post.content}
                             postImage={post.image}
                             postType={post.postType}
-                            comments={0}
+                            comments={post.replies || 0}
                             retweets={post.reposts}
                             like1={post.leaf}
                             like2={post.tree}
@@ -306,8 +291,8 @@ function ViewPost() {
                                     userId={reply.user?.id}
                                     userName={reply.user?.username || "Usuario"}
                                     userProfileUrl={reply.user?.photo_url}
-                                    date={formatDate(reply.created_at)}
-                                    time={formatTime(reply.created_at)}
+                                    date={formatDate(reply.createdAt)}
+                                    time={formatTime(reply.createdAt)}
                                     text={reply.content}
                                     replyImage={reply.image}
                                     like1={reply.leaf}
