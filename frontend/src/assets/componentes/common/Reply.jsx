@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Leaf } from "lucide-react";
 import SvgComponente from "../ui/Svg";
 import "../../styles/MainSection.css";
 import defaultAvatar from "../../img/user.png";
@@ -140,7 +141,11 @@ const Reply = ({
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >
-                                    <SvgComponente name={isLike1Active ? 'icon18' : 'icon17'} />
+                                    <Leaf
+                                        size={18}
+                                        color={(like1Hover || isLike1Active) ? '#f91880' : '#536471'}
+                                        strokeWidth={1.5}
+                                    />
                                     <span
                                         className="action-count"
                                         style={{

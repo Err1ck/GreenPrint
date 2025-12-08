@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
+import FollowListModal from "../componentes/common/FollowListModal";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewProfile() {
@@ -11,10 +12,13 @@ function ViewProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(""); // "followers" or "following"
 
   useEffect(() => {
     fetchUserData();
     fetchUserPosts();
+    checkIfFollowing();
   }, [userId]);
 
   const fetchUserData = async () => {
@@ -66,9 +70,107 @@ function ViewProfile() {
     }
   };
 
-  const handleFollowClick = () => {
-    setIsFollowing(!isFollowing);
-    // Aquí irá la lógica para seguir/dejar de seguir
+  const checkIfFollowing = async () => {
+    try {
+      const currentUserStr = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+
+      if (!currentUserStr || !token) return;
+
+      const currentUser = JSON.parse(currentUserStr);
+
+      // No verificar si es el mismo usuario
+      if (currentUser.id === parseInt(userId)) return;
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/users/${currentUser.id}/following`,
+        {
+          headers: { "Authorization": `Bearer ${token}` }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Verificar si data es un array antes de usar .some()
+        if (Array.isArray(data)) {
+          const isFollowingUser = data.some(
+            follow => follow.followingUser?.id === parseInt(userId)
+          );
+          setIsFollowing(isFollowingUser);
+        } else {
+          // Si no es un array, asumir que no sigue a nadie
+          setIsFollowing(false);
+        }
+      }
+    } catch (err) {
+      console.error("Error checking follow status:", err);
+    }
+  };
+
+  const handleFollowClick = async () => {
+    try {
+      const currentUserStr = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+
+      if (!currentUserStr || !token) {
+        alert("Debes iniciar sesión para seguir usuarios");
+        return;
+      }
+
+      const currentUser = JSON.parse(currentUserStr);
+
+      const endpoint = isFollowing
+        ? `http://127.0.0.1:8000/api/users/${currentUser.id}/unfollow`
+        : `http://127.0.0.1:8000/api/users/${currentUser.id}/follow`;
+
+      const method = isFollowing ? 'DELETE' : 'POST';
+
+      const response = await fetch(endpoint, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          following_user_id: parseInt(userId)
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsFollowing(!isFollowing);
+        // Actualizar contador de seguidores
+        fetchUserData();
+      } else if (response.status === 409) {
+        // Conflicto: ya sigue o ya no sigue
+        // Sincronizar el estado con el servidor
+        console.log("Conflicto detectado, sincronizando estado...");
+        await checkIfFollowing();
+        fetchUserData();
+      } else {
+        console.error("Error:", data);
+        alert(data.error || "Error al seguir/dejar de seguir");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Error al conectar con el servidor");
+    }
+  };
+
+  const openFollowersModal = () => {
+    setModalType("followers");
+    setIsModalOpen(true);
+  };
+
+  const openFollowingModal = () => {
+    setModalType("following");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalType("");
   };
 
   if (error) {
@@ -201,44 +303,53 @@ function ViewProfile() {
                 backgroundPosition: "center"
               }} />
 
-              {/* Follow Button */}
-              <button
-                onClick={handleFollowClick}
-                style={{
-                  marginTop: "72px",
-                  padding: "8px 24px",
-                  borderRadius: "9999px",
-                  fontSize: "15px",
-                  fontWeight: "700",
-                  border: isFollowing ? "1px solid #cfd9de" : "1px solid #0f1419",
-                  backgroundColor: isFollowing ? "transparent" : "#0f1419",
-                  color: isFollowing ? "#0f1419" : "#ffffff",
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-                onMouseEnter={(e) => {
-                  if (isFollowing) {
-                    e.target.style.backgroundColor = "#fee";
-                    e.target.style.borderColor = "#f4212e";
-                    e.target.style.color = "#f4212e";
-                    e.target.textContent = "Dejar de seguir";
-                  } else {
-                    e.target.style.backgroundColor = "#272c30";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isFollowing) {
-                    e.target.style.backgroundColor = "transparent";
-                    e.target.style.borderColor = "#cfd9de";
-                    e.target.style.color = "#0f1419";
-                    e.target.textContent = "Siguiendo";
-                  } else {
-                    e.target.style.backgroundColor = "#0f1419";
-                  }
-                }}
-              >
-                {isFollowing ? "Siguiendo" : "Seguir"}
-              </button>
+              {/* Follow Button - Only show if not own profile */}
+              {(() => {
+                const currentUserStr = localStorage.getItem('user');
+                if (!currentUserStr) return null;
+                const currentUser = JSON.parse(currentUserStr);
+                if (currentUser.id === parseInt(userId)) return null;
+
+                return (
+                  <button
+                    onClick={handleFollowClick}
+                    style={{
+                      marginTop: "72px",
+                      padding: "8px 24px",
+                      borderRadius: "9999px",
+                      fontSize: "15px",
+                      fontWeight: "700",
+                      border: isFollowing ? "1px solid #cfd9de" : "1px solid #0f1419",
+                      backgroundColor: isFollowing ? "transparent" : "#0f1419",
+                      color: isFollowing ? "#0f1419" : "#ffffff",
+                      cursor: "pointer",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isFollowing) {
+                        e.target.style.backgroundColor = "#fee";
+                        e.target.style.borderColor = "#f4212e";
+                        e.target.style.color = "#f4212e";
+                        e.target.textContent = "Dejar de seguir";
+                      } else {
+                        e.target.style.backgroundColor = "#272c30";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isFollowing) {
+                        e.target.style.backgroundColor = "transparent";
+                        e.target.style.borderColor = "#cfd9de";
+                        e.target.style.color = "#0f1419";
+                        e.target.textContent = "Siguiendo";
+                      } else {
+                        e.target.style.backgroundColor = "#0f1419";
+                      }
+                    }}
+                  >
+                    {isFollowing ? "Siguiendo" : "Seguir"}
+                  </button>
+                );
+              })()}
             </div>
 
             {/* Username */}
@@ -317,7 +428,7 @@ function ViewProfile() {
                 backgroundColor: "#e8f5fd",
                 borderRadius: "16px"
               }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="#1d9bf0">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#00ba7c">
                   <path d="M12 2L9 8H4l5 4-2 6 5-3 5 3-2-6 5-4h-5z" />
                 </svg>
                 <div>
@@ -332,7 +443,7 @@ function ViewProfile() {
                   <p style={{
                     fontSize: "17px",
                     fontWeight: "700",
-                    color: "#1d9bf0",
+                    color: "#00ba7c",
                     margin: 0,
                     lineHeight: "1.3"
                   }}>
@@ -348,7 +459,31 @@ function ViewProfile() {
               gap: "20px",
               marginTop: "12px"
             }}>
-              <div>
+              <div
+                onClick={openFollowingModal}
+                style={{
+                  cursor: "pointer",
+                  transition: "opacity 0.2s"
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = "0.7"}
+                onMouseLeave={(e) => e.target.style.opacity = "1"}
+              >
+                <span style={{ fontWeight: "700", color: "#0f1419" }}>
+                  {user.following_count || 0}
+                </span>
+                <span style={{ color: "#536471", marginLeft: "4px", fontSize: "15px" }}>
+                  Siguiendo
+                </span>
+              </div>
+              <div
+                onClick={openFollowersModal}
+                style={{
+                  cursor: "pointer",
+                  transition: "opacity 0.2s"
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = "0.7"}
+                onMouseLeave={(e) => e.target.style.opacity = "1"}
+              >
                 <span style={{ fontWeight: "700", color: "#0f1419" }}>
                   {user.follower_count || 0}
                 </span>
@@ -389,7 +524,7 @@ function ViewProfile() {
                 left: 0,
                 right: 0,
                 height: "4px",
-                backgroundColor: "#1d9bf0",
+                backgroundColor: "#00ba7c",
                 borderRadius: "9999px"
               }} />
             </div> */}
@@ -453,6 +588,14 @@ function ViewProfile() {
       <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0, zIndex: 100 }}>
         <Navbar navbarType={2} />
       </div>
+
+      {/* Follow List Modal */}
+      <FollowListModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        userId={userId}
+        type={modalType}
+      />
     </div>
   );
 }

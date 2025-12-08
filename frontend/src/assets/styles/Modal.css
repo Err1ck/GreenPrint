@@ -355,7 +355,7 @@
 }
 
 .media-tool:hover {
-    background-color: rgba(29, 155, 240, 0.1);
+    background-color: rgba(0, 186, 124, 0.1);
 }
 
 .media-tool svg,
@@ -363,8 +363,8 @@
 .media-tool [class^="icon"] {
     width: 20px;
     height: 20px;
-    fill: #1d9bf0;
-    color: #1d9bf0;
+    fill: #00ba7c;
+    color: #00ba7c;
 }
 
 .char-counter {

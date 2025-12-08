@@ -69,6 +69,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $follower_count = 0;
 
     /**
+     * @var int Siguiendo
+     */
+    #[ORM\Column]
+    #[Groups(['user'])]
+    private ?int $following_count = 0;
+
+    /**
      * @var string Biografia del perfil usuario
      */
     #[ORM\Column(length: 255, nullable: true)]
@@ -161,6 +168,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFollowerCount(int $follower_count): static
     {
         $this->follower_count = $follower_count;
+        return $this;
+    }
+
+    public function getFollowingCount(): ?int
+    {
+        return $this->following_count;
+    }
+
+    public function setFollowingCount(int $following_count): static
+    {
+        $this->following_count = $following_count;
         return $this;
     }
 

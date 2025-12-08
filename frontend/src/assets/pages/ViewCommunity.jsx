@@ -172,8 +172,8 @@ function ViewCommunity() {
         <div className="homepage-container">
             <style>{`
                 .spinner {
-                    border: 3px solid rgba(29, 155, 240, 0.3);
-                    border-top: 3px solid #1d9bf0;
+                    border: 3px solid rgba(0, 186, 124, 0.3);
+                    border-top: 3px solid #00ba7c;
                     border-radius: 50%;
                     width: 40px;
                     height: 40px;
@@ -188,7 +188,7 @@ function ViewCommunity() {
                 .community-banner {
                     width: 100%;
                     height: 200px;
-                    background: linear-gradient(135deg, #00ba7c 0%, #1d9bf0 100%);
+                    background: linear-gradient(135deg, #00ba7c 0%, #00ba7c 100%);
                     object-fit: cover;
                 }
                 
@@ -210,7 +210,7 @@ function ViewCommunity() {
                     height: 140px;
                     border-radius: 50%;
                     border: 4px solid #fff;
-                    background: linear-gradient(135deg, #00ba7c 0%, #1d9bf0 100%);
+                    background: linear-gradient(135deg, #00ba7c 0%, #00ba7c 100%);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -251,8 +251,8 @@ function ViewCommunity() {
                     gap: 6px;
                     font-size: 13px;
                     font-weight: 600;
-                    color: #1d9bf0;
-                    background-color: rgba(29, 155, 240, 0.1);
+                    color: #00ba7c;
+                    background-color: rgba(0, 186, 124, 0.1);
                     padding: 6px 14px;
                     border-radius: 12px;
                     letter-spacing: 0.5px;

@@ -24,7 +24,7 @@
 }
 
 .reply-input-textarea:focus {
-    border-color: #1d9bf0;
+    border-color: #00ba7c;
 }
 
 .reply-input-textarea:disabled {
@@ -44,7 +44,7 @@
 }
 
 .reply-input-button {
-    background-color: #1d9bf0;
+    background-color: #00ba7c;
     color: white;
     border: none;
     border-radius: 20px;

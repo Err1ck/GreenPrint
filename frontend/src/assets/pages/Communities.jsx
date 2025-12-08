@@ -158,7 +158,7 @@ function CommunityPage() {
                                     }}
                                     onFocus={(e) => {
                                         e.target.style.backgroundColor = "#fff";
-                                        e.target.style.borderColor = "#1d9bf0";
+                                        e.target.style.borderColor = "#00ba7c";
                                     }}
                                     onBlur={(e) => {
                                         e.target.style.backgroundColor = "#f7f9f9";

@@ -131,7 +131,7 @@ function Search() {
                                     }}
                                     onFocus={(e) => {
                                         e.target.style.backgroundColor = "#fff";
-                                        e.target.style.borderColor = "#1d9bf0";
+                                        e.target.style.borderColor = "#00ba7c";
                                     }}
                                     onBlur={(e) => {
                                         e.target.style.backgroundColor = "#f7f9f9";
@@ -185,7 +185,7 @@ function Search() {
                                         left: 0,
                                         right: 0,
                                         height: "4px",
-                                        backgroundColor: "#1d9bf0",
+                                        backgroundColor: "#00ba7c",
                                         borderRadius: "9999px"
                                     }} />
                                 )}
@@ -215,7 +215,7 @@ function Search() {
                                         left: 0,
                                         right: 0,
                                         height: "4px",
-                                        backgroundColor: "#1d9bf0",
+                                        backgroundColor: "#00ba7c",
                                         borderRadius: "9999px"
                                     }} />
                                 )}

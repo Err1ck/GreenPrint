@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageCircle, Repeat2, Leaf, TreeDeciduous } from "lucide-react";
 import LinkIcon from "../ui/LinkIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/MainSection.css";
@@ -339,7 +340,11 @@ const Publication = ({
                                         backgroundColor: commentHover ? 'rgba(29, 155, 240, 0.1)' : 'transparent'
                                     }}
                                 >
-                                    <SvgComponente name="icon15" />
+                                    <MessageCircle
+                                        size={18}
+                                        color={commentHover ? '#1d9bf0' : '#536471'}
+                                        strokeWidth={1.5}
+                                    />
                                     <span
                                         className="nonaction-count"
                                         style={{ color: commentHover ? '#1d9bf0' : '#536471' }}
@@ -359,7 +364,11 @@ const Publication = ({
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >
-                                    <SvgComponente name="icon21" />
+                                    <Repeat2
+                                        size={18}
+                                        color={(retweetHover || isRetweetActive) ? '#00ba7c' : '#536471'}
+                                        strokeWidth={1.5}
+                                    />
                                     <span
                                         className="action-count"
                                         style={{
@@ -385,7 +394,11 @@ const Publication = ({
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >
-                                    <SvgComponente name={isLike1Active ? 'icon18' : 'icon17'} />
+                                    <Leaf
+                                        size={18}
+                                        color={(like1Hover || isLike1Active) ? '#f91880' : '#536471'}
+                                        strokeWidth={1.5}
+                                    />
                                     <span
                                         className="action-count"
                                         style={{
@@ -409,7 +422,11 @@ const Publication = ({
                                             cursor: isLoading ? 'wait' : 'pointer'
                                         }}
                                     >
-                                        <SvgComponente name={isLike2Active ? 'icon20' : 'icon19'} />
+                                        <TreeDeciduous
+                                            size={18}
+                                            color={(like2Hover || isLike2Active) ? '#1d9bf0' : '#536471'}
+                                            strokeWidth={1.5}
+                                        />
                                         <span
                                             className="action-count"
                                             style={{

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FollowCard = ({
     type = "community", // "community" o "user"
+    id, // ID del usuario o comunidad
     name,
     username, // Solo para usuarios
     bio,
@@ -10,6 +12,7 @@ const FollowCard = ({
     photoUrl,
     maxBioLength = 100,
 }) => {
+    const navigate = useNavigate();
     const [isFollowing, setIsFollowing] = useState(false);
     const [followerCount, setFollowerCount] = useState(followers);
     const [isHovered, setIsHovered] = useState(false);
@@ -30,8 +33,18 @@ const FollowCard = ({
         setIsFollowing(!isFollowing);
     };
 
+    const handleCardClick = () => {
+        if (!id) return;
+        if (type === "community") {
+            navigate(`/community/${id}`);
+        } else {
+            navigate(`/profile/${id}`);
+        }
+    };
+
     return (
         <div
+            onClick={handleCardClick}
             style={{
                 backgroundColor: isHovered ? "#f7f9f9" : "#fff",
                 borderBottom: "1px solid #eff3f4",
@@ -122,8 +135,8 @@ const FollowCard = ({
                             gap: "4px",
                             fontSize: "12px",
                             fontWeight: "600",
-                            color: "#1d9bf0",
-                            backgroundColor: "rgba(29, 155, 240, 0.1)",
+                            color: "#00ba7c",
+                            backgroundColor: "rgba(0, 186, 124, 0.1)",
                             padding: "2px 8px",
                             borderRadius: "8px",
                             letterSpacing: "0.3px"

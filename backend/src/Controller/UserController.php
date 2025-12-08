@@ -29,10 +29,19 @@ final class UserController extends AbstractController
         tags: ['UserController'],
         summary: 'Lista todos los usuarios.'
     )]
-    public function index(UserRepository $users, SerializerInterface $serializer): JsonResponse
+    public function index(UserRepository $users, UserFollowsRepository $followsRepo, SerializerInterface $serializer): JsonResponse
     {
 
         $all = $users->findAll();
+
+        // Calcular contadores para cada usuario
+        foreach ($all as $user) {
+            $followerCount = $followsRepo->count(['followingUser' => $user]);
+            $user->setFollowerCount($followerCount);
+
+            $followingCount = $followsRepo->count(['user' => $user]);
+            $user->setFollowingCount($followingCount);
+        }
 
         return new JsonResponse(
             $serializer->serialize($all, 'json', ['groups' => 'user']),
@@ -48,12 +57,20 @@ final class UserController extends AbstractController
         tags: ['UserController'],
         summary: 'Muestra el usuario por la ID dada.'
     )]
-    public function show(int $id, UserRepository $users, SerializerInterface $serializer): JsonResponse
+    public function show(int $id, UserRepository $users, UserFollowsRepository $followsRepo, SerializerInterface $serializer): JsonResponse
     {
         $user = $users->find($id);
         if (!$user) {
             return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
         }
+
+        // Calcular dinámicamente el número de seguidores
+        $followerCount = $followsRepo->count(['followingUser' => $user]);
+        $user->setFollowerCount($followerCount);
+
+        // Calcular dinámicamente el número de usuarios que sigue
+        $followingCount = $followsRepo->count(['user' => $user]);
+        $user->setFollowingCount($followingCount);
 
         return new JsonResponse(
             $serializer->serialize($user, 'json', ['groups' => 'user']),
