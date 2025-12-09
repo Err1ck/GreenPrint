@@ -9,6 +9,7 @@ import ViewProfile from "./assets/pages/ViewProfile";
 import ViewCommunity from "./assets/pages/ViewCommunity";
 import Search from "./assets/pages/Search";
 import SavedPosts from "./assets/pages/SavedPosts";
+import ForgetPassword from "./assets/pages/ForgetPassword";
 function App() {
   return (
     <>
@@ -23,6 +24,7 @@ function App() {
         <Route path="/profile/:userId" element={<ViewProfile />} />
         <Route path="/community/:communityId" element={<ViewCommunity />} />
         <Route path="/saved" element={<SavedPosts />} />
+        <Route path="/forgot-password" element={<ForgetPassword/>} />
       </Routes>
     </>
   );
