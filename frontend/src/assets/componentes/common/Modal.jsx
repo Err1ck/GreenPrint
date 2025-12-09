@@ -494,7 +494,7 @@ function Modal({ children, onClose }) {
                                 onClick={handleImageClick}
                             >
                                 <LinkIcon
-                                    name={"icon29"}
+                                    name={"image"}
                                     anchor={false}
                                     classname={""}
                                 />
@@ -509,7 +509,7 @@ function Modal({ children, onClose }) {
                                 }}
                             >
                                 <LinkIcon
-                                    name={"icon27"}
+                                    name={"gif"}
                                     anchor={false}
                                     classname={""}
                                 />
@@ -524,7 +524,7 @@ function Modal({ children, onClose }) {
                                 }}
                             >
                                 <LinkIcon
-                                    name={"icon25"}
+                                    name={"emoji"}
                                     anchor={false}
                                     classname={""}
                                 />

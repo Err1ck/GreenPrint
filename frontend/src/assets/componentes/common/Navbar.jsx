@@ -13,10 +13,9 @@ function Navbar({ navbarType, onOpenModal }) {
   const [userId, setUserId] = useState(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-
   // Obtener el ID del usuario desde localStorage
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem("user");
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
@@ -26,7 +25,6 @@ function Navbar({ navbarType, onOpenModal }) {
       }
     }
   }, []);
-
 
   // 🔹 Lógica de búsqueda cuando se pulsa Enter en el buscador
   const handleSearch = (textoBuscado) => {
@@ -115,6 +113,9 @@ function Navbar({ navbarType, onOpenModal }) {
                   text={"Buscador"}
                 />
               </div>
+              <div className="section-toggle">
+                <ThemeToggle />
+              </div>
               <div className="seccion-trend">
                 <LinkIcon
                   name={"tendencias"}
@@ -130,7 +131,6 @@ function Navbar({ navbarType, onOpenModal }) {
                   classname={"navicon"}
                   text={"Comunidades"}
                 />
-                <ThemeToggle />
               </div>
             </div>
 
