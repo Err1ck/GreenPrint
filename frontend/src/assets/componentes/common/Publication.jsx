@@ -287,6 +287,63 @@ const Publication = ({
         }
     };
 
+    const handleHashtagClick = (e, hashtag) => {
+        e.stopPropagation();
+        navigate(`/search?q=${encodeURIComponent('#' + hashtag)}`);
+    };
+
+    // Función para renderizar texto con hashtags clickeables
+    const renderTextWithHashtags = (text) => {
+        if (!text) return null;
+
+        // Regex para encontrar hashtags
+        const hashtagRegex = /#(\w+)/g;
+        const parts = [];
+        let lastIndex = 0;
+        let match;
+
+        while ((match = hashtagRegex.exec(text)) !== null) {
+            // Agregar texto antes del hashtag
+            if (match.index > lastIndex) {
+                parts.push(text.substring(lastIndex, match.index));
+            }
+
+            // Agregar el hashtag como elemento clickeable
+            const hashtag = match[1];
+            parts.push(
+                <span
+                    key={`hashtag-${match.index}`}
+                    onClick={(e) => handleHashtagClick(e, hashtag)}
+                    style={{
+                        color: '#00ba7c',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.textDecoration = 'underline';
+                        e.target.style.color = '#008f5f';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.textDecoration = 'none';
+                        e.target.style.color = '#00ba7c';
+                    }}
+                >
+                    #{hashtag}
+                </span>
+            );
+
+            lastIndex = match.index + match[0].length;
+        }
+
+        // Agregar el texto restante
+        if (lastIndex < text.length) {
+            parts.push(text.substring(lastIndex));
+        }
+
+        return parts.length > 0 ? parts : text;
+    };
+
     const displayName = postType === 'community' ? communityName : userName;
     const displayPhoto = postType === 'community' ? communityPhotoUrl : userProfileUrl;
 
@@ -363,7 +420,7 @@ const Publication = ({
 
                     {/* Text */}
                     <div className="section-textWrapper">
-                        <p className="textWrapper-text">{text}</p>
+                        <p className="textWrapper-text">{renderTextWithHashtags(text)}</p>
                     </div>
 
                     {/* Image */}

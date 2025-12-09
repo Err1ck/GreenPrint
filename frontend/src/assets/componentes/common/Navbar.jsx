@@ -7,6 +7,7 @@ import Footer from "./Footer";
 import Button from "../ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
 import UserSettingsModal from "./UserSettingsModal";
+import TrendingTopics from "./TrendingTopics";
 
 function Navbar({ navbarType, onOpenModal }) {
   const navigate = useNavigate();
@@ -116,6 +117,10 @@ function Navbar({ navbarType, onOpenModal }) {
               <div className="section-toggle">
                 <ThemeToggle />
               </div>
+
+              {/* Trending Topics */}
+              <TrendingTopics />
+
               <div className="seccion-trend">
                 <LinkIcon
                   name={"tendencias"}
