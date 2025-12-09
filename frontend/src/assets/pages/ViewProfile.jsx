@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
 import FollowListModal from "../componentes/common/FollowListModal";
+import UserSettingsModal from "../componentes/common/UserSettingsModal";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewProfile() {
@@ -14,6 +15,7 @@ function ViewProfile() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // "followers" or "following"
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -276,7 +278,7 @@ function ViewProfile() {
             width: "100%",
             height: "200px",
             backgroundColor: user.banner_url ? "transparent" : "#cfd9de",
-            backgroundImage: user.banner_url ? `url(${user.banner_url})` : "none",
+            backgroundImage: user.banner_url ? `url(http://127.0.0.1:8000${user.banner_url})` : "none",
             backgroundSize: "cover",
             backgroundPosition: "center"
           }} />
@@ -298,18 +300,47 @@ function ViewProfile() {
                 borderRadius: "50%",
                 border: "4px solid #ffffff",
                 backgroundColor: "#cfd9de",
-                backgroundImage: user.photo_url ? `url(${user.photo_url})` : "none",
+                backgroundImage: user.photo_url ? `url(http://127.0.0.1:8000${user.photo_url})` : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center"
               }} />
 
-              {/* Follow Button - Only show if not own profile */}
+              {/* Follow Button or Edit Profile Button */}
               {(() => {
                 const currentUserStr = localStorage.getItem('user');
                 if (!currentUserStr) return null;
                 const currentUser = JSON.parse(currentUserStr);
-                if (currentUser.id === parseInt(userId)) return null;
 
+                // Show Edit Profile button for own profile
+                if (currentUser.id === parseInt(userId)) {
+                  return (
+                    <button
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{
+                        marginTop: "72px",
+                        padding: "8px 24px",
+                        borderRadius: "9999px",
+                        fontSize: "15px",
+                        fontWeight: "700",
+                        border: "1px solid #cfd9de",
+                        backgroundColor: "transparent",
+                        color: "#0f1419",
+                        cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = "#f7f9f9";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      Editar Perfil
+                    </button>
+                  );
+                }
+
+                // Show Follow button for other profiles
                 return (
                   <button
                     onClick={handleFollowClick}
@@ -595,6 +626,12 @@ function ViewProfile() {
         onClose={closeModal}
         userId={userId}
         type={modalType}
+      />
+
+      {/* User Settings Modal */}
+      <UserSettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
       />
     </div>
   );

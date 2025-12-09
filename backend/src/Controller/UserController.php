@@ -91,7 +91,7 @@ final class UserController extends AbstractController
             content: new OA\JsonContent(
                 type: 'object',
                 properties: [
-                    new OA\Property(property: 'username', type: 'string', example: 'Gordinxi'),
+                    // new OA\Property(property: 'username', type: 'string', example: 'Gordinxi'),
                     new OA\Property(property: 'biography', type: 'string', example: 'Lorem ipsum...'),
                     new OA\Property(property: 'photo_url', type: 'string', example: 'path/img'),
                     new OA\Property(property: 'banner_url', type: 'string', example: 'path/img')
@@ -122,9 +122,9 @@ final class UserController extends AbstractController
         }
 
         // 3. Actualizar solo los campos permitidos que vengan en el request
-        if (isset($data['username'])) {
-            $user->setUsername($data['username']);
-        }
+        // if (isset($data['username'])) {
+        //     $user->setUsername($data['username']);
+        // }
 
         if (isset($data['biography'])) {
             $user->setBiography($data['biography']);
@@ -162,6 +162,128 @@ final class UserController extends AbstractController
             JsonResponse::HTTP_OK,
             [],
             true // Indica que ya está serializado
+        );
+    }
+
+    #[Route('/{id<\d+>}/upload-image', name: 'user_upload_image', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['UserController'],
+        summary: 'Sube una imagen de perfil o banner para el usuario.',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'image_type', type: 'string', example: 'profile', description: 'Tipo de imagen: profile o banner'),
+                    new OA\Property(property: 'image_data', type: 'string', example: 'data:image/png;base64,iVBORw0KG...', description: 'Imagen en formato base64')
+                ]
+            )
+        ),
+    )]
+    public function uploadImage(int $id, Request $request, UserRepository $users): JsonResponse
+    {
+        // 1. Verificar que el usuario existe
+        $user = $users->find($id);
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'User not found'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // 2. Obtener datos del request
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['image_type']) || !isset($data['image_data'])) {
+            return new JsonResponse(
+                ['error' => 'image_type y image_data son requeridos'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $imageType = $data['image_type']; // 'profile' o 'banner'
+        $imageData = $data['image_data'];
+
+        // 3. Validar tipo de imagen
+        if (!in_array($imageType, ['profile', 'banner'])) {
+            return new JsonResponse(
+                ['error' => 'image_type debe ser "profile" o "banner"'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // 4. Decodificar base64
+        if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $matches)) {
+            $imageExtension = $matches[1];
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            $imageData = base64_decode($imageData);
+
+            if ($imageData === false) {
+                return new JsonResponse(
+                    ['error' => 'Error al decodificar la imagen'],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        } else {
+            return new JsonResponse(
+                ['error' => 'Formato de imagen inválido. Debe ser base64.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // 5. Validar extensión
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array(strtolower($imageExtension), $allowedExtensions)) {
+            return new JsonResponse(
+                ['error' => 'Tipo de archivo no permitido. Usa: jpg, png, gif, webp'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // 6. Validar tamaño (5MB máximo)
+        if (strlen($imageData) > 5 * 1024 * 1024) {
+            return new JsonResponse(
+                ['error' => 'La imagen es demasiado grande. Máximo 5MB.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // 7. Crear directorio del usuario si no existe
+        $uploadDir = __DIR__ . '/../../public/uploads/users/' . $id;
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+// 8. Eliminar imagen anterior si existe (antes de guardar la nueva)
+        $pattern = $uploadDir . '/' . $imageType . '.*';
+        foreach (glob($pattern) as $oldFile) {
+            if (file_exists($oldFile)) {
+                unlink($oldFile);
+            }
+        }
+        // 7. Generar nombre de archivo
+        $filename = $imageType . '.' . $imageExtension;
+        $filepath = $uploadDir . '/' . $filename;
+
+        // 9. Guardar archivo
+        if (file_put_contents($filepath, $imageData) === false) {
+            return new JsonResponse(
+                ['error' => 'Error al guardar la imagen'],
+                JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        // 10. Generar URL pública
+        $publicUrl = '/uploads/users/' . $id . '/' . $filename;
+
+        // 11. Retornar URL
+        return new JsonResponse(
+            [
+                'success' => true,
+                'url' => $publicUrl,
+                'message' => 'Imagen subida correctamente'
+            ],
+            JsonResponse::HTTP_OK
         );
     }
 

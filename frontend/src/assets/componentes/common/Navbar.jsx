@@ -6,10 +6,12 @@ import "../../styles/Navbar.css";
 import Footer from "./Footer";
 import Button from "../ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
+import UserSettingsModal from "./UserSettingsModal";
 
 function Navbar({ navbarType, onOpenModal }) {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
 
   // Obtener el ID del usuario desde localStorage
@@ -47,7 +49,7 @@ function Navbar({ navbarType, onOpenModal }) {
                 <div className="navbar-links-right">
                   <LinkIcon
                     name={"home"}
-                    href={"#"}
+                    href={"/"}
                     classname={"navicon"}
                     text={"Inicio"}
                   />
@@ -75,17 +77,28 @@ function Navbar({ navbarType, onOpenModal }) {
                     classname={"navicon"}
                     text={"Perfil"}
                   />
-                  <LinkIcon
-                    name={"dots"}
-                    href={"/opciones"}
-                    classname={"navicon"}
-                    text={"Opciones"}
-                  />
+                  <div
+                    onClick={() => setIsSettingsModalOpen(true)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <LinkIcon
+                      name={"dots"}
+                      anchor={false}
+                      classname={"navicon"}
+                      text={"Configuración"}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <Footer footerType={1} />
+
+          {/* User Settings Modal */}
+          <UserSettingsModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+          />
         </nav>
       )}
 
