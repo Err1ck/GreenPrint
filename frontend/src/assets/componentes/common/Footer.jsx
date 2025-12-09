@@ -1,14 +1,106 @@
+import { useState, useEffect } from "react";
+import { LogIn } from "lucide-react";
 import LinkIcon from "../ui/LinkIcon";
+import defaultAvatar from "../../img/user.png";
 
 function Footer({ footerType }) {
+  const [username, setUsername] = useState("");
+  const [userPhoto, setUserPhoto] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Obtener usuario de localStorage
+    const userStr = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+
+    if (userStr && token) {
+      const user = JSON.parse(userStr);
+      setUsername(user.username);
+      setUserPhoto(user.photo_url);
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        console.error("No se encontró token");
+        return;
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/api/logout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Limpiar localStorage independientemente de la respuesta
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
+      // Redirigir al login o página principal
+      window.location.href = '/login';
+
+    } catch (error) {
+      console.error("Error al hacer logout:", error);
+      // Limpiar localStorage incluso si hay error
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    window.location.href = '/login';
+  };
+
   return (
     <>
       {footerType === 1 && (
         <div className="footer1">
-          <div className="footer1-container">
-            <LinkIcon name={"imagen2"} />
-            <span className="info-username">DanielRoses</span>
-            <LinkIcon name={"exit"} />
+          <div className="footer1-container" style={{ gap: '12px' }}>
+            {isLoggedIn ? (
+              <>
+                <img
+                  src={userPhoto ? `http://127.0.0.1:8000${userPhoto}` : defaultAvatar}
+                  alt={username}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    objectFit: 'cover'
+                  }}
+                />
+                <span className="info-username">{username}</span>
+                <LinkIcon name={"exit"} onClick={handleLogout} />
+              </>
+            ) : (
+              <>
+                <LogIn
+                  size={24}
+                  color="#1d9bf0"
+                  style={{ cursor: 'pointer' }}
+                  onClick={handleLoginRedirect}
+                />
+                <span
+                  className="info-username"
+                  style={{
+                    cursor: 'pointer',
+                    color: '#1d9bf0',
+                    fontWeight: '600'
+                  }}
+                  onClick={handleLoginRedirect}
+                >
+                  Iniciar sesión
+                </span>
+              </>
+            )}
           </div>
         </div>
       )}
