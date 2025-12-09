@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
 import FollowCard from "../componentes/common/FollowCard";
@@ -10,6 +10,7 @@ import "../styles/app.css";
 
 function Search() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("users"); // "users" o "posts"
     const [searchQuery, setSearchQuery] = useState("");
@@ -21,6 +22,18 @@ function Search() {
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
+
+    // Leer el parámetro 'q' de la URL al cargar el componente
+    useEffect(() => {
+        const query = searchParams.get('q');
+        if (query) {
+            setSearchQuery(query);
+            // Si es un hashtag, cambiar a la pestaña de posts
+            if (query.startsWith('#')) {
+                setActiveTab('posts');
+            }
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         fetchAllData();

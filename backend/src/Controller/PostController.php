@@ -7,6 +7,7 @@ use App\Entity\UserPostLeaf;
 use App\Entity\UserPostTree;
 use App\Entity\UserRepost;
 use App\Repository\CommunityRepository;
+use App\Repository\HashtagRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserPostLeafRepository;
 use App\Repository\UserPostTreeRepository;
@@ -239,6 +240,7 @@ final class PostController extends AbstractController
         Request $request, 
         UserRepository $users, 
         CommunityRepository $communities,
+        HashtagRepository $hashtagRepo,
         EntityManagerInterface $entityManager, 
         ValidatorInterface $validator
     ): JsonResponse {
@@ -331,10 +333,51 @@ final class PostController extends AbstractController
         $entityManager->persist($post);
         $entityManager->flush();
 
+        // Extraer y guardar hashtags
+        $this->extractAndSaveHashtags($post->getContent(), $hashtagRepo, $entityManager);
+
         return new JsonResponse(
             ['message' => "El post ha sido creado.", 'post_id' => $post->getId()],
             JsonResponse::HTTP_CREATED,
         );
+    }
+
+    /**
+     * Extrae hashtags del contenido y actualiza la tabla de hashtags
+     */
+    private function extractAndSaveHashtags(string $content, HashtagRepository $hashtagRepo, EntityManagerInterface $entityManager): void
+    {
+        // Regex para encontrar hashtags (#palabra)
+        preg_match_all('/#(\w+)/u', $content, $matches);
+        
+        if (empty($matches[1])) {
+            return;
+        }
+
+        $hashtags = array_unique($matches[1]); // Eliminar duplicados
+
+        foreach ($hashtags as $tag) {
+            $tag = strtolower($tag); // Normalizar a minúsculas
+            
+            // Buscar si el hashtag ya existe
+            $hashtag = $hashtagRepo->findOneBy(['tag' => $tag]);
+            
+            if ($hashtag) {
+                // Si existe, incrementar el contador
+                $hashtag->incrementCount();
+                $hashtag->setUpdatedAt(new \DateTimeImmutable());
+            } else {
+                // Si no existe, crear uno nuevo
+                $hashtag = new \App\Entity\Hashtag();
+                $hashtag->setTag($tag);
+                $hashtag->setCount(1);
+                $hashtag->setCreatedAt(new \DateTimeImmutable());
+                $hashtag->setUpdatedAt(new \DateTimeImmutable());
+                $entityManager->persist($hashtag);
+            }
+        }
+
+        $entityManager->flush();
     }
 
     // Nuevo método para obtener posts de una comunidad
