@@ -20,6 +20,7 @@
   --color-border: #eff3f4;
   --color-border-hover: #cfd9de;
   --color-overlay: rgba(91, 112, 131, 0.4);
+  --color-login: #10b981;
 
   /* Tipografía */
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
