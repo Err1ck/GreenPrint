@@ -332,7 +332,7 @@ const Publication = ({
                                     onMouseEnter={() => setProfileHover(true)}
                                     onMouseLeave={() => setProfileHover(false)}
                                     style={{
-                                        color: profileHover ? '#1d9bf0' : '#0f1419',
+                                        color: profileHover ? '#1d9bf0' : 'var(--color-text-primary)',
                                         cursor: (postType === 'community' ? communityId : userId) ? 'pointer' : 'default',
                                         transition: 'color 0.2s'
                                     }}
