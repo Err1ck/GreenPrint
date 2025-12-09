@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
-import { IMAGENES } from "../data/imagenes.js";
+import SvgComponente from "../componentes/ui/Svg";
 
 
 function Login() {
@@ -51,11 +51,7 @@ function Login() {
 
       <div className="login-right-panel">
         <div className="login-form-wrapper">
-          <img
-            src={IMAGENES.img.imagen3}
-            alt="GreenPrint"
-            className="login-small-logo"
-          />
+          <SvgComponente name="imagen3" />
 
           <h1 className="login-title">Iniciar sesión en GreenPrint</h1>
 
