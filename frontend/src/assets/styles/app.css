@@ -50,6 +50,7 @@
   --space-12: 48px;
 
   /* Bordes y sombras */
+  --size-border: 1.5px;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 16px;
@@ -84,6 +85,7 @@
   --color-accent-light: #031018;
   --color-success-light: #001a11;
   --color-danger-light: #2b0a0f;
+  --size-border: 3px;
 }
 /* ===================================
    RESET Y BASE
