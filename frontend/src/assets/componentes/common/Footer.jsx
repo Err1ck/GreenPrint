@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { LogIn } from "lucide-react";
-import LinkIcon from "../ui/LinkIcon";
+import { LogIn, LogOut } from "lucide-react";
 import defaultAvatar from "../../img/user.png";
 
 function Footer({ footerType }) {
@@ -60,11 +59,27 @@ function Footer({ footerType }) {
     window.location.href = '/login';
   };
 
+  const handleFooterClick = () => {
+    if (isLoggedIn) {
+      handleLogout();
+    } else {
+      handleLoginRedirect();
+    }
+  };
+
   return (
     <>
       {footerType === 1 && (
         <div className="footer1">
-          <div className="footer1-container" style={{ gap: '12px' }}>
+          <div
+            className="footer1-container"
+            style={{
+              gap: '12px',
+              cursor: 'pointer',
+              justifyContent: isLoggedIn ? 'flex-start' : 'center'
+            }}
+            onClick={handleFooterClick}
+          >
             {isLoggedIn ? (
               <>
                 <img
@@ -78,24 +93,24 @@ function Footer({ footerType }) {
                   }}
                 />
                 <span className="info-username">{username}</span>
-                <LinkIcon name={"exit"} onClick={handleLogout} />
+                <LogOut
+                  size={20}
+                  color="#536471"
+                  style={{ marginLeft: 'auto' }}
+                />
               </>
             ) : (
               <>
                 <LogIn
                   size={24}
                   color="#1d9bf0"
-                  style={{ cursor: 'pointer' }}
-                  onClick={handleLoginRedirect}
                 />
                 <span
                   className="info-username"
                   style={{
-                    cursor: 'pointer',
                     color: '#1d9bf0',
                     fontWeight: '600'
                   }}
-                  onClick={handleLoginRedirect}
                 >
                   Iniciar sesión
                 </span>

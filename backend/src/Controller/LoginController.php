@@ -123,7 +123,9 @@ class LoginController extends AbstractController
             'token' => $token,
             'user' => [
                 'id' => $user->getId(),
+                'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
+                'photo_url' => $user->getPhotoUrl(),
                 'roles' => $user->getRoles()
             ]
         ]);
