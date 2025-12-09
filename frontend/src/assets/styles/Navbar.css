@@ -160,10 +160,22 @@
 /* .navbarRight2-container > .link-icon:first-child:hover {
   background-color: transparent;
 } */
-.section-buscador .link-icon {
+/* .section-buscador .link-icon {
   width: 50%;
+} */
+.button-toggleTheme {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-base);
+  cursor: pointer;
+  width: fit-content;
 }
-
+.button-toggleTheme:hover {
+  background-color: var(--color-bg-secondary);
+}
 .input-buscador {
   width: 100%;
   padding: var(--space-3) var(--space-4);
