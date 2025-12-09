@@ -92,10 +92,10 @@ function Footer({ footerType }) {
                     objectFit: 'cover'
                   }}
                 />
-                <span className="info-username">{username}</span>
+                <span style={{ color: "var(--color-text-primary)" }} className="info-username">{username}</span>
                 <LogOut
                   size={20}
-                  color="#536471"
+                  color="var(--color-text-primary)"
                   style={{ marginLeft: 'auto' }}
                 />
               </>
@@ -103,12 +103,12 @@ function Footer({ footerType }) {
               <>
                 <LogIn
                   size={24}
-                  color="#1d9bf0"
+                  color="#10b981"
                 />
                 <span
                   className="info-username"
                   style={{
-                    color: '#1d9bf0',
+                    color: '#10b981',
                     fontWeight: '600'
                   }}
                 >
