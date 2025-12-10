@@ -9,6 +9,7 @@
 /vendor/
 .env
 /.env
+/public/uploads/users/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
