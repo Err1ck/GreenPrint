@@ -444,8 +444,8 @@ function Messages() {
                     </div>
                 </main>
             </div>
-            <div className="navbarRight-content">
-                <Navbar navbarType={3} />
+            <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0, zIndex: 100 }}>
+                <Navbar navbarType={2} />
             </div>
         </div>
     );
