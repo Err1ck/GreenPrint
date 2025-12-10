@@ -54,7 +54,7 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"message"}
-                    href={"/communities"}
+                    href={"/messages"}
                     classname={"navicon"}
                     text={"Mensajes"}
                   />
