@@ -10,6 +10,7 @@ import ViewCommunity from "./assets/pages/ViewCommunity";
 import Search from "./assets/pages/Search";
 import SavedPosts from "./assets/pages/SavedPosts";
 import ForgetPassword from "./assets/pages/ForgetPassword";
+import Messages from "./assets/pages/Messages";
 function App() {
   return (
     <>
@@ -18,13 +19,14 @@ function App() {
         <Route path="/communities" element={<CommunityPage />} />
         <Route path="/users" element={<SuggestedUsersPage />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/messages" element={<Messages />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/post/:id" element={<ViewPost />} />
         <Route path="/profile/:userId" element={<ViewProfile />} />
         <Route path="/community/:communityId" element={<ViewCommunity />} />
         <Route path="/saved" element={<SavedPosts />} />
-        <Route path="/forgot-password" element={<ForgetPassword/>} />
+        <Route path="/forgot-password" element={<ForgetPassword />} />
       </Routes>
     </>
   );

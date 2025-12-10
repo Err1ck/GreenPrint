@@ -8,11 +8,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait TimestampableTrait
 {
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    #[Groups(['user','follows', 'posts', 'post', 'reply', 'saved_posts'])]
+    #[Groups(['user','follows', 'posts', 'post', 'reply', 'saved_posts', 'message'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-     #[Groups(['user','follows', 'posts', 'post', 'reply', 'saved_posts'])]
+     #[Groups(['user','follows', 'posts', 'post', 'reply', 'saved_posts', 'message'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\PrePersist]
