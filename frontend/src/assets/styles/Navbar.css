@@ -68,7 +68,9 @@
 }
 
 .link-icon:not(.footer1-container .link-icon,
-  .section-buscador .link-icon):hover {
+  .section-buscador .link-icon,
+  .seccion-trend .link-icon,
+):hover {
   background-color: var(--color-bg-secondary);
 }
 

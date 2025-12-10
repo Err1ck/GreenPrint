@@ -225,9 +225,9 @@ function ViewProfile() {
           <div style={{
             position: "sticky",
             top: 0,
-            backgroundColor: "rgba(255, 255, 255, 0.85)",
+            backgroundColor: "var(--color-bg)",
             backdropFilter: "blur(12px)",
-            borderBottom: "1px solid #eff3f4",
+            borderBottom: "var(--size-border) solid var(--color-bg-secondary)",
             padding: "12px 16px",
             zIndex: 10
           }}>
@@ -246,10 +246,10 @@ function ViewProfile() {
                   cursor: "pointer",
                   transition: "background-color 0.2s"
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = "#f7f9f9"}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "var(--color-bg-secondary)"}
                 onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
               >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="#0f1419">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--color-text-primary)">
                   <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z" />
                 </svg>
               </button>
@@ -257,7 +257,7 @@ function ViewProfile() {
                 <h2 style={{
                   fontSize: "20px",
                   fontWeight: "700",
-                  color: "#0f1419",
+                  color: "var(--color-text-primary)",
                   margin: 0
                 }}>
                   {user.username}
@@ -284,7 +284,7 @@ function ViewProfile() {
           }} />
 
           {/* Profile Info Section */}
-          <div style={{ padding: "12px 16px", borderBottom: "1px solid #eff3f4" }}>
+          <div style={{ padding: "12px 16px", borderBottom: "var(--size-border) solid var(--color-bg-secondary)" }}>
             {/* Avatar and Follow Button */}
             <div style={{
               display: "flex",
@@ -324,12 +324,12 @@ function ViewProfile() {
                         fontWeight: "700",
                         border: "1px solid #cfd9de",
                         backgroundColor: "transparent",
-                        color: "#0f1419",
+                        color: "var(--color-text-primary)",
                         cursor: "pointer",
                         transition: "all 0.2s"
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = "#f7f9f9";
+                        e.target.style.backgroundColor = "var(--color-bg-secondary)";
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.backgroundColor = "transparent";
@@ -388,7 +388,7 @@ function ViewProfile() {
               <h1 style={{
                 fontSize: "20px",
                 fontWeight: "700",
-                color: "#0f1419",
+                color: "var(--color-text-primary)",
                 margin: 0,
                 marginBottom: "2px"
               }}>
@@ -401,7 +401,7 @@ function ViewProfile() {
               <div style={{ marginBottom: "12px" }}>
                 <p style={{
                   fontSize: "15px",
-                  color: "#0f1419",
+                  color: "var(--color-text-primary)",
                   margin: 0,
                   lineHeight: "20px",
                   whiteSpace: "pre-wrap"
@@ -499,7 +499,7 @@ function ViewProfile() {
                 onMouseEnter={(e) => e.target.style.opacity = "0.7"}
                 onMouseLeave={(e) => e.target.style.opacity = "1"}
               >
-                <span style={{ fontWeight: "700", color: "#0f1419" }}>
+                <span style={{ fontWeight: "700", color: "var(--color-text-primary)" }}>
                   {user.following_count || 0}
                 </span>
                 <span style={{ color: "#536471", marginLeft: "4px", fontSize: "15px" }}>
@@ -515,7 +515,7 @@ function ViewProfile() {
                 onMouseEnter={(e) => e.target.style.opacity = "0.7"}
                 onMouseLeave={(e) => e.target.style.opacity = "1"}
               >
-                <span style={{ fontWeight: "700", color: "#0f1419" }}>
+                <span style={{ fontWeight: "700", color: "var(--color-text-primary)" }}>
                   {user.follower_count || 0}
                 </span>
                 <span style={{ color: "#536471", marginLeft: "4px", fontSize: "15px" }}>
@@ -528,10 +528,10 @@ function ViewProfile() {
           {/* Tabs */}
           <div style={{
             display: "flex",
-            borderBottom: "1px solid #eff3f4",
+            // borderBottom: "1px solid #eff3f4",
             position: "sticky",
             top: "53px",
-            backgroundColor: "#ffffff",
+            backgroundColor: "var(--color-bg)",
             zIndex: 9
           }}>
             {/* <div style={{

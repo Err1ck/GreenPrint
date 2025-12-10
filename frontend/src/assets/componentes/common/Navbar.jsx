@@ -54,7 +54,7 @@ function Navbar({ navbarType, onOpenModal }) {
                   />
                   <LinkIcon
                     name={"message"}
-                    href={"/communities"}
+                    href={"/messages"}
                     classname={"navicon"}
                     text={"Mensajes"}
                   />
@@ -121,7 +121,7 @@ function Navbar({ navbarType, onOpenModal }) {
               {/* Trending Topics */}
               <TrendingTopics />
 
-              <div className="seccion-trend">
+              {/* <div className="seccion-trend">
                 <LinkIcon
                   name={"tendencias"}
                   anchor={false}
@@ -129,14 +129,7 @@ function Navbar({ navbarType, onOpenModal }) {
                   classname={"navicon"}
                   text={"Tendencias"}
                 />
-                <LinkIcon
-                  name={"comunidadGeneral"}
-                  anchor={false}
-                  href={"/communities"}
-                  classname={"navicon"}
-                  text={"Comunidades"}
-                />
-              </div>
+              </div> */}
             </div>
 
             <div className="navbarRight-container-footer">
