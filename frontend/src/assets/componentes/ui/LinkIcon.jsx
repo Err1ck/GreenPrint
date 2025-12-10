@@ -14,23 +14,18 @@ const LinkIcon = ({
     text,
     onSearch, // función opcional, se usa solo en modo buscador
 }) => {
-    // ⭐ MODO BUSCADOR: icon5 + anchor=false
-    if (name === "icon9" && anchor === false) {
-        const handleKeyDown = (e) => {
-            if (e.key === "Enter" && typeof onSearch === "function") {
-                onSearch(e.target.value); // mandamos el texto al padre (Navbar)
+    // ⭐ MODO BUSCADOR: lupa + anchor=false
+    if (name === "lupa" && anchor === false) {
+        const handleClick = () => {
+            if (typeof onSearch === "function") {
+                onSearch(""); // navegar a la página de búsqueda
             }
         };
 
         return (
-            <div className="link-icon">
+            <div className="link-icon" onClick={handleClick} style={{ cursor: 'pointer' }}>
                 <SvgComponente name={name} />
-                <input
-                    type="text"
-                    className="input-buscador"
-                    placeholder={text || "Buscar..."}
-                    onKeyDown={handleKeyDown}
-                />
+                <div className="search-button-text">{text || "Buscar"}</div>
             </div>
         );
     }

@@ -32,7 +32,7 @@ final class PostController extends AbstractController
     )]
     public function index(
         Request $request,
-        PostRepository $postsRepository, 
+        PostRepository $postsRepository,
         UserRepository $userRepository,
         UserPostLeafRepository $likeLeafs,
         UserPostTreeRepository $likeTrees,
@@ -46,15 +46,15 @@ final class PostController extends AbstractController
 
         // Obtener user_id opcional de los query params
         $userId = $request->query->get('user_id');
-        
+
         // Si hay user_id, incluir las interacciones del usuario
         if ($userId) {
             $user = $userRepository->find($userId);
-            
+
             if ($user) {
                 // Obtener todas las interacciones del usuario de una vez
                 $postIds = array_map(fn($post) => $post->getId(), $all);
-                
+
                 // Consultas optimizadas para obtener todas las interacciones
                 $userLeafLikes = $likeLeafs->createQueryBuilder('l')
                     ->where('l.user = :user')
@@ -63,7 +63,7 @@ final class PostController extends AbstractController
                     ->setParameter('posts', $postIds)
                     ->getQuery()
                     ->getResult();
-                
+
                 $userTreeLikes = $likeTrees->createQueryBuilder('t')
                     ->where('t.user = :user')
                     ->andWhere('t.post IN (:posts)')
@@ -71,7 +71,7 @@ final class PostController extends AbstractController
                     ->setParameter('posts', $postIds)
                     ->getQuery()
                     ->getResult();
-                
+
                 $repostRepository = $entityManager->getRepository(UserRepost::class);
                 $userReposts = $repostRepository->createQueryBuilder('r')
                     ->where('r.user = :user')
@@ -80,29 +80,29 @@ final class PostController extends AbstractController
                     ->setParameter('posts', $postIds)
                     ->getQuery()
                     ->getResult();
-                
+
                 // Crear mapas para búsqueda rápida
                 $leafLikesMap = [];
                 foreach ($userLeafLikes as $like) {
                     $leafLikesMap[$like->getPost()->getId()] = true;
                 }
-                
+
                 $treeLikesMap = [];
                 foreach ($userTreeLikes as $like) {
                     $treeLikesMap[$like->getPost()->getId()] = true;
                 }
-                
+
                 $repostsMap = [];
                 foreach ($userReposts as $repost) {
                     $repostsMap[$repost->getPost()->getId()] = true;
                 }
-                
+
                 // Serializar posts y agregar interacciones
                 $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
-                
+
                 // Obtener repositorio de replies
                 $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
-                
+
                 foreach ($postsData as &$postData) {
                     $postId = $postData['id'];
                     $postData['user_interactions'] = [
@@ -113,19 +113,19 @@ final class PostController extends AbstractController
                     // Agregar contador de replies
                     $postData['replies'] = $replyRepository->count(['post' => $postId]);
                 }
-                
+
                 return new JsonResponse($postsData, JsonResponse::HTTP_OK);
             }
         }
-        
+
         // Si no hay user_id o el usuario no existe, devolver posts sin interacciones pero con reply count
         $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
         $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
-        
+
         foreach ($postsData as &$postData) {
             $postData['replies'] = $replyRepository->count(['post' => $postData['id']]);
         }
-        
+
         return new JsonResponse($postsData, JsonResponse::HTTP_OK);
     }
 
@@ -135,9 +135,9 @@ final class PostController extends AbstractController
     )]
     #[Route('/{id<\d+>}', name: 'api_post_show', methods: ['GET'])]
     public function show(
-        int $id, 
+        int $id,
         Request $request,
-        PostRepository $postRepository, 
+        PostRepository $postRepository,
         UserRepository $userRepository,
         UserPostLeafRepository $likeLeafs,
         UserPostTreeRepository $likeTrees,
@@ -155,19 +155,19 @@ final class PostController extends AbstractController
 
         // Obtener user_id opcional de los query params
         $userId = $request->query->get('user_id');
-        
+
         // Si hay user_id, incluir las interacciones del usuario
         if ($userId) {
             $user = $userRepository->find($userId);
-            
+
             if ($user) {
                 // Verificar interacciones del usuario con este post
                 $hasLikedLeaf = $likeLeafs->findOneBy(['user' => $user, 'post' => $post]) !== null;
                 $hasLikedTree = $likeTrees->findOneBy(['user' => $user, 'post' => $post]) !== null;
-                
+
                 $repostRepository = $entityManager->getRepository(UserRepost::class);
                 $hasReposted = $repostRepository->findOneBy(['user' => $user, 'post' => $post]) !== null;
-                
+
                 // Serializar post y agregar interacciones
                 $postData = json_decode($serializer->serialize($post, 'json', ['groups' => 'post']), true);
                 $postData['user_interactions'] = [
@@ -175,11 +175,11 @@ final class PostController extends AbstractController
                     'has_liked_tree' => $hasLikedTree,
                     'has_reposted' => $hasReposted
                 ];
-                
+
                 // Agregar contador de replies
                 $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
                 $postData['replies'] = $replyRepository->count(['post' => $post]);
-                
+
                 return new JsonResponse($postData, JsonResponse::HTTP_OK);
             }
         }
@@ -188,7 +188,7 @@ final class PostController extends AbstractController
         $postData = json_decode($serializer->serialize($post, 'json', ['groups' => 'post']), true);
         $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
         $postData['replies'] = $replyRepository->count(['post' => $post]);
-        
+
         return new JsonResponse($postData, JsonResponse::HTTP_OK);
     }
 
@@ -218,7 +218,7 @@ final class PostController extends AbstractController
         );
     }
 
-     #[Route('/create', name: 'api_posts_create', methods: ['POST'])]
+    #[Route('/create', name: 'api_posts_create', methods: ['POST'])]
     #[OA\Post(
         tags: ['PostController'],
         summary: 'Crea un nuevo post.',
@@ -237,15 +237,32 @@ final class PostController extends AbstractController
         ),
     )]
     public function create(
-        Request $request, 
-        UserRepository $users, 
+        Request $request,
+        UserRepository $users,
         CommunityRepository $communities,
         HashtagRepository $hashtagRepo,
-        EntityManagerInterface $entityManager, 
-        ValidatorInterface $validator
+        EntityManagerInterface $entityManager,
+        ValidatorInterface $validator,
+        \App\Service\FileUploadService $fileUploadService
     ): JsonResponse {
         $post = new Post();
-        $data = json_decode($request->getContent(), true);
+
+        // Detectar si es multipart/form-data o JSON
+        $contentType = $request->headers->get('Content-Type');
+        $isMultipart = str_contains($contentType ?? '', 'multipart/form-data');
+
+        if ($isMultipart) {
+            // Obtener datos del formulario
+            $data = [
+                'user' => $request->request->get('user'),
+                'community' => $request->request->get('community'),
+                'postType' => $request->request->get('postType'),
+                'content' => $request->request->get('content'),
+            ];
+        } else {
+            // Obtener datos del JSON (backward compatibility)
+            $data = json_decode($request->getContent(), true);
+        }
 
         // Validar y asignar usuario
         if (isset($data['user'])) {
@@ -296,9 +313,25 @@ final class PostController extends AbstractController
             $post->setPostType($data['postType']);
         }
 
-        // Asignar imagen si existe
-        if (isset($data['image'])) {
-            $post->setImage($data['image']);
+        // Manejar imagen subida
+        if ($isMultipart) {
+            $imageFile = $request->files->get('image');
+            if ($imageFile) {
+                try {
+                    $imagePath = $fileUploadService->upload($imageFile, 'posts');
+                    $post->setImage($imagePath);
+                } catch (\Exception $e) {
+                    return new JsonResponse(
+                        ['error' => $e->getMessage()],
+                        JsonResponse::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+        } else {
+            // Asignar imagen si existe (backward compatibility para base64 u otras rutas)
+            if (isset($data['image'])) {
+                $post->setImage($data['image']);
+            }
         }
 
         // Validar y asignar contenido
@@ -333,8 +366,13 @@ final class PostController extends AbstractController
         $entityManager->persist($post);
         $entityManager->flush();
 
-        // Extraer y guardar hashtags
-        $this->extractAndSaveHashtags($post->getContent(), $hashtagRepo, $entityManager);
+        // Extraer y guardar hashtags (no debe fallar la creación del post si hay error)
+        try {
+            $this->extractAndSaveHashtags($post->getContent(), $hashtagRepo, $entityManager);
+        } catch (\Exception $e) {
+            // Log el error pero no fallar la creación del post
+            error_log("Error al procesar hashtags: " . $e->getMessage());
+        }
 
         return new JsonResponse(
             ['message' => "El post ha sido creado.", 'post_id' => $post->getId()],
@@ -349,7 +387,7 @@ final class PostController extends AbstractController
     {
         // Regex para encontrar hashtags (#palabra)
         preg_match_all('/#(\w+)/u', $content, $matches);
-        
+
         if (empty($matches[1])) {
             return;
         }
@@ -358,10 +396,10 @@ final class PostController extends AbstractController
 
         foreach ($hashtags as $tag) {
             $tag = strtolower($tag); // Normalizar a minúsculas
-            
+
             // Buscar si el hashtag ya existe
             $hashtag = $hashtagRepo->findOneBy(['tag' => $tag]);
-            
+
             if ($hashtag) {
                 // Si existe, incrementar el contador
                 $hashtag->incrementCount();
@@ -415,7 +453,7 @@ final class PostController extends AbstractController
     }
 
 
-    #[Route('/{id<\d+>}/edit', name: 'api_posts_edit', methods: ['PUT'])]
+    #[Route('/{id<\d+>}/edit', name: 'api_posts_edit', methods: ['PUT', 'POST'])]
     #[OA\Put(
         tags: ['PostController'],
         summary: 'Edita el post dado ID.',
@@ -430,10 +468,15 @@ final class PostController extends AbstractController
             )
         ),
     )]
-    public function edit(int $id, Request $request, UserRepository $users, PostRepository $posts, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
-    {
-
-        $data = json_decode($request->getContent(), true);
+    public function edit(
+        int $id,
+        Request $request,
+        UserRepository $users,
+        PostRepository $posts,
+        EntityManagerInterface $entityManager,
+        ValidatorInterface $validator,
+        \App\Service\FileUploadService $fileUploadService
+    ): JsonResponse {
 
         $post = $posts->find($id);
 
@@ -444,8 +487,40 @@ final class PostController extends AbstractController
             );
         }
 
-        if (isset($data['image'])) {
-            $post->setImage($data['image']);
+        // Detectar si es multipart/form-data o JSON
+        $contentType = $request->headers->get('Content-Type');
+        $isMultipart = str_contains($contentType ?? '', 'multipart/form-data');
+
+        if ($isMultipart) {
+            // Obtener datos del formulario
+            $data = [
+                'content' => $request->request->get('content'),
+            ];
+
+            // Manejar imagen subida
+            $imageFile = $request->files->get('image');
+            if ($imageFile) {
+                try {
+                    // Eliminar imagen anterior si existe
+                    if ($post->getImage()) {
+                        $fileUploadService->delete($post->getImage());
+                    }
+
+                    $imagePath = $fileUploadService->upload($imageFile, 'posts');
+                    $post->setImage($imagePath);
+                } catch (\Exception $e) {
+                    return new JsonResponse(
+                        ['error' => $e->getMessage()],
+                        JsonResponse::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+        } else {
+            $data = json_decode($request->getContent(), true);
+
+            if (isset($data['image'])) {
+                $post->setImage($data['image']);
+            }
         }
 
         if (isset($data['content'])) {
@@ -454,7 +529,7 @@ final class PostController extends AbstractController
 
         $post->setUpdatedAt(new \DateTimeImmutable());
 
-        // 4. Validar la entidad antes de guardar
+        // Validar la entidad antes de guardar
         $errors = $validator->validate($post);
 
         if (count($errors) > 0) {
@@ -484,12 +559,12 @@ final class PostController extends AbstractController
         summary: 'Darle like (leaf) al post. ID de la URL -> post.'
     )]
     public function likePostLeaf(
-        int $id, 
-        Request $request, 
-        PostRepository $posts, 
-        UserRepository $users, 
-        UserPostLeafRepository $likeLeafs, 
-        EntityManagerInterface $entityManager, 
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
+        UserPostLeafRepository $likeLeafs,
+        EntityManagerInterface $entityManager,
         ValidatorInterface $validator
     ): JsonResponse {
         $post = $posts->find($id);
@@ -572,11 +647,11 @@ final class PostController extends AbstractController
         summary: 'Quitar like (leaf) al post. ID de la URL -> post.'
     )]
     public function unlikePostLeaf(
-        int $id, 
-        Request $request, 
-        PostRepository $posts, 
-        UserRepository $users, 
-        UserPostLeafRepository $likeLeafs, 
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
+        UserPostLeafRepository $likeLeafs,
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $post = $posts->find($id);
@@ -636,12 +711,12 @@ final class PostController extends AbstractController
         summary: 'Darle like (tree) al post de comunidad. ID de la URL -> post.'
     )]
     public function likePostTree(
-        int $id, 
-        Request $request, 
-        PostRepository $posts, 
-        UserRepository $users, 
-        UserPostTreeRepository $likeTrees, 
-        EntityManagerInterface $entityManager, 
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
+        UserPostTreeRepository $likeTrees,
+        EntityManagerInterface $entityManager,
         ValidatorInterface $validator
     ): JsonResponse {
         $post = $posts->find($id);
@@ -731,11 +806,11 @@ final class PostController extends AbstractController
         summary: 'Quitar like (tree) al post. ID de la URL -> post.'
     )]
     public function unlikePostTree(
-        int $id, 
-        Request $request, 
-        PostRepository $posts, 
-        UserRepository $users, 
-        UserPostTreeRepository $likeTrees, 
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
+        UserPostTreeRepository $likeTrees,
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $post = $posts->find($id);
@@ -795,11 +870,11 @@ final class PostController extends AbstractController
         summary: 'Hacer repost del post. ID de la URL -> post.'
     )]
     public function repost(
-        int $id, 
-        Request $request, 
-        PostRepository $posts, 
-        UserRepository $users, 
-        EntityManagerInterface $entityManager, 
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
+        EntityManagerInterface $entityManager,
         ValidatorInterface $validator
     ): JsonResponse {
         $post = $posts->find($id);
@@ -883,10 +958,10 @@ final class PostController extends AbstractController
         summary: 'Quitar repost del post. ID de la URL -> post.'
     )]
     public function unrepost(
-        int $id, 
-        Request $request, 
-        PostRepository $posts, 
-        UserRepository $users, 
+        int $id,
+        Request $request,
+        PostRepository $posts,
+        UserRepository $users,
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $post = $posts->find($id);
@@ -986,7 +1061,7 @@ final class PostController extends AbstractController
         // Verificar interacciones
         $hasLikedLeaf = $likeLeafs->findOneBy(['user' => $user, 'post' => $post]) !== null;
         $hasLikedTree = $likeTrees->findOneBy(['user' => $user, 'post' => $post]) !== null;
-        
+
         $repostRepository = $entityManager->getRepository(UserRepost::class);
         $hasReposted = $repostRepository->findOneBy(['user' => $user, 'post' => $post]) !== null;
 
@@ -1025,7 +1100,7 @@ final class PostController extends AbstractController
 
         // Obtener repositorio de replies
         $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
-        
+
         // Obtener todas las respuestas del post
         $replies = $replyRepository->findBy(
             ['post' => $post],
@@ -1034,18 +1109,18 @@ final class PostController extends AbstractController
 
         // Obtener user_id opcional de los query params
         $userId = $request->query->get('user_id');
-        
+
         // Si hay user_id, incluir las interacciones del usuario
         if ($userId) {
             $user = $userRepository->find($userId);
-            
+
             if ($user) {
                 // Obtener repositorio de likes de replies
                 $replyLeafRepository = $entityManager->getRepository(\App\Entity\UserPostReplyLeaf::class);
-                
+
                 // Obtener IDs de replies
                 $replyIds = array_map(fn($reply) => $reply->getId(), $replies);
-                
+
                 if (!empty($replyIds)) {
                     // Consulta optimizada para obtener todos los likes del usuario
                     $userReplyLikes = $replyLeafRepository->createQueryBuilder('l')
@@ -1055,28 +1130,28 @@ final class PostController extends AbstractController
                         ->setParameter('replies', $replyIds)
                         ->getQuery()
                         ->getResult();
-                    
+
                     // Crear mapa para búsqueda rápida
                     $likesMap = [];
                     foreach ($userReplyLikes as $like) {
                         $likesMap[$like->getReply()->getId()] = true;
                     }
-                    
+
                     // Serializar replies y agregar interacciones
                     $repliesData = json_decode($serializer->serialize($replies, 'json', ['groups' => 'reply']), true);
-                    
+
                     foreach ($repliesData as &$replyData) {
                         $replyId = $replyData['id'];
                         $replyData['user_interactions'] = [
                             'has_liked_leaf' => isset($likesMap[$replyId])
                         ];
                     }
-                    
+
                     return new JsonResponse($repliesData, JsonResponse::HTTP_OK);
                 }
             }
         }
-        
+
         // Si no hay user_id o el usuario no existe, devolver replies sin interacciones
         return new JsonResponse(
             $serializer->serialize($replies, 'json', ['groups' => 'reply']),
@@ -1119,15 +1194,15 @@ final class PostController extends AbstractController
 
         // Obtener current_user_id opcional de los query params
         $currentUserId = $request->query->get('current_user_id');
-        
+
         // Si hay current_user_id, incluir las interacciones del usuario actual
         if ($currentUserId) {
             $currentUser = $userRepository->find($currentUserId);
-            
+
             if ($currentUser) {
                 // Obtener todas las interacciones del usuario de una vez
                 $postIds = array_map(fn($post) => $post->getId(), $posts);
-                
+
                 if (!empty($postIds)) {
                     // Consultas optimizadas para obtener todas las interacciones
                     $userLeafLikes = $likeLeafs->createQueryBuilder('l')
@@ -1137,7 +1212,7 @@ final class PostController extends AbstractController
                         ->setParameter('posts', $postIds)
                         ->getQuery()
                         ->getResult();
-                    
+
                     $userTreeLikes = $likeTrees->createQueryBuilder('t')
                         ->where('t.user = :user')
                         ->andWhere('t.post IN (:posts)')
@@ -1145,7 +1220,7 @@ final class PostController extends AbstractController
                         ->setParameter('posts', $postIds)
                         ->getQuery()
                         ->getResult();
-                    
+
                     $repostRepository = $entityManager->getRepository(UserRepost::class);
                     $userReposts = $repostRepository->createQueryBuilder('r')
                         ->where('r.user = :user')
@@ -1154,26 +1229,26 @@ final class PostController extends AbstractController
                         ->setParameter('posts', $postIds)
                         ->getQuery()
                         ->getResult();
-                    
+
                     // Crear mapas para búsqueda rápida
                     $leafLikesMap = [];
                     foreach ($userLeafLikes as $like) {
                         $leafLikesMap[$like->getPost()->getId()] = true;
                     }
-                    
+
                     $treeLikesMap = [];
                     foreach ($userTreeLikes as $like) {
                         $treeLikesMap[$like->getPost()->getId()] = true;
                     }
-                    
+
                     $repostsMap = [];
                     foreach ($userReposts as $repost) {
                         $repostsMap[$repost->getPost()->getId()] = true;
                     }
-                    
+
                     // Serializar posts y agregar interacciones
                     $postsData = json_decode($serializer->serialize($posts, 'json', ['groups' => 'post']), true);
-                    
+
                     foreach ($postsData as &$postData) {
                         $postId = $postData['id'];
                         $postData['user_interactions'] = [
@@ -1182,7 +1257,7 @@ final class PostController extends AbstractController
                             'has_reposted' => isset($repostsMap[$postId])
                         ];
                     }
-                    
+
                     return new JsonResponse($postsData, JsonResponse::HTTP_OK);
                 }
             }

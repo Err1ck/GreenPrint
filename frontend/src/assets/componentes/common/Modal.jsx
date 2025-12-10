@@ -238,51 +238,61 @@ function Modal({ children, onClose }) {
 
     const handlePostSubmit = async () => {
         if (postText.trim() !== "" || selectedImage) {
+            setIsSubmitting(true);
+            
             try {
-                setIsSubmitting(true);
                 // Obtener token y usuario de localStorage
                 const token = localStorage.getItem('token');
                 const userStr = localStorage.getItem('user');
 
                 if (!token || !userStr) {
                     alert("Debes iniciar sesión para crear un post");
+                    setIsSubmitting(false);
                     return;
                 }
 
                 const user = JSON.parse(userStr);
 
+                // Crear FormData para enviar archivo
+                const formData = new FormData();
+                formData.append('user', user.id);
+                formData.append('content', postText);
+                
+                // Si hay imagen seleccionada, agregarla al FormData
+                if (selectedImage && selectedImage.file) {
+                    formData.append('image', selectedImage.file);
+                }
+
                 const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        user: user.id,
-                        content: postText,
-                        image: selectedImage || null
-                    })
+                    body: formData
                 });
 
-                const data = await response.json();
-
+                // Verificar si la respuesta fue exitosa
                 if (response.ok) {
-                    console.log("Post creado exitosamente:", data);
-                    // Limpiar el formulario
-                    setPostText("");
-                    setCharCount(0);
-                    setSelectedImage(null);
-                    onClose();
-                    // Opcional: recargar la página para ver el nuevo post
+                    // Post creado exitosamente, recargar la página
+                    console.log("Post creado exitosamente");
                     window.location.reload();
-                } else {
+                    return; // Importante: salir aquí para que no ejecute el resto
+                }
+
+                // Si llegamos aquí, hubo un error del servidor
+                try {
+                    const data = await response.json();
                     console.error("Error al crear el post:", data);
                     alert(data.error || "Error al crear el post");
+                } catch (jsonError) {
+                    alert("Error al crear el post");
                 }
+                setIsSubmitting(false);
+                
             } catch (error) {
+                // Error de red o conexión
                 console.error("Error de red:", error);
                 alert("Error al conectar con el servidor");
-            } finally {
                 setIsSubmitting(false);
             }
         }
@@ -302,9 +312,19 @@ function Modal({ children, onClose }) {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file && file.type.startsWith("image/")) {
+            // Validar tamaño (5MB)
+            if (file.size > 5242880) {
+                alert("La imagen es demasiado grande. Tamaño máximo: 5MB");
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onloadend = () => {
-                setSelectedImage(reader.result);
+                // Guardar tanto el preview como el archivo original
+                setSelectedImage({
+                    preview: reader.result,
+                    file: file
+                });
             };
             reader.readAsDataURL(file);
         }
@@ -385,7 +405,7 @@ function Modal({ children, onClose }) {
                     {selectedImage && (
                         <div className="image-preview-container">
                             <img
-                                src={selectedImage}
+                                src={selectedImage.preview || selectedImage}
                                 alt="Preview"
                                 className="image-preview"
                             />

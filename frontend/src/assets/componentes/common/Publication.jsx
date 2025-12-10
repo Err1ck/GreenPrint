@@ -427,7 +427,7 @@ const Publication = ({
                     {postImage && (
                         <div className="section-imageWrapper">
                             <img
-                                src={postImage}
+                                src={postImage.startsWith('http') ? postImage : `http://127.0.0.1:8000${postImage}`}
                                 alt="post"
                                 className="imageWrapper-image"
                             />
