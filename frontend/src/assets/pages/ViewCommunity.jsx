@@ -553,6 +553,10 @@ function ViewCommunity() {
                                                 like1={0}
                                                 like2={0}
                                                 clickable={true}
+                                                initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                                                initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                                                initialHasReposted={post.user_interactions?.has_reposted || false}
+                                                initialIsSaved={post.user_interactions?.has_saved || false}
                                             />
                                         </div>
                                     );
@@ -576,6 +580,10 @@ function ViewCommunity() {
                                             like1={0}
                                             like2={0}
                                             clickable={true}
+                                            initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                                            initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                                            initialHasReposted={post.user_interactions?.has_reposted || false}
+                                            initialIsSaved={post.user_interactions?.has_saved || false}
                                         />
                                     );
                                 }

@@ -125,10 +125,10 @@ function HomePage() {
                 like1={post.leaf}
                 like2={post.tree}
                 clickable={true}
-                // Pasar datos de interacciones del usuario si existen
                 initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
                 initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
                 initialHasReposted={post.user_interactions?.has_reposted || false}
+                initialIsSaved={post.user_interactions?.has_saved || false}
               />
             ))}
         </main>

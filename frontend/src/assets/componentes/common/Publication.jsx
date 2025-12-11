@@ -468,7 +468,7 @@ const Publication = ({
                                     onMouseEnter={() => setRetweetHover(true)}
                                     onMouseLeave={() => setRetweetHover(false)}
                                     style={{
-                                        backgroundColor: retweetHover || isRetweetActive ? 'rgba(0, 186, 124, 0.1)' : 'transparent',
+                                        backgroundColor: retweetHover || isRetweetActive ? 'rgba(52, 52, 52, 0.1)' : 'transparent',
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >

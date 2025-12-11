@@ -227,6 +227,7 @@ function ViewPost() {
                             initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
                             initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
                             initialHasReposted={post.user_interactions?.has_reposted || false}
+                            initialIsSaved={post.user_interactions?.has_saved || false}
                         />
                     )}
 
