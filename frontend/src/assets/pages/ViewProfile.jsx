@@ -616,7 +616,7 @@ function ViewProfile() {
       </div>
 
       {/* Navbar Right */}
-      <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0, zIndex: 100 }}>
+      <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
         <Navbar navbarType={2} />
       </div>
 
