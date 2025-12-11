@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
+import FollowCommunity from "../componentes/common/FollowCommunity";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewCommunity() {
@@ -16,7 +17,6 @@ function ViewCommunity() {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [isFollowing, setIsFollowing] = useState(false);
 
     const observer = useRef();
     const lastPostRef = useCallback(node => {
@@ -34,7 +34,6 @@ function ViewCommunity() {
 
     useEffect(() => {
         fetchCommunityData();
-        checkIfFollowing();
     }, [communityId]);
 
     useEffect(() => {
@@ -42,51 +41,6 @@ function ViewCommunity() {
             fetchMorePosts();
         }
     }, [page]);
-
-    const checkIfFollowing = async () => {
-        try {
-            const currentUserStr = localStorage.getItem('user');
-            const token = localStorage.getItem('token');
-
-            if (!currentUserStr || !token) return;
-
-            const currentUser = JSON.parse(currentUserStr);
-
-            console.log("Checking if following community:", communityId);
-
-            const response = await fetch(
-                `http://127.0.0.1:8000/api/users/${currentUser.id}/followed-communities`,
-                {
-                    headers: { "Authorization": `Bearer ${token}` }
-                }
-            );
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Communities data:", data);
-                console.log("Is array?", Array.isArray(data));
-
-                if (Array.isArray(data)) {
-                    const isFollowingCommunity = data.some(
-                        item => {
-                            console.log("Checking item:", item, "community id:", item.community?.id, "target:", parseInt(communityId));
-                            return item.community?.id === parseInt(communityId);
-                        }
-                    );
-                    console.log("Is following community?", isFollowingCommunity);
-                    setIsFollowing(isFollowingCommunity);
-                } else {
-                    console.log("Data is not an array, setting to false");
-                    setIsFollowing(false);
-                }
-            } else {
-                console.log("Response not OK:", response.status);
-            }
-        } catch (err) {
-            console.error("Error checking follow status:", err);
-        }
-    };
-
 
     const fetchCommunityData = async () => {
         try {
@@ -156,68 +110,6 @@ function ViewCommunity() {
         } catch (err) {
             console.error(err);
             setLoadingPosts(false);
-        }
-    };
-
-
-    const handleFollow = async () => {
-        try {
-            const currentUserStr = localStorage.getItem('user');
-            const token = localStorage.getItem('token');
-
-            if (!currentUserStr || !token) {
-                alert("Debes iniciar sesión para seguir comunidades");
-                return;
-            }
-
-            const currentUser = JSON.parse(currentUserStr);
-
-            const endpoint = isFollowing
-                ? `http://127.0.0.1:8000/api/users/${currentUser.id}/unfollow-community`
-                : `http://127.0.0.1:8000/api/users/${currentUser.id}/follow-community`;
-
-            const method = isFollowing ? 'DELETE' : 'POST';
-
-            const response = await fetch(endpoint, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    community_id: parseInt(communityId)
-                })
-            });
-
-            if (response.ok) {
-                // Actualizar estado local sin recargar
-                const newFollowingState = !isFollowing;
-                setIsFollowing(newFollowingState);
-
-                // Actualizar contador de seguidores localmente
-                if (community) {
-                    setCommunity({
-                        ...community,
-                        follower_count: community.follower_count + (newFollowingState ? 1 : -1)
-                    });
-                }
-            } else if (response.status === 409) {
-                // Conflicto: ya sigue o ya no sigue - sincronizar estado
-                await checkIfFollowing();
-                // Solo recargar datos de la comunidad (sin posts) en caso de conflicto
-                const communityResponse = await fetch(`http://127.0.0.1:8000/api/communities/${communityId}`);
-                if (communityResponse.ok) {
-                    const communityData = await communityResponse.json();
-                    setCommunity(communityData);
-                }
-            } else {
-                const data = await response.json();
-                console.error("Error:", data);
-                alert(data.error || "Error al seguir/dejar de seguir");
-            }
-        } catch (err) {
-            console.error("Error:", err);
-            alert("Error al conectar con el servidor");
         }
     };
 
@@ -447,12 +339,11 @@ function ViewCommunity() {
                                     {community?.name?.charAt(0).toUpperCase() || "C"}
                                 </div>
                             )}
-                            <button
-                                onClick={handleFollow}
-                                className={`follow-button ${isFollowing ? 'following' : 'not-following'}`}
-                            >
-                                {isFollowing ? "Siguiendo" : "Seguir"}
-                            </button>
+                            <FollowCommunity
+                                communityId={parseInt(communityId)}
+                                onFollowChange={() => fetchCommunityData()}
+                                style={{ marginTop: "72px" }}
+                            />
                         </div>
 
                         <div style={{ marginBottom: "12px" }}>
