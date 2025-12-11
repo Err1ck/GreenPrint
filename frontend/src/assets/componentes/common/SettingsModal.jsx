@@ -1,17 +1,58 @@
 import React, { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import "../../styles/Modal.css";
-import { X, Palette, Lock, Bell, Shield } from "lucide-react";
+import { X, Palette, Lock, Shield } from "lucide-react";
 
 function SettingsModal({ isOpen, onClose }) {
     const [activeTab, setActiveTab] = useState("appearance");
     const [isDarkMode, setIsDarkMode] = useState(false);
+    
+    // Account states
+    const [newEmail, setNewEmail] = useState("");
+    const [confirmEmail, setConfirmEmail] = useState("");
+    const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+    
+    // Privacy states
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
 
-    // Cargar tema actual
+    // Cargar datos del usuario
     useEffect(() => {
-        const storedTheme = localStorage.getItem("theme");
-        setIsDarkMode(storedTheme === "dark");
+        if (isOpen) {
+            loadUserData();
+        }
     }, [isOpen]);
+
+    const loadUserData = async () => {
+        try {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (!userStr || !token) return;
+
+            const user = JSON.parse(userStr);
+
+            // Cargar tema
+            const storedTheme = localStorage.getItem("theme");
+            setIsDarkMode(storedTheme === "dark");
+
+            // Cargar datos del usuario desde la API
+            const response = await fetch(`http://127.0.0.1:8000/api/users/${user.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const userData = await response.json();
+                setNewEmail(userData.email || "");
+                setConfirmEmail(userData.email || "");
+                setIsPrivate(userData.is_private || false);
+            }
+        } catch (error) {
+            console.error("Error loading user data:", error);
+        }
+    };
 
     const toggleTheme = () => {
         if (isDarkMode) {
@@ -22,6 +63,144 @@ function SettingsModal({ isOpen, onClose }) {
             document.documentElement.classList.add("dark");
             localStorage.setItem("theme", "dark");
             setIsDarkMode(true);
+        }
+    };
+
+    const handleEmailChange = async () => {
+        if (newEmail !== confirmEmail) {
+            alert("Los emails no coinciden");
+            return;
+        }
+
+        if (!newEmail || newEmail.trim() === "") {
+            alert("El email no puede estar vacío");
+            return;
+        }
+
+        try {
+            setIsUpdatingEmail(true);
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (!userStr || !token) {
+                alert("Debes iniciar sesión");
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+
+            const response = await fetch(`http://127.0.0.1:8000/api/users/${user.id}/edit`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    email: newEmail
+                })
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                alert("Email actualizado correctamente");
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || "Error al actualizar el email");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al actualizar el email");
+        } finally {
+            setIsUpdatingEmail(false);
+        }
+    };
+
+    const handlePrivacyToggle = async () => {
+        try {
+            setIsUpdatingPrivacy(true);
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (!userStr || !token) {
+                alert("Debes iniciar sesión");
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+            const newPrivacyValue = !isPrivate;
+
+            const response = await fetch(`http://127.0.0.1:8000/api/users/${user.id}/edit`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    is_private: newPrivacyValue
+                })
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                setIsPrivate(newPrivacyValue);
+                alert(`Perfil ${newPrivacyValue ? 'privado' : 'público'} activado`);
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || "Error al actualizar la privacidad");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al actualizar la privacidad");
+        } finally {
+            setIsUpdatingPrivacy(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        const confirmation = window.confirm(
+            "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer."
+        );
+
+        if (!confirmation) return;
+
+        const doubleConfirmation = window.confirm(
+            "Esta es tu última oportunidad. ¿Realmente quieres eliminar tu cuenta permanentemente?"
+        );
+
+        if (!doubleConfirmation) return;
+
+        try {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            if (!userStr || !token) {
+                alert("Debes iniciar sesión");
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+
+            const response = await fetch(`http://127.0.0.1:8000/api/users/${user.id}/destroy`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert("Cuenta eliminada correctamente");
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || "Error al eliminar la cuenta");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al eliminar la cuenta");
         }
     };
 
@@ -37,7 +216,6 @@ function SettingsModal({ isOpen, onClose }) {
         { id: "appearance", label: "Apariencia", icon: Palette },
         { id: "account", label: "Cuenta", icon: Lock },
         { id: "privacy", label: "Privacidad", icon: Shield },
-        { id: "notifications", label: "Notificaciones", icon: Bell },
     ];
 
     return (
@@ -203,32 +381,111 @@ function SettingsModal({ isOpen, onClose }) {
                                     Cuenta y Seguridad
                                 </h3>
                                 
+                                {/* Cambiar Email */}
                                 <div style={{
-                                    padding: "24px",
+                                    padding: "16px",
                                     backgroundColor: "var(--color-bg-secondary)",
                                     borderRadius: "12px",
-                                    textAlign: "center"
+                                    marginBottom: "16px"
                                 }}>
-                                    <Lock size={48} color="#536471" style={{ marginBottom: "12px" }} />
-                                    <p style={{
+                                    <h4 style={{
                                         fontSize: "15px",
-                                        color: "#536471",
-                                        margin: 0
+                                        fontWeight: "600",
+                                        color: "var(--color-text-primary)",
+                                        margin: "0 0 12px 0"
                                     }}>
-                                        Opciones de cuenta próximamente:
+                                        Cambiar Email
+                                    </h4>
+                                    <input
+                                        type="email"
+                                        placeholder="Nuevo email"
+                                        value={newEmail}
+                                        onChange={(e) => setNewEmail(e.target.value)}
+                                        style={{
+                                            width: "100%",
+                                            padding: "10px",
+                                            marginBottom: "8px",
+                                            border: "1px solid #cfd9de",
+                                            borderRadius: "8px",
+                                            fontSize: "14px",
+                                            fontFamily: "inherit",
+                                            color: "var(--color-text-primary)",
+                                            backgroundColor: "var(--color-bg)"
+                                        }}
+                                    />
+                                    <input
+                                        type="email"
+                                        placeholder="Confirmar email"
+                                        value={confirmEmail}
+                                        onChange={(e) => setConfirmEmail(e.target.value)}
+                                        style={{
+                                            width: "100%",
+                                            padding: "10px",
+                                            marginBottom: "12px",
+                                            border: "1px solid #cfd9de",
+                                            borderRadius: "8px",
+                                            fontSize: "14px",
+                                            fontFamily: "inherit",
+                                            color: "var(--color-text-primary)",
+                                            backgroundColor: "var(--color-bg)"
+                                        }}
+                                    />
+                                    <button
+                                        onClick={handleEmailChange}
+                                        disabled={isUpdatingEmail}
+                                        style={{
+                                            padding: "8px 16px",
+                                            backgroundColor: "#00ba7c",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: "20px",
+                                            fontSize: "14px",
+                                            fontWeight: "600",
+                                            cursor: isUpdatingEmail ? "not-allowed" : "pointer",
+                                            opacity: isUpdatingEmail ? 0.6 : 1
+                                        }}
+                                    >
+                                        {isUpdatingEmail ? "Actualizando..." : "Actualizar Email"}
+                                    </button>
+                                </div>
+
+                                {/* Eliminar Cuenta */}
+                                <div style={{
+                                    padding: "16px",
+                                    backgroundColor: "#fff5f5",
+                                    border: "1px solid #fed7d7",
+                                    borderRadius: "12px"
+                                }}>
+                                    <h4 style={{
+                                        fontSize: "15px",
+                                        fontWeight: "600",
+                                        color: "#c53030",
+                                        margin: "0 0 8px 0"
+                                    }}>
+                                        Zona Peligrosa
+                                    </h4>
+                                    <p style={{
+                                        fontSize: "13px",
+                                        color: "#742a2a",
+                                        margin: "0 0 12px 0"
+                                    }}>
+                                        Una vez que elimines tu cuenta, no hay vuelta atrás.
                                     </p>
-                                    <ul style={{
-                                        listStyle: "none",
-                                        padding: 0,
-                                        margin: "12px 0 0 0",
-                                        fontSize: "14px",
-                                        color: "#536471"
-                                    }}>
-                                        <li>• Cambiar contraseña</li>
-                                        <li>• Cambiar email</li>
-                                        <li>• Autenticación de dos factores</li>
-                                        <li>• Eliminar cuenta</li>
-                                    </ul>
+                                    <button
+                                        onClick={handleDeleteAccount}
+                                        style={{
+                                            padding: "8px 16px",
+                                            backgroundColor: "#e53e3e",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: "20px",
+                                            fontSize: "14px",
+                                            fontWeight: "600",
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        Eliminar Cuenta
+                                    </button>
                                 </div>
                             </div>
                         )}
@@ -245,75 +502,72 @@ function SettingsModal({ isOpen, onClose }) {
                                     Privacidad
                                 </h3>
                                 
+                                {/* Perfil Privado */}
                                 <div style={{
-                                    padding: "24px",
+                                    padding: "16px",
                                     backgroundColor: "var(--color-bg-secondary)",
                                     borderRadius: "12px",
-                                    textAlign: "center"
-                                }}>
-                                    <Shield size={48} color="#536471" style={{ marginBottom: "12px" }} />
-                                    <p style={{
-                                        fontSize: "15px",
-                                        color: "#536471",
-                                        margin: 0
-                                    }}>
-                                        Opciones de privacidad próximamente:
-                                    </p>
-                                    <ul style={{
-                                        listStyle: "none",
-                                        padding: 0,
-                                        margin: "12px 0 0 0",
-                                        fontSize: "14px",
-                                        color: "#536471"
-                                    }}>
-                                        <li>• Perfil público/privado</li>
-                                        <li>• Usuarios bloqueados</li>
-                                        <li>• Contenido silenciado</li>
-                                        <li>• Visibilidad de actividad</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Notificaciones Tab */}
-                        {activeTab === "notifications" && (
-                            <div>
-                                <h3 style={{
-                                    fontSize: "18px",
-                                    fontWeight: "700",
-                                    color: "var(--color-text-primary)",
                                     marginBottom: "16px"
                                 }}>
-                                    Notificaciones
-                                </h3>
-                                
-                                <div style={{
-                                    padding: "24px",
-                                    backgroundColor: "var(--color-bg-secondary)",
-                                    borderRadius: "12px",
-                                    textAlign: "center"
-                                }}>
-                                    <Bell size={48} color="#536471" style={{ marginBottom: "12px" }} />
-                                    <p style={{
-                                        fontSize: "15px",
-                                        color: "#536471",
-                                        margin: 0
+                                    <div style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center"
                                     }}>
-                                        Opciones de notificaciones próximamente:
-                                    </p>
-                                    <ul style={{
-                                        listStyle: "none",
-                                        padding: 0,
-                                        margin: "12px 0 0 0",
-                                        fontSize: "14px",
-                                        color: "#536471"
-                                    }}>
-                                        <li>• Notificaciones de likes</li>
-                                        <li>• Notificaciones de comentarios</li>
-                                        <li>• Notificaciones de seguidores</li>
-                                        <li>• Notificaciones push</li>
-                                    </ul>
+                                        <div>
+                                            <h4 style={{
+                                                fontSize: "15px",
+                                                fontWeight: "600",
+                                                color: "var(--color-text-primary)",
+                                                margin: "0 0 4px 0"
+                                            }}>
+                                                Perfil Privado
+                                            </h4>
+                                            <p style={{
+                                                fontSize: "13px",
+                                                color: "#536471",
+                                                margin: 0
+                                            }}>
+                                                Solo tus seguidores pueden ver tus publicaciones
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={handlePrivacyToggle}
+                                            disabled={isUpdatingPrivacy}
+                                            style={{
+                                                width: "52px",
+                                                height: "28px",
+                                                borderRadius: "14px",
+                                                backgroundColor: isPrivate ? "#00ba7c" : "#cfd9de",
+                                                border: "none",
+                                                cursor: isUpdatingPrivacy ? "not-allowed" : "pointer",
+                                                position: "relative",
+                                                transition: "background-color 0.3s",
+                                                opacity: isUpdatingPrivacy ? 0.6 : 1
+                                            }}
+                                        >
+                                            <div style={{
+                                                width: "24px",
+                                                height: "24px",
+                                                borderRadius: "50%",
+                                                backgroundColor: "white",
+                                                position: "absolute",
+                                                top: "2px",
+                                                left: isPrivate ? "26px" : "2px",
+                                                transition: "left 0.3s",
+                                                boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                                            }} />
+                                        </button>
+                                    </div>
                                 </div>
+
+                                <p style={{
+                                    fontSize: "13px",
+                                    color: "#536471",
+                                    fontStyle: "italic"
+                                }}>
+                                    Más opciones de privacidad próximamente...
+                                </p>
                             </div>
                         )}
                     </div>
