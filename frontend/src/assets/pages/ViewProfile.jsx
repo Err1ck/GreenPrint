@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
 import FollowListModal from "../componentes/common/FollowListModal";
-import UserSettingsModal from "../componentes/common/UserSettingsModal";
+import EditProfileModal from "../componentes/common/EditProfileModal";
 import Modal from "../componentes/common/Modal";
 import FollowUser from "../componentes/common/FollowUser";
 import { formatDate, formatTime } from "../utils/dateUtils";
@@ -618,8 +618,8 @@ function ViewProfile() {
         type={modalType}
       />
 
-      {/* User Settings Modal */}
-      <UserSettingsModal
+      {/* Edit Profile Modal */}
+      <EditProfileModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
