@@ -5,235 +5,251 @@ import { X } from "lucide-react";
 import "../../styles/Modal.css";
 
 function Modal({ children, onClose }) {
-    const [postText, setPostText] = useState("");
-    const [charCount, setCharCount] = useState(0);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [showGifPicker, setShowGifPicker] = useState(false);
-    const fileInputRef = useRef(null);
-    const textareaRef = useRef(null);
-    const maxChars = 280;
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [postText, setPostText] = useState("");
+  const [charCount, setCharCount] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
+  const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
+  const maxChars = 280;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Emojis populares organizados por categorías
-    const emojiCategories = {
-        Expresiones: [
-            "😀",
-            "😃",
-            "😄",
-            "😁",
-            "😅",
-            "😂",
-            "🤣",
-            "😊",
-            "😇",
-            "🙂",
-            "😉",
-            "😌",
-            "😍",
-            "🥰",
-            "😘",
-            "😗",
-            "😙",
-            "😚",
-            "😋",
-            "😛",
-            "😝",
-            "😜",
-            "🤪",
-            "🤨",
-            "🧐",
-            "🤓",
-        ],
-        Gestos: [
-            "👍",
-            "👎",
-            "👌",
-            "✌️",
-            "🤞",
-            "🤟",
-            "🤘",
-            "🤙",
-            "👈",
-            "👉",
-            "👆",
-            "👇",
-            "☝️",
-            "👏",
-            "🙌",
-            "🤲",
-            "🤝",
-            "🙏",
-            "💪",
-        ],
-        Corazones: [
-            "❤️",
-            "🧡",
-            "💛",
-            "💚",
-            "💙",
-            "💜",
-            "🖤",
-            "🤍",
-            "🤎",
-            "💔",
-            "❣️",
-            "💕",
-            "💞",
-            "💓",
-            "💗",
-            "💖",
-            "💘",
-            "💝",
-        ],
-        Naturaleza: [
-            "🌱",
-            "🌿",
-            "🍀",
-            "🌾",
-            "🌳",
-            "🌲",
-            "🌴",
-            "🌵",
-            "🌷",
-            "🌹",
-            "🌺",
-            "🌸",
-            "🌼",
-            "🌻",
-            "🌞",
-            "🌝",
-            "🌛",
-            "⭐",
-            "✨",
-            "⚡",
-            "🔥",
-            "💧",
-        ],
-        Animales: [
-            "🐶",
-            "🐱",
-            "🐭",
-            "🐹",
-            "🐰",
-            "🦊",
-            "🐻",
-            "🐼",
-            "🐨",
-            "🐯",
-            "🦁",
-            "🐮",
-            "🐷",
-            "🐸",
-            "🐵",
-            "🐔",
-            "🐧",
-            "🐦",
-            "🦄",
-            "🐝",
-            "🦋",
-            "🐛",
-        ],
-        Comida: [
-            "🍕",
-            "🍔",
-            "🍟",
-            "🌭",
-            "🍿",
-            "🧇",
-            "🥓",
-            "🥞",
-            "🧀",
-            "🥗",
-            "🍝",
-            "🍜",
-            "🍲",
-            "🍛",
-            "🍣",
-            "🍱",
-            "🥟",
-            "🍦",
-            "🍰",
-            "🎂",
-            "🧁",
-            "🍪",
-            "🍩",
-            "☕",
-            "🍵",
-        ],
-        Deportes: [
-            "⚽",
-            "🏀",
-            "🏈",
-            "⚾",
-            "🥎",
-            "🎾",
-            "🏐",
-            "🏉",
-            "🥏",
-            "🎱",
-            "🏓",
-            "🏸",
-            "🏒",
-            "🏑",
-            "🥍",
-            "🏏",
-            "🥊",
-            "🥋",
-            "🎯",
-            "⛳",
-        ],
-    };
+  // Emojis populares organizados por categorías
+  const emojiCategories = {
+    Expresiones: [
+      "😀",
+      "😃",
+      "😄",
+      "😁",
+      "😅",
+      "😂",
+      "🤣",
+      "😊",
+      "😇",
+      "🙂",
+      "😉",
+      "😌",
+      "😍",
+      "🥰",
+      "😘",
+      "😗",
+      "😙",
+      "😚",
+      "😋",
+      "😛",
+      "😝",
+      "😜",
+      "🤪",
+      "🤨",
+      "🧐",
+      "🤓",
+    ],
+    Gestos: [
+      "👍",
+      "👎",
+      "👌",
+      "✌️",
+      "🤞",
+      "🤟",
+      "🤘",
+      "🤙",
+      "👈",
+      "👉",
+      "👆",
+      "👇",
+      "☝️",
+      "👏",
+      "🙌",
+      "🤲",
+      "🤝",
+      "🙏",
+      "💪",
+    ],
+    Corazones: [
+      "❤️",
+      "🧡",
+      "💛",
+      "💚",
+      "💙",
+      "💜",
+      "🖤",
+      "🤍",
+      "🤎",
+      "💔",
+      "❣️",
+      "💕",
+      "💞",
+      "💓",
+      "💗",
+      "💖",
+      "💘",
+      "💝",
+    ],
+    Naturaleza: [
+      "🌱",
+      "🌿",
+      "🍀",
+      "🌾",
+      "🌳",
+      "🌲",
+      "🌴",
+      "🌵",
+      "🌷",
+      "🌹",
+      "🌺",
+      "🌸",
+      "🌼",
+      "🌻",
+      "🌞",
+      "🌝",
+      "🌛",
+      "⭐",
+      "✨",
+      "⚡",
+      "🔥",
+      "💧",
+    ],
+    Animales: [
+      "🐶",
+      "🐱",
+      "🐭",
+      "🐹",
+      "🐰",
+      "🦊",
+      "🐻",
+      "🐼",
+      "🐨",
+      "🐯",
+      "🦁",
+      "🐮",
+      "🐷",
+      "🐸",
+      "🐵",
+      "🐔",
+      "🐧",
+      "🐦",
+      "🦄",
+      "🐝",
+      "🦋",
+      "🐛",
+    ],
+    Comida: [
+      "🍕",
+      "🍔",
+      "🍟",
+      "🌭",
+      "🍿",
+      "🧇",
+      "🥓",
+      "🥞",
+      "🧀",
+      "🥗",
+      "🍝",
+      "🍜",
+      "🍲",
+      "🍛",
+      "🍣",
+      "🍱",
+      "🥟",
+      "🍦",
+      "🍰",
+      "🎂",
+      "🧁",
+      "🍪",
+      "🍩",
+      "☕",
+      "🍵",
+    ],
+    Deportes: [
+      "⚽",
+      "🏀",
+      "🏈",
+      "⚾",
+      "🥎",
+      "🎾",
+      "🏐",
+      "🏉",
+      "🥏",
+      "🎱",
+      "🏓",
+      "🏸",
+      "🏒",
+      "🏑",
+      "🥍",
+      "🏏",
+      "🥊",
+      "🥋",
+      "🎯",
+      "⛳",
+    ],
+  };
 
-    // GIFs simulados (en producción, estos vendrían de una API como Giphy o Tenor)
-    const gifs = [
-        {
-            id: 1,
-            url: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif",
-            title: "Celebration",
-        },
-        {
-            id: 2,
-            url: "https://media.giphy.com/media/g9582DNuQppxC/giphy.gif",
-            title: "Happy Dance",
-        },
-        {
-            id: 3,
-            url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-            title: "Thumbs Up",
-        },
-        {
-            id: 4,
-            url: "https://media.giphy.com/media/kyLYXonQYYfwYDIeZl/giphy.gif",
-            title: "Excited",
-        },
-        {
-            id: 5,
-            url: "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
-            title: "Clapping",
-        },
-        {
-            id: 6,
-            url: "https://media.giphy.com/media/3oz8xAFtqoOUUrsh7W/giphy.gif",
-            title: "Dancing",
-        },
-        {
-            id: 7,
-            url: "https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif",
-            title: "Wow",
-        },
-        {
-            id: 8,
-            url: "https://media.giphy.com/media/3o6Zt6KHxJTbXCnSvu/giphy.gif",
-            title: "Love",
-        },
-    ];
+  // GIFs simulados (en producción, estos vendrían de una API como Giphy o Tenor)
+  const gifs = [
+    {
+      id: 1,
+      url: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif",
+      title: "Celebration",
+    },
+    {
+      id: 2,
+      url: "https://media.giphy.com/media/g9582DNuQppxC/giphy.gif",
+      title: "Happy Dance",
+    },
+    {
+      id: 3,
+      url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+      title: "Thumbs Up",
+    },
+    {
+      id: 4,
+      url: "https://media.giphy.com/media/kyLYXonQYYfwYDIeZl/giphy.gif",
+      title: "Excited",
+    },
+    {
+      id: 5,
+      url: "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
+      title: "Clapping",
+    },
+    {
+      id: 6,
+      url: "https://media.giphy.com/media/3oz8xAFtqoOUUrsh7W/giphy.gif",
+      title: "Dancing",
+    },
+    {
+      id: 7,
+      url: "https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif",
+      title: "Wow",
+    },
+    {
+      id: 8,
+      url: "https://media.giphy.com/media/3o6Zt6KHxJTbXCnSvu/giphy.gif",
+      title: "Love",
+    },
+  ];
 
-    const handlePostChange = (event) => {
-        const text = event.target.value;
-        if (text.length <= maxChars) {
-            setPostText(text);
-            setCharCount(text.length);
+  const handlePostChange = (event) => {
+    const text = event.target.value;
+    if (text.length <= maxChars) {
+      setPostText(text);
+      setCharCount(text.length);
+    }
+  };
+
+  const handlePostSubmit = async () => {
+    if (postText.trim() !== "" || selectedImage) {
+      setIsSubmitting(true);
+
+      try {
+        // Obtener token y usuario de localStorage
+        const token = localStorage.getItem("token");
+        const userStr = localStorage.getItem("user");
+
+        if (!token || !userStr) {
+          alert("Debes iniciar sesión para crear un post");
+          setIsSubmitting(false);
+          return;
         }
     };
 
@@ -305,66 +321,41 @@ function Modal({ children, onClose }) {
         }
     };
 
-    const handleOverlayClick = (e) => {
-        if (e.target.className === "modal-overlay") {
-            onClose();
+        const user = JSON.parse(userStr);
+
+        // Crear FormData para enviar archivo
+        const formData = new FormData();
+        formData.append("user", user.id);
+        formData.append("content", postText);
+
+        // Si hay imagen seleccionada, agregarla al FormData
+        if (selectedImage && selectedImage.file) {
+          formData.append("image", selectedImage.file);
         }
-    };
 
-    // Manejo de imagen
-    const handleImageClick = () => {
-        fileInputRef.current?.click();
-    };
+        const response = await fetch("http://127.0.0.1:8000/api/posts/create", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
 
-    const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith("image/")) {
-            // Validar tamaño (5MB)
-            if (file.size > 5242880) {
-                alert("La imagen es demasiado grande. Tamaño máximo: 5MB");
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                // Guardar tanto el preview como el archivo original
-                setSelectedImage({
-                    preview: reader.result,
-                    file: file
-                });
-            };
-            reader.readAsDataURL(file);
+        // Verificar si la respuesta fue exitosa
+        if (response.ok) {
+          // Post creado exitosamente, recargar la página
+          console.log("Post creado exitosamente");
+          window.location.reload();
+          return; // Importante: salir aquí para que no ejecute el resto
         }
-    };
 
-    const handleRemoveImage = () => {
-        setSelectedImage(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
-
-    // Manejo de emojis
-    const handleEmojiClick = (emoji) => {
-        const textarea = textareaRef.current;
-        const cursorPosition = textarea.selectionStart;
-        const newText =
-            postText.slice(0, cursorPosition) +
-            emoji +
-            postText.slice(cursorPosition);
-
-        if (newText.length <= maxChars) {
-            setPostText(newText);
-            setCharCount(newText.length);
-
-            // Mantener el focus y posicionar el cursor después del emoji
-            setTimeout(() => {
-                textarea.focus();
-                textarea.setSelectionRange(
-                    cursorPosition + emoji.length,
-                    cursorPosition + emoji.length
-                );
-            }, 0);
+        // Si llegamos aquí, hubo un error del servidor
+        try {
+          const data = await response.json();
+          console.error("Error al crear el post:", data);
+          alert(data.error || "Error al crear el post");
+        } catch (jsonError) {
+          alert("Error al crear el post");
         }
     };
 
@@ -393,244 +384,230 @@ function Modal({ children, onClose }) {
                     </button>
                 </div>
 
-                <div className="post-body">
-                    <div className="post-user-section">
-                        <div className="post-avatar">
-                            <LinkIcon
-                                name={"imagen2"}
-                                anchor={false}
-                                classname={"avatar-icon"}
-                            />
-                        </div>
-                        <div className="post-input-wrapper">
-                            <textarea
-                                ref={textareaRef}
-                                placeholder="¿Qué está pasando?"
-                                className="post-textarea"
-                                value={postText}
-                                onChange={handlePostChange}
-                                maxLength={maxChars}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-
-                    {/* Previsualización de imagen/GIF */}
-                    {selectedImage && (
-                        <div className="image-preview-container">
-                            <img
-                                src={selectedImage.preview || selectedImage}
-                                alt="Preview"
-                                className="image-preview"
-                            />
-                            <button
-                                className="remove-image-button"
-                                onClick={handleRemoveImage}
-                            >
-                                ×
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Selector de emojis */}
-                    {showEmojiPicker && (
-                        <div className="emoji-picker">
-                            <div className="emoji-picker-header">
-                                <h3>Emojis</h3>
-                                <button
-                                    className="emoji-close-button"
-                                    onClick={() => setShowEmojiPicker(false)}
-                                >
-                                    ×
-                                </button>
-                            </div>
-                            <div className="emoji-picker-content">
-                                {Object.entries(emojiCategories).map(
-                                    ([category, emojis]) => (
-                                        <div
-                                            key={category}
-                                            className="emoji-category"
-                                        >
-                                            <div className="emoji-category-name">
-                                                {category}
-                                            </div>
-                                            <div className="emoji-grid">
-                                                {emojis.map((emoji, index) => (
-                                                    <button
-                                                        key={index}
-                                                        className="emoji-button"
-                                                        onClick={() =>
-                                                            handleEmojiClick(
-                                                                emoji
-                                                            )
-                                                        }
-                                                    >
-                                                        {emoji}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Selector de GIFs */}
-                    {showGifPicker && (
-                        <div className="gif-picker">
-                            <div className="gif-picker-header">
-                                <h3>Elige un GIF</h3>
-                                <button
-                                    className="gif-close-button"
-                                    onClick={() => setShowGifPicker(false)}
-                                >
-                                    ×
-                                </button>
-                            </div>
-                            <div className="gif-picker-content">
-                                <div className="gif-grid">
-                                    {gifs.map((gif) => (
-                                        <div
-                                            key={gif.id}
-                                            className="gif-item"
-                                            onClick={() =>
-                                                handleGifSelect(gif.url)
-                                            }
-                                        >
-                                            <img
-                                                src={gif.url}
-                                                alt={gif.title}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="post-footer">
-                    <div className="post-media-tools">
-                        <div className="media-tools-left">
-                            {/* Input oculto para archivos */}
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                style={{ display: "none" }}
-                            />
-
-                            <button
-                                className="media-tool"
-                                title="Agregar imagen"
-                                onClick={handleImageClick}
-                            >
-                                <LinkIcon
-                                    name={"image"}
-                                    anchor={false}
-                                    classname={""}
-                                />
-                            </button>
-
-                            <button
-                                className="media-tool"
-                                title="Agregar GIF"
-                                onClick={() => {
-                                    setShowGifPicker(!showGifPicker);
-                                    setShowEmojiPicker(false);
-                                }}
-                            >
-                                <LinkIcon
-                                    name={"gif"}
-                                    anchor={false}
-                                    classname={""}
-                                />
-                            </button>
-
-                            <button
-                                className="media-tool"
-                                title="Agregar emoji"
-                                onClick={() => {
-                                    setShowEmojiPicker(!showEmojiPicker);
-                                    setShowGifPicker(false);
-                                }}
-                            >
-                                <LinkIcon
-                                    name={"emoji"}
-                                    anchor={false}
-                                    classname={""}
-                                />
-                            </button>
-                        </div>
-
-                        <div className="media-tools-right">
-                            {charCount > 0 && (
-                                <div className="char-counter">
-                                    <svg
-                                        width="30"
-                                        height="30"
-                                        viewBox="0 0 30 30"
-                                        className="char-circle"
-                                    >
-                                        <circle
-                                            cx="15"
-                                            cy="15"
-                                            r="12"
-                                            fill="none"
-                                            stroke="#eff3f4"
-                                            strokeWidth="2"
-                                        />
-                                        <circle
-                                            cx="15"
-                                            cy="15"
-                                            r="12"
-                                            fill="none"
-                                            stroke={
-                                                charPercentage >= 100
-                                                    ? "#f4212e"
-                                                    : charPercentage >= 90
-                                                        ? "#ffd400"
-                                                        : "#318041"
-                                            }
-                                            strokeWidth="2"
-                                            strokeDasharray={`${(charPercentage / 100) * 75.4
-                                                } 75.4`}
-                                            transform="rotate(-90 15 15)"
-                                        />
-                                    </svg>
-                                    {charCount >= maxChars - 20 && (
-                                        <span
-                                            className={`char-count ${charCount >= maxChars
-                                                ? "over-limit"
-                                                : ""
-                                                }`}
-                                        >
-                                            {maxChars - charCount}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="post-actions">
-                        <Button
-                            onClick={handlePostSubmit}
-                            classButton={`post-button ${!isPostButtonEnabled ? "disabled" : ""
-                                }`}
-                            disabled={!isPostButtonEnabled || isSubmitting}
-                        >
-                            <span className="post-button-text">
-                                {isSubmitting ? "Posteando..." : "Postear"}
-                            </span>
-                        </Button>
-                    </div>
-                </div>
+        <div className="post-body">
+          <div className="post-user-section">
+            <div className="post-avatar">
+              <LinkIcon
+                name={"imagen2"}
+                anchor={false}
+                classname={"avatar-icon"}
+              />
             </div>
+            <div className="post-input-wrapper">
+              <textarea
+                ref={textareaRef}
+                placeholder="¿Qué está pasando?"
+                className="post-textarea"
+                value={postText}
+                onChange={handlePostChange}
+                maxLength={maxChars}
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Previsualización de imagen/GIF */}
+          {selectedImage && (
+            <div className="image-preview-container">
+              <img
+                src={selectedImage.preview || selectedImage}
+                alt="Preview"
+                className="image-preview"
+              />
+              <button
+                className="remove-image-button"
+                onClick={handleRemoveImage}
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {/* Selector de emojis */}
+          {showEmojiPicker && (
+            <div className="emoji-picker">
+              <div className="emoji-picker-header">
+                <h3>Emojis</h3>
+                <button
+                  className="emoji-close-button"
+                  onClick={() => setShowEmojiPicker(false)}
+                >
+                  ×
+                </button>
+              </div>
+              <div className="emoji-picker-content">
+                {Object.entries(emojiCategories).map(([category, emojis]) => (
+                  <div key={category} className="emoji-category">
+                    <div className="emoji-category-name">{category}</div>
+                    <div className="emoji-grid">
+                      {emojis.map((emoji, index) => (
+                        <button
+                          key={index}
+                          className="emoji-button"
+                          onClick={() => handleEmojiClick(emoji)}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Selector de GIFs */}
+          {showGifPicker && (
+            <div className="gif-picker">
+              <div className="gif-picker-header">
+                <h3>Elige un GIF</h3>
+                <button
+                  className="gif-close-button"
+                  onClick={() => setShowGifPicker(false)}
+                >
+                  ×
+                </button>
+              </div>
+              <div className="gif-picker-content">
+                <div className="gif-grid">
+                  {gifs.map((gif) => (
+                    <div
+                      key={gif.id}
+                      className="gif-item"
+                      onClick={() => handleGifSelect(gif.url)}
+                    >
+                      <img src={gif.url} alt={gif.title} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-    );
+
+        <div className="post-footer">
+          <div className="post-media-tools">
+            <div className="media-tools-left">
+              {/* Input oculto para archivos */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "none" }}
+              />
+
+              <button
+                className="media-tool"
+                title="Agregar imagen"
+                onClick={handleImageClick}
+              >
+                <LinkIcon
+                  classLink={"modal-icon"}
+                  name={"image"}
+                  anchor={false}
+                  classname={""}
+                />
+              </button>
+
+              <button
+                className="media-tool"
+                title="Agregar GIF"
+                onClick={() => {
+                  setShowGifPicker(!showGifPicker);
+                  setShowEmojiPicker(false);
+                }}
+              >
+                <LinkIcon
+                  classLink={"modal-icon"}
+                  name={"gif"}
+                  anchor={false}
+                  classname={""}
+                />
+              </button>
+
+              <button
+                className="media-tool"
+                title="Agregar emoji"
+                onClick={() => {
+                  setShowEmojiPicker(!showEmojiPicker);
+                  setShowGifPicker(false);
+                }}
+              >
+                <LinkIcon
+                  classLink={"modal-icon"}
+                  name={"emoji"}
+                  anchor={false}
+                  classname={""}
+                />
+              </button>
+            </div>
+
+            <div className="media-tools-right">
+              {charCount > 0 && (
+                <div className="char-counter">
+                  <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 30 30"
+                    className="char-circle"
+                  >
+                    <circle
+                      cx="15"
+                      cy="15"
+                      r="12"
+                      fill="none"
+                      stroke="#eff3f4"
+                      strokeWidth="2"
+                    />
+                    <circle
+                      cx="15"
+                      cy="15"
+                      r="12"
+                      fill="none"
+                      stroke={
+                        charPercentage >= 100
+                          ? "#f4212e"
+                          : charPercentage >= 90
+                          ? "#ffd400"
+                          : "#318041"
+                      }
+                      strokeWidth="2"
+                      strokeDasharray={`${(charPercentage / 100) * 75.4} 75.4`}
+                      transform="rotate(-90 15 15)"
+                    />
+                  </svg>
+                  {charCount >= maxChars - 20 && (
+                    <span
+                      className={`char-count ${
+                        charCount >= maxChars ? "over-limit" : ""
+                      }`}
+                    >
+                      {maxChars - charCount}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="post-actions">
+            <Button
+              onClick={handlePostSubmit}
+              classButton={`post-button ${
+                !isPostButtonEnabled ? "disabled" : ""
+              }`}
+              disabled={!isPostButtonEnabled || isSubmitting}
+            >
+              <span className="post-button-text">
+                {isSubmitting ? "Posteando..." : "Postear"}
+              </span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Modal;

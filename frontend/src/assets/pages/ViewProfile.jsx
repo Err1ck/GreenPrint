@@ -223,7 +223,9 @@ function ViewProfile() {
             style={{
               width: "100%",
               height: "200px",
-              backgroundColor: user.banner_url ? "transparent" : "#cfd9de",
+              backgroundColor: user.banner_url
+                ? "transparent"
+                : "var(--color-login)",
               backgroundImage: user.banner_url
                 ? `url(http://127.0.0.1:8000${user.banner_url})`
                 : "none",
@@ -257,7 +259,7 @@ function ViewProfile() {
                   height: "134px",
                   borderRadius: "50%",
                   border: "4px solid #ffffff",
-                  backgroundColor: "#cfd9de",
+                  backgroundColor: "var(--color-login)",
                   backgroundImage: user.photo_url
                     ? `url(http://127.0.0.1:8000${user.photo_url})`
                     : "none",
