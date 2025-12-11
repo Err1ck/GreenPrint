@@ -135,7 +135,7 @@ const FollowCard = ({
           style={{
             width: "48px",
             height: "48px",
-            borderRadius: "50%",
+            borderRadius: type === "community" ? "12px" : "50%",
             backgroundColor: "#e0e0e0",
             flexShrink: 0,
             overflow: "hidden",
@@ -163,13 +163,13 @@ const FollowCard = ({
             border: isFollowing
               ? "1px solid #ccc"
               : type === "community"
-              ? "1px solid #00ba7c"
-              : "1px solid #1da1f2",
+                ? "1px solid #00ba7c"
+                : "1px solid #1da1f2",
             backgroundColor: isFollowing
               ? "#fff"
               : type === "community"
-              ? "#00ba7c"
-              : "#1da1f2",
+                ? "#00ba7c"
+                : "#1da1f2",
             color: isFollowing ? "#000" : "#fff",
             fontWeight: "bold",
             fontSize: "14px",
