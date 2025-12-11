@@ -276,17 +276,17 @@ function UserSettingsModal({ isOpen, onClose }) {
             <div className="modal-content post-modal-content" style={{ maxWidth: "600px" }}>
                 {/* Header */}
                 <div className="post-header">
-                    <button className="close-x-button" onClick={onClose}>
-                        ×
-                    </button>
                     <h2 style={{
                         fontSize: "20px",
                         fontWeight: "700",
                         color: "#0f1419",
-                        margin: "0 0 0 20px"
+                        margin: "0"
                     }}>
                         Editar Perfil
                     </h2>
+                    <button className="close-x-button" onClick={onClose}>
+                        <X size={20} />
+                    </button>
                 </div>
 
                 {/* Body */}
