@@ -45,9 +45,10 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                 </div>
               </div>
               <div className="navbar-links">
-                {navbarPage === 1 && (
+                {navbarPage === "home" && (
                   <div className="navbar-links-right">
                     <LinkIcon
+                      classLink={"navbar-home"}
                       name={"home"}
                       href={"/"}
                       classname={"navicon"}
@@ -90,7 +91,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                     </div>
                   </div>
                 )}
-                {navbarPage === 2 && (
+                {navbarPage === "messages" && (
                   <div className="navbar-links-right">
                     <LinkIcon
                       name={"home"}
@@ -99,6 +100,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                       text={"Inicio"}
                     />
                     <LinkIcon
+                      classLink={"navbar-messages"}
                       name={"message"}
                       href={"/messages"}
                       classname={"navicon"}
@@ -135,7 +137,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                     </div>
                   </div>
                 )}
-                {navbarPage === 3 && (
+                {navbarPage === "saved" && (
                   <div className="navbar-links-right">
                     <LinkIcon
                       name={"home"}
@@ -150,6 +152,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                       text={"Mensajes"}
                     />
                     <LinkIcon
+                      classLink={"navbar-saved"}
                       name={"save"}
                       href={"/saved"}
                       classname={"navicon"}
@@ -180,7 +183,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                     </div>
                   </div>
                 )}
-                {navbarPage === 4 && (
+                {navbarPage === "community" && (
                   <div className="navbar-links-right">
                     <LinkIcon
                       name={"home"}
@@ -201,6 +204,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                       text={"Guardados"}
                     />
                     <LinkIcon
+                      classLink={"navbar-community"}
                       name={"comunidadesMias"}
                       href={"/communities"}
                       classname={"navicon"}
@@ -225,7 +229,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                     </div>
                   </div>
                 )}
-                {navbarPage === 5 && (
+                {navbarPage === "profile" && (
                   <div className="navbar-links-right">
                     <LinkIcon
                       name={"home"}
@@ -252,6 +256,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                       text={"Comunidades"}
                     />
                     <LinkIcon
+                      classLink={"navbar-profile"}
                       name={"perfil"}
                       href={userId ? `/profile/${userId}` : "/perfil"}
                       classname={"navicon"}

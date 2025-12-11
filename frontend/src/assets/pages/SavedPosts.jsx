@@ -68,7 +68,7 @@ function SavedPosts() {
     return (
         <div className="homepage-container">
             <div className="navbarLeft-content">
-                <Navbar navbarType={1} />
+                <Navbar navbarType={1} navbarPage={"saved"} />
             </div>
             <div className="main-layout-container">
                 <main className="main-content" style={{ padding: 0 }}>
