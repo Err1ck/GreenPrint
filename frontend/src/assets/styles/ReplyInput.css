@@ -22,6 +22,7 @@
   outline: none;
   transition: border-color 0.2s;
   background-color: var(--color-bg);
+  color:var(--color-text-primary);
 }
 
 .reply-input-textarea:focus {
