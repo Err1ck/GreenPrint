@@ -11,13 +11,22 @@
   flex-shrink: 0;
   z-index: 100;
 }
-.navbar-links-right > .link-icon:first-child {
+.navbar-links-right .navbar-home,
+.navbar-links-right .navbar-messages,
+.navbar-links-right .navbar-saved,
+.navbar-links-right .navbar-community,
+.navbar-links-right .navbar-profile {
   background-color: var(--color-bg-secondary);
 }
-.navbar-links-right:hover > .link-icon:first-child {
+
+.navbar-links-right:hover .navbar-home,
+.navbar-links-right:hover .navbar-messages,
+.navbar-links-right:hover .navbar-saved,
+.navbar-links-right:hover .navbar-community,
+.navbar-links-right:hover .navbar-profile {
   background-color: transparent;
 }
-.navbar-links-right:hover > .link-icon:hover {
+.navbar-links-right:hover .link-icon:hover {
   background-color: var(--color-bg-secondary);
 }
 
