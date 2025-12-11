@@ -277,6 +277,7 @@ function Search() {
                                             <div key={`user-${user.id}`} onClick={() => handleUserClick(user.id)}>
                                                 <FollowCard
                                                     type="user"
+                                                    id={user.id}
                                                     name={user.username}
                                                     username={user.username}
                                                     bio={user.biography}
@@ -291,10 +292,11 @@ function Search() {
                                             <div key={`community-${community.id}`} onClick={() => handleCommunityClick(community.id)}>
                                                 <FollowCard
                                                     type="community"
+                                                    id={community.id}
                                                     name={community.name}
                                                     bio={community.biography}
-                                                    followers={community.follower_count || 0}
                                                     members={community.member_count || 0}
+                                                    followers={community.follower_count || 0}
                                                     photoUrl={community.photo_url}
                                                 />
                                             </div>
