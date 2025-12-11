@@ -18,215 +18,49 @@ function Modal({ children, onClose }) {
   // Emojis populares organizados por categorías
   const emojiCategories = {
     Expresiones: [
-      "😀",
-      "😃",
-      "😄",
-      "😁",
-      "😅",
-      "😂",
-      "🤣",
-      "😊",
-      "😇",
-      "🙂",
-      "😉",
-      "😌",
-      "😍",
-      "🥰",
-      "😘",
-      "😗",
-      "😙",
-      "😚",
-      "😋",
-      "😛",
-      "😝",
-      "😜",
-      "🤪",
-      "🤨",
-      "🧐",
-      "🤓",
+      "😀", "😃", "😄", "😁", "😅", "😂", "🤣", "😊", "😇", "🙂",
+      "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛",
+      "😝", "😜", "🤪", "🤨", "🧐", "🤓",
     ],
     Gestos: [
-      "👍",
-      "👎",
-      "👌",
-      "✌️",
-      "🤞",
-      "🤟",
-      "🤘",
-      "🤙",
-      "👈",
-      "👉",
-      "👆",
-      "👇",
-      "☝️",
-      "👏",
-      "🙌",
-      "🤲",
-      "🤝",
-      "🙏",
-      "💪",
+      "👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉",
+      "👆", "👇", "☝️", "👏", "🙌", "🤲", "🤝", "🙏", "💪",
     ],
     Corazones: [
-      "❤️",
-      "🧡",
-      "💛",
-      "💚",
-      "💙",
-      "💜",
-      "🖤",
-      "🤍",
-      "🤎",
-      "💔",
-      "❣️",
-      "💕",
-      "💞",
-      "💓",
-      "💗",
-      "💖",
-      "💘",
-      "💝",
+      "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
+      "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝",
     ],
     Naturaleza: [
-      "🌱",
-      "🌿",
-      "🍀",
-      "🌾",
-      "🌳",
-      "🌲",
-      "🌴",
-      "🌵",
-      "🌷",
-      "🌹",
-      "🌺",
-      "🌸",
-      "🌼",
-      "🌻",
-      "🌞",
-      "🌝",
-      "🌛",
-      "⭐",
-      "✨",
-      "⚡",
-      "🔥",
-      "💧",
+      "🌱", "🌿", "🍀", "🌾", "🌳", "🌲", "🌴", "🌵", "🌷", "🌹",
+      "🌺", "🌸", "🌼", "🌻", "🌞", "🌝", "🌛", "⭐", "✨", "⚡",
+      "🔥", "💧",
     ],
     Animales: [
-      "🐶",
-      "🐱",
-      "🐭",
-      "🐹",
-      "🐰",
-      "🦊",
-      "🐻",
-      "🐼",
-      "🐨",
-      "🐯",
-      "🦁",
-      "🐮",
-      "🐷",
-      "🐸",
-      "🐵",
-      "🐔",
-      "🐧",
-      "🐦",
-      "🦄",
-      "🐝",
-      "🦋",
-      "🐛",
+      "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯",
+      "🦁", "🐮", "🐷", "🐸", "🐵", "🐔", "🐧", "🐦", "🦄", "🐝",
+      "🦋", "🐛",
     ],
     Comida: [
-      "🍕",
-      "🍔",
-      "🍟",
-      "🌭",
-      "🍿",
-      "🧇",
-      "🥓",
-      "🥞",
-      "🧀",
-      "🥗",
-      "🍝",
-      "🍜",
-      "🍲",
-      "🍛",
-      "🍣",
-      "🍱",
-      "🥟",
-      "🍦",
-      "🍰",
-      "🎂",
-      "🧁",
-      "🍪",
-      "🍩",
-      "☕",
-      "🍵",
+      "🍕", "🍔", "🍟", "🌭", "🍿", "🧇", "🥓", "🥞", "🧀", "🥗",
+      "🍝", "🍜", "🍲", "🍛", "🍣", "🍱", "🥟", "🍦", "🍰", "🎂",
+      "🧁", "🍪", "🍩", "☕", "🍵",
     ],
     Deportes: [
-      "⚽",
-      "🏀",
-      "🏈",
-      "⚾",
-      "🥎",
-      "🎾",
-      "🏐",
-      "🏉",
-      "🥏",
-      "🎱",
-      "🏓",
-      "🏸",
-      "🏒",
-      "🏑",
-      "🥍",
-      "🏏",
-      "🥊",
-      "🥋",
-      "🎯",
-      "⛳",
+      "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱",
+      "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🥊", "🥋", "🎯", "⛳",
     ],
   };
 
-  // GIFs simulados (en producción, estos vendrían de una API como Giphy o Tenor)
+  // GIFs simulados
   const gifs = [
-    {
-      id: 1,
-      url: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif",
-      title: "Celebration",
-    },
-    {
-      id: 2,
-      url: "https://media.giphy.com/media/g9582DNuQppxC/giphy.gif",
-      title: "Happy Dance",
-    },
-    {
-      id: 3,
-      url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-      title: "Thumbs Up",
-    },
-    {
-      id: 4,
-      url: "https://media.giphy.com/media/kyLYXonQYYfwYDIeZl/giphy.gif",
-      title: "Excited",
-    },
-    {
-      id: 5,
-      url: "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
-      title: "Clapping",
-    },
-    {
-      id: 6,
-      url: "https://media.giphy.com/media/3oz8xAFtqoOUUrsh7W/giphy.gif",
-      title: "Dancing",
-    },
-    {
-      id: 7,
-      url: "https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif",
-      title: "Wow",
-    },
-    {
-      id: 8,
-      url: "https://media.giphy.com/media/3o6Zt6KHxJTbXCnSvu/giphy.gif",
-      title: "Love",
-    },
+    { id: 1, url: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif", title: "Celebration" },
+    { id: 2, url: "https://media.giphy.com/media/g9582DNuQppxC/giphy.gif", title: "Happy Dance" },
+    { id: 3, url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", title: "Thumbs Up" },
+    { id: 4, url: "https://media.giphy.com/media/kyLYXonQYYfwYDIeZl/giphy.gif", title: "Excited" },
+    { id: 5, url: "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif", title: "Clapping" },
+    { id: 6, url: "https://media.giphy.com/media/3oz8xAFtqoOUUrsh7W/giphy.gif", title: "Dancing" },
+    { id: 7, url: "https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif", title: "Wow" },
+    { id: 8, url: "https://media.giphy.com/media/3o6Zt6KHxJTbXCnSvu/giphy.gif", title: "Love" },
   ];
 
   const handlePostChange = (event) => {
@@ -242,7 +76,6 @@ function Modal({ children, onClose }) {
       setIsSubmitting(true);
 
       try {
-        // Obtener token y usuario de localStorage
         const token = localStorage.getItem("token");
         const userStr = localStorage.getItem("user");
 
@@ -251,86 +84,19 @@ function Modal({ children, onClose }) {
           setIsSubmitting(false);
           return;
         }
-    };
-
-    const handlePostSubmit = async () => {
-        if (postText.trim() !== "" || selectedImage) {
-            setIsSubmitting(true);
-            
-            try {
-                // Obtener token y usuario de localStorage
-                const token = localStorage.getItem('token');
-                const userStr = localStorage.getItem('user');
-
-                if (!token || !userStr) {
-                    alert("Debes iniciar sesión para crear un post");
-                    setIsSubmitting(false);
-                    return;
-                }
-
-                const user = JSON.parse(userStr);
-
-                // Crear FormData para enviar archivo
-                const formData = new FormData();
-                formData.append('user', user.id);
-                formData.append('content', postText);
-                
-                // Si hay imagen seleccionada, agregarla al FormData
-                if (selectedImage) {
-                    if (selectedImage.file) {
-                        // Es una imagen de archivo
-                        formData.append('image', selectedImage.file);
-                    } else if (selectedImage.isGif && selectedImage.url) {
-                        // Es un GIF - enviar la URL
-                        formData.append('gif_url', selectedImage.url);
-                    }
-                }
-
-                const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                // Verificar si la respuesta fue exitosa
-                if (response.ok) {
-                    // Post creado exitosamente, recargar la página
-                    console.log("Post creado exitosamente");
-                    window.location.reload();
-                    return; // Importante: salir aquí para que no ejecute el resto
-                }
-
-                // Si llegamos aquí, hubo un error del servidor
-                try {
-                    const data = await response.json();
-                    console.error("Error al crear el post:", data);
-                    alert(data.error || "Error al crear el post");
-                } catch (jsonError) {
-                    alert("Error al crear el post");
-                }
-                setIsSubmitting(false);
-                
-            } catch (error) {
-                // Error de red o conexión
-                console.error("Error de red:", error);
-                alert("Error al conectar con el servidor");
-                setIsSubmitting(false);
-            }
-        }
-    };
 
         const user = JSON.parse(userStr);
 
-        // Crear FormData para enviar archivo
         const formData = new FormData();
         formData.append("user", user.id);
         formData.append("content", postText);
 
-        // Si hay imagen seleccionada, agregarla al FormData
-        if (selectedImage && selectedImage.file) {
-          formData.append("image", selectedImage.file);
+        if (selectedImage) {
+          if (selectedImage.file) {
+            formData.append("image", selectedImage.file);
+          } else if (selectedImage.isGif && selectedImage.url) {
+            formData.append("gif_url", selectedImage.url);
+          }
         }
 
         const response = await fetch("http://127.0.0.1:8000/api/posts/create", {
@@ -341,15 +107,12 @@ function Modal({ children, onClose }) {
           body: formData,
         });
 
-        // Verificar si la respuesta fue exitosa
         if (response.ok) {
-          // Post creado exitosamente, recargar la página
           console.log("Post creado exitosamente");
           window.location.reload();
-          return; // Importante: salir aquí para que no ejecute el resto
+          return;
         }
 
-        // Si llegamos aquí, hubo un error del servidor
         try {
           const data = await response.json();
           console.error("Error al crear el post:", data);
@@ -357,32 +120,88 @@ function Modal({ children, onClose }) {
         } catch (jsonError) {
           alert("Error al crear el post");
         }
-    };
+        setIsSubmitting(false);
+      } catch (error) {
+        console.error("Error de red:", error);
+        alert("Error al conectar con el servidor");
+        setIsSubmitting(false);
+      }
+    }
+  };
 
-    // Manejo de GIFs
-    const handleGifSelect = (gifUrl) => {
-        // Guardar GIF URL en el mismo formato que las imágenes
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
         setSelectedImage({
-            preview: gifUrl,
-            file: null,
-            isGif: true,
-            url: gifUrl
+          preview: reader.result,
+          file: file,
+          isGif: false,
         });
-        setShowGifPicker(false);
-    };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    const isPostButtonEnabled = postText.trim().length > 0 || selectedImage;
-    const charPercentage = (charCount / maxChars) * 100;
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
-    return (
-        <div className="modal-overlay" onClick={handleOverlayClick}>
-            <div className="modal-content post-modal-content">
-                <div className="post-header">
-                    <div></div>
-                    <button className="close-x-button" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </div>
+  const handleEmojiClick = (emoji) => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newText = postText.substring(0, start) + emoji + postText.substring(end);
+
+      if (newText.length <= maxChars) {
+        setPostText(newText);
+        setCharCount(newText.length);
+
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+        }, 0);
+      }
+    }
+  };
+
+  const handleGifSelect = (gifUrl) => {
+    setSelectedImage({
+      preview: gifUrl,
+      file: null,
+      isGif: true,
+      url: gifUrl,
+    });
+    setShowGifPicker(false);
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target.className === "modal-overlay") {
+      onClose();
+    }
+  };
+
+  const isPostButtonEnabled = postText.trim().length > 0 || selectedImage;
+  const charPercentage = (charCount / maxChars) * 100;
+
+  return (
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-content post-modal-content">
+        <div className="post-header">
+          <div></div>
+          <button className="close-x-button" onClick={onClose}>
+            <X size={20} />
+          </button>
+        </div>
 
         <div className="post-body">
           <div className="post-user-section">
@@ -488,7 +307,6 @@ function Modal({ children, onClose }) {
         <div className="post-footer">
           <div className="post-media-tools">
             <div className="media-tools-left">
-              {/* Input oculto para archivos */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -569,8 +387,8 @@ function Modal({ children, onClose }) {
                         charPercentage >= 100
                           ? "#f4212e"
                           : charPercentage >= 90
-                          ? "#ffd400"
-                          : "#318041"
+                            ? "#ffd400"
+                            : "#318041"
                       }
                       strokeWidth="2"
                       strokeDasharray={`${(charPercentage / 100) * 75.4} 75.4`}
@@ -579,9 +397,8 @@ function Modal({ children, onClose }) {
                   </svg>
                   {charCount >= maxChars - 20 && (
                     <span
-                      className={`char-count ${
-                        charCount >= maxChars ? "over-limit" : ""
-                      }`}
+                      className={`char-count ${charCount >= maxChars ? "over-limit" : ""
+                        }`}
                     >
                       {maxChars - charCount}
                     </span>
@@ -594,9 +411,8 @@ function Modal({ children, onClose }) {
           <div className="post-actions">
             <Button
               onClick={handlePostSubmit}
-              classButton={`post-button ${
-                !isPostButtonEnabled ? "disabled" : ""
-              }`}
+              classButton={`post-button ${!isPostButtonEnabled ? "disabled" : ""
+                }`}
               disabled={!isPostButtonEnabled || isSubmitting}
             >
               <span className="post-button-text">
