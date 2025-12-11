@@ -10,7 +10,7 @@ const LinkIcon = ({
   classLink,
   name,
   anchor = true,
-  href = "#",
+  href,
   classname,
   text,
   onSearch, // función opcional, se usa solo en modo buscador

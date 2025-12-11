@@ -275,6 +275,51 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                     </div>
                   </div>
                 )}
+                {navbarPage === "none" && (
+                  <div className="navbar-links-right">
+                    <LinkIcon
+                      name={"home"}
+                      href={"/"}
+                      classname={"navicon"}
+                      text={"Inicio"}
+                    />
+                    <LinkIcon
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
