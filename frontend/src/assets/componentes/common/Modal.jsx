@@ -260,8 +260,14 @@ function Modal({ children, onClose }) {
                 formData.append('content', postText);
                 
                 // Si hay imagen seleccionada, agregarla al FormData
-                if (selectedImage && selectedImage.file) {
-                    formData.append('image', selectedImage.file);
+                if (selectedImage) {
+                    if (selectedImage.file) {
+                        // Es una imagen de archivo
+                        formData.append('image', selectedImage.file);
+                    } else if (selectedImage.isGif && selectedImage.url) {
+                        // Es un GIF - enviar la URL
+                        formData.append('gif_url', selectedImage.url);
+                    }
                 }
 
                 const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
@@ -364,7 +370,13 @@ function Modal({ children, onClose }) {
 
     // Manejo de GIFs
     const handleGifSelect = (gifUrl) => {
-        setSelectedImage(gifUrl);
+        // Guardar GIF URL en el mismo formato que las imágenes
+        setSelectedImage({
+            preview: gifUrl,
+            file: null,
+            isGif: true,
+            url: gifUrl
+        });
         setShowGifPicker(false);
     };
 

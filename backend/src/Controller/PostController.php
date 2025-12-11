@@ -345,6 +345,12 @@ final class PostController extends AbstractController
                         JsonResponse::HTTP_BAD_REQUEST
                     );
                 }
+            } else {
+                // Si no hay archivo de imagen, verificar si hay una URL de GIF
+                $gifUrl = $request->request->get('gif_url');
+                if ($gifUrl) {
+                    $post->setImage($gifUrl);
+                }
             }
         } else {
             // Asignar imagen si existe (backward compatibility para base64 u otras rutas)

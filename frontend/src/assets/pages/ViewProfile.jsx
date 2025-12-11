@@ -4,6 +4,7 @@ import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
 import FollowListModal from "../componentes/common/FollowListModal";
 import UserSettingsModal from "../componentes/common/UserSettingsModal";
+import Modal from "../componentes/common/Modal";
 import FollowUser from "../componentes/common/FollowUser";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
@@ -16,6 +17,10 @@ function ViewProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // "followers" or "following"
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
+
+  const openNewPostModal = () => setIsNewPostModalOpen(true);
+  const closeNewPostModal = () => setIsNewPostModalOpen(false);
 
   useEffect(() => {
     fetchUserData();
@@ -591,7 +596,18 @@ function ViewProfile() {
 
       {/* Navbar Right */}
       <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
-        <Navbar navbarType={2} />
+        <Navbar 
+          navbarType={2} 
+          onOpenModal={(() => {
+            const currentUserStr = localStorage.getItem('user');
+            if (currentUserStr) {
+              const currentUser = JSON.parse(currentUserStr);
+              // Solo pasar onOpenModal si es el perfil del usuario actual
+              return currentUser.id === parseInt(userId) ? openNewPostModal : undefined;
+            }
+            return undefined;
+          })()}
+        />
       </div>
 
       {/* Follow List Modal */}
@@ -607,6 +623,9 @@ function ViewProfile() {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+
+      {/* New Post Modal */}
+      {isNewPostModalOpen && <Modal onClose={closeNewPostModal} />}
     </div>
   );
 }
