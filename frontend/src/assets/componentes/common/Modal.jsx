@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Button from "../ui/Button";
 import LinkIcon from "../ui/LinkIcon";
 import { X } from "lucide-react";
@@ -10,10 +10,18 @@ function Modal({ children, onClose }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
+  const [user, setUser] = useState(null);
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
   const maxChars = 280;
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+  }, []);
 
   // Emojis populares organizados por categorías
   const emojiCategories = {
@@ -205,12 +213,44 @@ function Modal({ children, onClose }) {
 
         <div className="post-body">
           <div className="post-user-section">
-            <div className="post-avatar">
-              <LinkIcon
-                name={"imagen2"}
-                anchor={false}
-                classname={"avatar-icon"}
-              />
+            <div
+              className="post-avatar"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                backgroundColor: "#cfd9de",
+                flexShrink: 0,
+                alignSelf: "flex-start"
+              }}
+            >
+              {user?.photo_url ? (
+                <img
+                  src={`http://127.0.0.1:8000${user.photo_url}`}
+                  alt={user.username}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover"
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    color: "#536471"
+                  }}
+                >
+                  {user?.username?.charAt(0).toUpperCase() || "U"}
+                </div>
+              )}
             </div>
             <div className="post-input-wrapper">
               <textarea
