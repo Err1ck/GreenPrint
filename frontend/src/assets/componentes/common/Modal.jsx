@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import Button from "../ui/Button";
 import LinkIcon from "../ui/LinkIcon";
+import { X } from "lucide-react";
 import "../../styles/Modal.css";
 
 function Modal({ children, onClose }) {
@@ -374,8 +375,9 @@ function Modal({ children, onClose }) {
         <div className="modal-overlay" onClick={handleOverlayClick}>
             <div className="modal-content post-modal-content">
                 <div className="post-header">
+                    <div></div>
                     <button className="close-x-button" onClick={onClose}>
-                        ×
+                        <X size={20} />
                     </button>
                 </div>
 

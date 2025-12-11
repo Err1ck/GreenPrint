@@ -204,7 +204,7 @@ function Messages() {
         return (
             <div className="homepage-container">
                 <div className="navbarLeft-content">
-                    <Navbar navbarType={1} />
+                    <Navbar navbarType={1} navbarPage={"messages"}/>
                 </div>
                 <div className="main-layout-container">
                     <main className="main-content">
@@ -223,7 +223,7 @@ function Messages() {
     return (
         <div className="homepage-container">
             <div className="navbarLeft-content">
-                <Navbar navbarType={1} />
+                <Navbar navbarType={1} navbarPage={"messages"}/>
             </div>
             <div className="main-layout-container">
                 <main className="main-content" style={{ padding: 0 }}>
@@ -444,7 +444,7 @@ function Messages() {
                     </div>
                 </main>
             </div>
-            <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0, zIndex: 100 }}>
+            <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
                 <Navbar navbarType={2} />
             </div>
         </div>

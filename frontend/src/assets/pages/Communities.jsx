@@ -8,7 +8,6 @@ import Pagination from "../componentes/common/Pagination";
 
 function CommunityPage() {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,9 +15,6 @@ function CommunityPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [followedCommunities, setFollowedCommunities] = useState(new Set());
   const communitiesPerPage = 10;
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   useEffect(() => {
     fetchCommunities();
@@ -136,7 +132,7 @@ function CommunityPage() {
   return (
     <div className="homepage-container">
       <div className="navbarLeft-content">
-        <Navbar navbarType={1} />
+        <Navbar navbarType={1} navbarPage={"community"} />
       </div>
       <div className="main-layout-container">
         <main className="main-content" style={{ padding: 0 }}>
@@ -310,9 +306,8 @@ function CommunityPage() {
         </main>
       </div>
       <div className="navbarRight-content">
-        <Navbar navbarType={2} onOpenModal={openModal} />
+        <Navbar navbarType={2} />
       </div>
-      {isModalOpen && <Modal onClose={closeModal} />}
     </div>
   );
 }

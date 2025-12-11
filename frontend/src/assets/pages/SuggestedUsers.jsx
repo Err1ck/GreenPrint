@@ -6,15 +6,11 @@ import FollowCard from "../componentes/common/FollowCard";
 import Pagination from "../componentes/common/Pagination";
 
 function SuggestedUsersPage() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 10;
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
 
     useEffect(() => {
         fetchUsers();
@@ -142,9 +138,8 @@ function SuggestedUsersPage() {
                 <div className="spacer-right"></div>
             </div>
             <div className="navbarRight-content">
-                <Navbar navbarType={2} onOpenModal={openModal} />
+                <Navbar navbarType={2} />
             </div>
-            {isModalOpen && <Modal onClose={closeModal} />}
         </>
     );
 }

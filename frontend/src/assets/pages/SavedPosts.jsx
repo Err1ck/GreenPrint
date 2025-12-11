@@ -7,13 +7,9 @@ import Publication from "../componentes/common/Publication";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function SavedPosts() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
 
     useEffect(() => {
         fetchSavedPosts();
@@ -68,7 +64,7 @@ function SavedPosts() {
     return (
         <div className="homepage-container">
             <div className="navbarLeft-content">
-                <Navbar navbarType={1} />
+                <Navbar navbarType={1} navbarPage={"saved"} />
             </div>
             <div className="main-layout-container">
                 <main className="main-content" style={{ padding: 0 }}>
@@ -176,9 +172,8 @@ function SavedPosts() {
                 </main>
             </div>
             <div className="navbarRight-content">
-                <Navbar navbarType={2} onOpenModal={openModal} />
+                <Navbar navbarType={2} />
             </div>
-            {isModalOpen && <Modal onClose={closeModal} />}
         </div>
     );
 }

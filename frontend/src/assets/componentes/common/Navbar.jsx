@@ -9,7 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import UserSettingsModal from "./UserSettingsModal";
 import TrendingTopics from "./TrendingTopics";
 
-function Navbar({ navbarType, onOpenModal }) {
+function Navbar({ navbarType, navbarPage, onOpenModal }) {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -40,54 +40,245 @@ function Navbar({ navbarType, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <div className="navbarImg-container">
+                <div 
+                  className="navbarImg-container" 
+                  onClick={() => navigate("/")}
+                  style={{ cursor: "pointer" }}
+                >
                   <SvgComponente name="imagen3" />
                 </div>
               </div>
               <div className="navbar-links">
-                <div className="navbar-links-right">
-                  <LinkIcon
-                    name={"home"}
-                    href={"/"}
-                    classname={"navicon"}
-                    text={"Inicio"}
-                  />
-                  <LinkIcon
-                    name={"message"}
-                    href={"/messages"}
-                    classname={"navicon"}
-                    text={"Mensajes"}
-                  />
-                  <LinkIcon
-                    name={"save"}
-                    href={"/saved"}
-                    classname={"navicon"}
-                    text={"Guardados"}
-                  />
-                  <LinkIcon
-                    name={"comunidadesMias"}
-                    href={"/communities"}
-                    classname={"navicon"}
-                    text={"Comunidades"}
-                  />
-                  <LinkIcon
-                    name={"perfil"}
-                    href={userId ? `/profile/${userId}` : "/perfil"}
-                    classname={"navicon"}
-                    text={"Perfil"}
-                  />
-                  <div
-                    onClick={() => setIsSettingsModalOpen(true)}
-                    style={{ cursor: "pointer" }}
-                  >
+                {navbarPage === "home" && (
+                  <div className="navbar-links-right">
                     <LinkIcon
-                      name={"dots"}
-                      anchor={false}
+                      classLink={"navbar-home"}
+                      name={"home"}
+                      href={"/"}
                       classname={"navicon"}
-                      text={"Configuración"}
+                      text={"Inicio"}
                     />
+                    <LinkIcon
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
+                {navbarPage === "messages" && (
+                  <div className="navbar-links-right">
+                    <LinkIcon
+                      name={"home"}
+                      href={"/"}
+                      classname={"navicon"}
+                      text={"Inicio"}
+                    />
+                    <LinkIcon
+                      classLink={"navbar-messages"}
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
+                  </div>
+                )}
+                {navbarPage === "saved" && (
+                  <div className="navbar-links-right">
+                    <LinkIcon
+                      name={"home"}
+                      href={"/"}
+                      classname={"navicon"}
+                      text={"Inicio"}
+                    />
+                    <LinkIcon
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      classLink={"navbar-saved"}
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
+                  </div>
+                )}
+                {navbarPage === "community" && (
+                  <div className="navbar-links-right">
+                    <LinkIcon
+                      name={"home"}
+                      href={"/"}
+                      classname={"navicon"}
+                      text={"Inicio"}
+                    />
+                    <LinkIcon
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      classLink={"navbar-community"}
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
+                  </div>
+                )}
+                {navbarPage === "profile" && (
+                  <div className="navbar-links-right">
+                    <LinkIcon
+                      name={"home"}
+                      href={"/"}
+                      classname={"navicon"}
+                      text={"Inicio"}
+                    />
+                    <LinkIcon
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      classLink={"navbar-profile"}
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -134,12 +325,14 @@ function Navbar({ navbarType, onOpenModal }) {
 
             <div className="navbarRight-container-footer">
               <Footer footerType={2} />
-              <Button
-                onClick={onOpenModal}
-                classButton="button-navbar-open-modal"
-              >
-                <div className="button-text">Nuevo Post</div>
-              </Button>
+              {onOpenModal && (
+                <Button
+                  onClick={onOpenModal}
+                  classButton="button-navbar-open-modal"
+                >
+                  <div className="button-text">Nuevo Post</div>
+                </Button>
+              )}
             </div>
           </div>
         </nav>
