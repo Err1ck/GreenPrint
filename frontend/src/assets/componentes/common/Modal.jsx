@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import Button from "../ui/Button";
 import LinkIcon from "../ui/LinkIcon";
+import { X } from "lucide-react";
 import "../../styles/Modal.css";
 
 function Modal({ children, onClose }) {
@@ -250,6 +251,75 @@ function Modal({ children, onClose }) {
           setIsSubmitting(false);
           return;
         }
+    };
+
+    const handlePostSubmit = async () => {
+        if (postText.trim() !== "" || selectedImage) {
+            setIsSubmitting(true);
+            
+            try {
+                // Obtener token y usuario de localStorage
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
+
+                if (!token || !userStr) {
+                    alert("Debes iniciar sesión para crear un post");
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                const user = JSON.parse(userStr);
+
+                // Crear FormData para enviar archivo
+                const formData = new FormData();
+                formData.append('user', user.id);
+                formData.append('content', postText);
+                
+                // Si hay imagen seleccionada, agregarla al FormData
+                if (selectedImage) {
+                    if (selectedImage.file) {
+                        // Es una imagen de archivo
+                        formData.append('image', selectedImage.file);
+                    } else if (selectedImage.isGif && selectedImage.url) {
+                        // Es un GIF - enviar la URL
+                        formData.append('gif_url', selectedImage.url);
+                    }
+                }
+
+                const response = await fetch('http://127.0.0.1:8000/api/posts/create', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                // Verificar si la respuesta fue exitosa
+                if (response.ok) {
+                    // Post creado exitosamente, recargar la página
+                    console.log("Post creado exitosamente");
+                    window.location.reload();
+                    return; // Importante: salir aquí para que no ejecute el resto
+                }
+
+                // Si llegamos aquí, hubo un error del servidor
+                try {
+                    const data = await response.json();
+                    console.error("Error al crear el post:", data);
+                    alert(data.error || "Error al crear el post");
+                } catch (jsonError) {
+                    alert("Error al crear el post");
+                }
+                setIsSubmitting(false);
+                
+            } catch (error) {
+                // Error de red o conexión
+                console.error("Error de red:", error);
+                alert("Error al conectar con el servidor");
+                setIsSubmitting(false);
+            }
+        }
+    };
 
         const user = JSON.parse(userStr);
 
@@ -287,96 +357,32 @@ function Modal({ children, onClose }) {
         } catch (jsonError) {
           alert("Error al crear el post");
         }
-        setIsSubmitting(false);
-      } catch (error) {
-        // Error de red o conexión
-        console.error("Error de red:", error);
-        alert("Error al conectar con el servidor");
-        setIsSubmitting(false);
-      }
-    }
-  };
+    };
 
-  const handleOverlayClick = (e) => {
-    if (e.target.className === "modal-overlay") {
-      onClose();
-    }
-  };
-
-  // Manejo de imagen
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      // Validar tamaño (5MB)
-      if (file.size > 5242880) {
-        alert("La imagen es demasiado grande. Tamaño máximo: 5MB");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Guardar tanto el preview como el archivo original
+    // Manejo de GIFs
+    const handleGifSelect = (gifUrl) => {
+        // Guardar GIF URL en el mismo formato que las imágenes
         setSelectedImage({
-          preview: reader.result,
-          file: file,
+            preview: gifUrl,
+            file: null,
+            isGif: true,
+            url: gifUrl
         });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+        setShowGifPicker(false);
+    };
 
-  const handleRemoveImage = () => {
-    setSelectedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
+    const isPostButtonEnabled = postText.trim().length > 0 || selectedImage;
+    const charPercentage = (charCount / maxChars) * 100;
 
-  // Manejo de emojis
-  const handleEmojiClick = (emoji) => {
-    const textarea = textareaRef.current;
-    const cursorPosition = textarea.selectionStart;
-    const newText =
-      postText.slice(0, cursorPosition) +
-      emoji +
-      postText.slice(cursorPosition);
-
-    if (newText.length <= maxChars) {
-      setPostText(newText);
-      setCharCount(newText.length);
-
-      // Mantener el focus y posicionar el cursor después del emoji
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(
-          cursorPosition + emoji.length,
-          cursorPosition + emoji.length
-        );
-      }, 0);
-    }
-  };
-
-  // Manejo de GIFs
-  const handleGifSelect = (gifUrl) => {
-    setSelectedImage(gifUrl);
-    setShowGifPicker(false);
-  };
-
-  const isPostButtonEnabled = postText.trim().length > 0 || selectedImage;
-  const charPercentage = (charCount / maxChars) * 100;
-
-  return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content post-modal-content">
-        <div className="post-header">
-          <button className="close-x-button" onClick={onClose}>
-            ×
-          </button>
-        </div>
+    return (
+        <div className="modal-overlay" onClick={handleOverlayClick}>
+            <div className="modal-content post-modal-content">
+                <div className="post-header">
+                    <div></div>
+                    <button className="close-x-button" onClick={onClose}>
+                        <X size={20} />
+                    </button>
+                </div>
 
         <div className="post-body">
           <div className="post-user-section">

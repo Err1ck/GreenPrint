@@ -192,56 +192,53 @@ function ViewPost() {
             </div>
           )}
 
-          {!loading && !error && post && (
-            //   <Publication
-            //     key={post.id}
-            //     postId={post.id}
-            //     userId={post.user?.id}
-            //     userName={post.user?.username || "Usuario"}
-            //     userProfileUrl={`/perfil/${post.user?.username}`}
-            //     communityId={post.community?.id}
-            //     communityName={post.community?.name}
-            //     communityPhotoUrl={post.community?.photo_url} // ✨ Nueva prop
-            //     date={formatDate(post.created_at)}
-            //     time={formatTime(post.created_at)}
-            //     text={post.content}
-            //     postImage={post.image}
-            //     postType={post.postType} // Asegúrate de que esto viene del backend
-            //     comments={0}
-            //     retweets={0}
-            //     like1={0}
-            //     like2={0}
-            //     clickable={false}
-            //   />
-            <Publication
-              key={post.id}
-              postId={post.id}
-              userId={post.user?.id}
-              userName={post.user?.username || "Usuario"}
-              userProfileUrl={post.user?.photo_url}
-              communityId={post.community?.id}
-              communityName={post.community?.name}
-              communityPhotoUrl={post.community?.photo_url}
-              date={formatDate(post.createdAt)}
-              time={formatTime(post.createdAt)}
-              text={post.content}
-              postImage={post.image}
-              postType={post.postType}
-              comments={post.replies || 0}
-              retweets={post.reposts}
-              like1={post.leaf}
-              like2={post.tree}
-              clickable={true}
-              // Pasar datos de interacciones del usuario si existen
-              initialHasLikedLeaf={
-                post.user_interactions?.has_liked_leaf || false
-              }
-              initialHasLikedTree={
-                post.user_interactions?.has_liked_tree || false
-              }
-              initialHasReposted={post.user_interactions?.has_reposted || false}
-            />
-          )}
+                    {!loading && !error && post && (
+                        //   <Publication
+                        //     key={post.id}
+                        //     postId={post.id}
+                        //     userId={post.user?.id}
+                        //     userName={post.user?.username || "Usuario"}
+                        //     userProfileUrl={`/perfil/${post.user?.username}`}
+                        //     communityId={post.community?.id}
+                        //     communityName={post.community?.name}
+                        //     communityPhotoUrl={post.community?.photo_url} // ✨ Nueva prop
+                        //     date={formatDate(post.created_at)}
+                        //     time={formatTime(post.created_at)}
+                        //     text={post.content}
+                        //     postImage={post.image}
+                        //     postType={post.postType} // Asegúrate de que esto viene del backend
+                        //     comments={0}
+                        //     retweets={0}
+                        //     like1={0}
+                        //     like2={0}
+                        //     clickable={false}  
+                        //   />
+                        <Publication
+                            key={post.id}
+                            postId={post.id}
+                            userId={post.user?.id}
+                            userName={post.user?.username || "Usuario"}
+                            userProfileUrl={post.user?.photo_url}
+                            communityId={post.community?.id}
+                            communityName={post.community?.name}
+                            communityPhotoUrl={post.community?.photo_url}
+                            date={formatDate(post.createdAt)}
+                            time={formatTime(post.createdAt)}
+                            text={post.content}
+                            postImage={post.image}
+                            postType={post.postType}
+                            comments={post.replies || 0}
+                            retweets={post.reposts}
+                            like1={post.leaf}
+                            like2={post.tree}
+                            clickable={true}
+                            // Pasar datos de interacciones del usuario si existen
+                            initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                            initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                            initialHasReposted={post.user_interactions?.has_reposted || false}
+                            initialIsSaved={post.user_interactions?.has_saved || false}
+                        />
+                    )}
 
           {!loading && !error && !post && (
             <div

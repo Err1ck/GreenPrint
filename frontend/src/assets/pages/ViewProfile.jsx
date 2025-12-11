@@ -4,6 +4,8 @@ import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
 import FollowListModal from "../componentes/common/FollowListModal";
 import UserSettingsModal from "../componentes/common/UserSettingsModal";
+import Modal from "../componentes/common/Modal";
+import FollowUser from "../componentes/common/FollowUser";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewProfile() {
@@ -12,15 +14,17 @@ function ViewProfile() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFollowing, setIsFollowing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // "followers" or "following"
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
+
+  const openNewPostModal = () => setIsNewPostModalOpen(true);
+  const closeNewPostModal = () => setIsNewPostModalOpen(false);
 
   useEffect(() => {
     fetchUserData();
     fetchUserPosts();
-    checkIfFollowing();
   }, [userId]);
 
   const fetchUserData = async () => {
@@ -72,93 +76,7 @@ function ViewProfile() {
     }
   };
 
-  const checkIfFollowing = async () => {
-    try {
-      const currentUserStr = localStorage.getItem("user");
-      const token = localStorage.getItem("token");
 
-      if (!currentUserStr || !token) return;
-
-      const currentUser = JSON.parse(currentUserStr);
-
-      // No verificar si es el mismo usuario
-      if (currentUser.id === parseInt(userId)) return;
-
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/users/${currentUser.id}/following`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        // Verificar si data es un array antes de usar .some()
-        if (Array.isArray(data)) {
-          const isFollowingUser = data.some(
-            (follow) => follow.followingUser?.id === parseInt(userId)
-          );
-          setIsFollowing(isFollowingUser);
-        } else {
-          // Si no es un array, asumir que no sigue a nadie
-          setIsFollowing(false);
-        }
-      }
-    } catch (err) {
-      console.error("Error checking follow status:", err);
-    }
-  };
-
-  const handleFollowClick = async () => {
-    try {
-      const currentUserStr = localStorage.getItem("user");
-      const token = localStorage.getItem("token");
-
-      if (!currentUserStr || !token) {
-        alert("Debes iniciar sesión para seguir usuarios");
-        return;
-      }
-
-      const currentUser = JSON.parse(currentUserStr);
-
-      const endpoint = isFollowing
-        ? `http://127.0.0.1:8000/api/users/${currentUser.id}/unfollow`
-        : `http://127.0.0.1:8000/api/users/${currentUser.id}/follow`;
-
-      const method = isFollowing ? "DELETE" : "POST";
-
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          following_user_id: parseInt(userId),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setIsFollowing(!isFollowing);
-        // Actualizar contador de seguidores
-        fetchUserData();
-      } else if (response.status === 409) {
-        // Conflicto: ya sigue o ya no sigue
-        // Sincronizar el estado con el servidor
-        console.log("Conflicto detectado, sincronizando estado...");
-        await checkIfFollowing();
-        fetchUserData();
-      } else {
-        console.error("Error:", data);
-        alert(data.error || "Error al seguir/dejar de seguir");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      alert("Error al conectar con el servidor");
-    }
-  };
 
   const openFollowersModal = () => {
     setModalType("followers");
@@ -388,45 +306,11 @@ function ViewProfile() {
 
                 // Show Follow button for other profiles
                 return (
-                  <button
-                    onClick={handleFollowClick}
-                    style={{
-                      marginTop: "72px",
-                      padding: "8px 24px",
-                      borderRadius: "9999px",
-                      fontSize: "15px",
-                      fontWeight: "700",
-                      border: isFollowing
-                        ? "1px solid #cfd9de"
-                        : "1px solid #0f1419",
-                      backgroundColor: isFollowing ? "transparent" : "#0f1419",
-                      color: isFollowing ? "#0f1419" : "#ffffff",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (isFollowing) {
-                        e.target.style.backgroundColor = "#fee";
-                        e.target.style.borderColor = "#f4212e";
-                        e.target.style.color = "#f4212e";
-                        e.target.textContent = "Dejar de seguir";
-                      } else {
-                        e.target.style.backgroundColor = "#272c30";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (isFollowing) {
-                        e.target.style.backgroundColor = "transparent";
-                        e.target.style.borderColor = "#cfd9de";
-                        e.target.style.color = "#0f1419";
-                        e.target.textContent = "Siguiendo";
-                      } else {
-                        e.target.style.backgroundColor = "#0f1419";
-                      }
-                    }}
-                  >
-                    {isFollowing ? "Siguiendo" : "Seguir"}
-                  </button>
+                  <FollowUser
+                    userId={parseInt(userId)}
+                    onFollowChange={() => fetchUserData()}
+                    style={{ marginTop: "72px" }}
+                  />
                 );
               })()}
             </div>
@@ -681,55 +565,51 @@ function ViewProfile() {
               </div>
             )}
 
-            {!loading &&
-              posts.map((post) => (
-                <Publication
-                  key={post.id}
-                  postId={post.id}
-                  userId={post.user?.id}
-                  userName={post.user?.username || "Usuario"}
-                  userProfileUrl={post.user?.photo_url}
-                  communityId={post.community?.id}
-                  communityName={post.community?.name}
-                  communityPhotoUrl={post.community?.photo_url}
-                  date={formatDate(post.createdAt)}
-                  time={formatTime(post.createdAt)}
-                  text={post.content}
-                  postImage={post.image}
-                  postType={post.postType}
-                  comments={post.replies || 0}
-                  retweets={post.reposts}
-                  like1={post.leaf}
-                  like2={post.tree}
-                  clickable={true}
-                  // Pasar datos de interacciones del usuario si existen
-                  initialHasLikedLeaf={
-                    post.user_interactions?.has_liked_leaf || false
-                  }
-                  initialHasLikedTree={
-                    post.user_interactions?.has_liked_tree || false
-                  }
-                  initialHasReposted={
-                    post.user_interactions?.has_reposted || false
-                  }
-                />
-              ))}
+            {!loading && posts.map((post) => (
+              <Publication
+                key={post.id}
+                postId={post.id}
+                userId={post.user?.id}
+                userName={post.user?.username || "Usuario"}
+                userProfileUrl={post.user?.photo_url}
+                communityId={post.community?.id}
+                communityName={post.community?.name}
+                communityPhotoUrl={post.community?.photo_url}
+                date={formatDate(post.createdAt)}
+                time={formatTime(post.createdAt)}
+                text={post.content}
+                postImage={post.image}
+                postType={post.postType}
+                comments={post.replies || 0}
+                retweets={post.reposts}
+                like1={post.leaf}
+                like2={post.tree}
+                clickable={true}
+                // Pasar datos de interacciones del usuario si existen
+                initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
+                initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
+                initialHasReposted={post.user_interactions?.has_reposted || false}
+                initialIsSaved={post.user_interactions?.has_saved || false}
+              />
+            ))}
           </div>
         </main>
       </div>
 
       {/* Navbar Right */}
-      <div
-        style={{
-          flex: 1,
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          flexShrink: 0,
-          zIndex: 100,
-        }}
-      >
-        <Navbar navbarType={2} />
+      <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
+        <Navbar 
+          navbarType={2} 
+          onOpenModal={(() => {
+            const currentUserStr = localStorage.getItem('user');
+            if (currentUserStr) {
+              const currentUser = JSON.parse(currentUserStr);
+              // Solo pasar onOpenModal si es el perfil del usuario actual
+              return currentUser.id === parseInt(userId) ? openNewPostModal : undefined;
+            }
+            return undefined;
+          })()}
+        />
       </div>
 
       {/* Follow List Modal */}
@@ -745,6 +625,9 @@ function ViewProfile() {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+
+      {/* New Post Modal */}
+      {isNewPostModalOpen && <Modal onClose={closeNewPostModal} />}
     </div>
   );
 }

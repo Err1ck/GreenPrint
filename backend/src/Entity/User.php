@@ -21,7 +21,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing' , 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees'])]
+    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing' , 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees', 'message'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -29,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply'])]
+    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply', 'message'])]
     private ?string $username = null;
 
 

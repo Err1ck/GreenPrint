@@ -40,7 +40,11 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <div className="navbarImg-container">
+                <div 
+                  className="navbarImg-container" 
+                  onClick={() => navigate("/")}
+                  style={{ cursor: "pointer" }}
+                >
                   <SvgComponente name="imagen3" />
                 </div>
               </div>
@@ -366,12 +370,14 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
 
             <div className="navbarRight-container-footer">
               <Footer footerType={2} />
-              <Button
-                onClick={onOpenModal}
-                classButton="button-navbar-open-modal"
-              >
-                <div className="button-text">Nuevo Post</div>
-              </Button>
+              {onOpenModal && (
+                <Button
+                  onClick={onOpenModal}
+                  classButton="button-navbar-open-modal"
+                >
+                  <div className="button-text">Nuevo Post</div>
+                </Button>
+              )}
             </div>
           </div>
         </nav>

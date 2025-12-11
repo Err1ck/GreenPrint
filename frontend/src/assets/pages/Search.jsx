@@ -11,7 +11,6 @@ import "../styles/app.css";
 function Search() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("users"); // "users" o "posts"
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState([]);
@@ -19,9 +18,6 @@ function Search() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
 
     // Leer el parámetro 'q' de la URL al cargar el componente
     useEffect(() => {
@@ -343,6 +339,7 @@ function Search() {
                                                 initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
                                                 initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
                                                 initialHasReposted={post.user_interactions?.has_reposted || false}
+                                                initialIsSaved={post.user_interactions?.has_saved || false}
                                             />
                                         ))}
                                     </div>
@@ -353,9 +350,8 @@ function Search() {
                 </main>
             </div>
             <div className="navbarRight-content">
-                <Navbar navbarType={2} onOpenModal={openModal} />
+                <Navbar navbarType={2} />
             </div>
-            {isModalOpen && <Modal onClose={closeModal} />}
         </div>
     );
 }

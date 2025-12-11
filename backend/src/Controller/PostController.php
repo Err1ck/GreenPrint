@@ -81,6 +81,15 @@ final class PostController extends AbstractController
                     ->getQuery()
                     ->getResult();
 
+                $savedPostsRepository = $entityManager->getRepository(\App\Entity\SavedPosts::class);
+                $userSavedPosts = $savedPostsRepository->createQueryBuilder('s')
+                    ->where('s.user = :user')
+                    ->andWhere('s.post IN (:posts)')
+                    ->setParameter('user', $user)
+                    ->setParameter('posts', $postIds)
+                    ->getQuery()
+                    ->getResult();
+
                 // Crear mapas para búsqueda rápida
                 $leafLikesMap = [];
                 foreach ($userLeafLikes as $like) {
@@ -97,6 +106,11 @@ final class PostController extends AbstractController
                     $repostsMap[$repost->getPost()->getId()] = true;
                 }
 
+                $savedPostsMap = [];
+                foreach ($userSavedPosts as $saved) {
+                    $savedPostsMap[$saved->getPost()->getId()] = true;
+                }
+
                 // Serializar posts y agregar interacciones
                 $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
 
@@ -108,7 +122,8 @@ final class PostController extends AbstractController
                     $postData['user_interactions'] = [
                         'has_liked_leaf' => isset($leafLikesMap[$postId]),
                         'has_liked_tree' => isset($treeLikesMap[$postId]),
-                        'has_reposted' => isset($repostsMap[$postId])
+                        'has_reposted' => isset($repostsMap[$postId]),
+                        'has_saved' => isset($savedPostsMap[$postId])
                     ];
                     // Agregar contador de replies
                     $postData['replies'] = $replyRepository->count(['post' => $postId]);
@@ -168,12 +183,16 @@ final class PostController extends AbstractController
                 $repostRepository = $entityManager->getRepository(UserRepost::class);
                 $hasReposted = $repostRepository->findOneBy(['user' => $user, 'post' => $post]) !== null;
 
+                $savedPostsRepository = $entityManager->getRepository(\App\Entity\SavedPosts::class);
+                $hasSaved = $savedPostsRepository->findOneBy(['user' => $user, 'post' => $post]) !== null;
+
                 // Serializar post y agregar interacciones
                 $postData = json_decode($serializer->serialize($post, 'json', ['groups' => 'post']), true);
                 $postData['user_interactions'] = [
                     'has_liked_leaf' => $hasLikedLeaf,
                     'has_liked_tree' => $hasLikedTree,
-                    'has_reposted' => $hasReposted
+                    'has_reposted' => $hasReposted,
+                    'has_saved' => $hasSaved
                 ];
 
                 // Agregar contador de replies
@@ -325,6 +344,12 @@ final class PostController extends AbstractController
                         ['error' => $e->getMessage()],
                         JsonResponse::HTTP_BAD_REQUEST
                     );
+                }
+            } else {
+                // Si no hay archivo de imagen, verificar si hay una URL de GIF
+                $gifUrl = $request->request->get('gif_url');
+                if ($gifUrl) {
+                    $post->setImage($gifUrl);
                 }
             }
         } else {
@@ -1230,6 +1255,15 @@ final class PostController extends AbstractController
                         ->getQuery()
                         ->getResult();
 
+                    $savedPostsRepository = $entityManager->getRepository(\App\Entity\SavedPosts::class);
+                    $userSavedPosts = $savedPostsRepository->createQueryBuilder('s')
+                        ->where('s.user = :user')
+                        ->andWhere('s.post IN (:posts)')
+                        ->setParameter('user', $currentUser)
+                        ->setParameter('posts', $postIds)
+                        ->getQuery()
+                        ->getResult();
+
                     // Crear mapas para búsqueda rápida
                     $leafLikesMap = [];
                     foreach ($userLeafLikes as $like) {
@@ -1246,6 +1280,11 @@ final class PostController extends AbstractController
                         $repostsMap[$repost->getPost()->getId()] = true;
                     }
 
+                    $savedPostsMap = [];
+                    foreach ($userSavedPosts as $saved) {
+                        $savedPostsMap[$saved->getPost()->getId()] = true;
+                    }
+
                     // Serializar posts y agregar interacciones
                     $postsData = json_decode($serializer->serialize($posts, 'json', ['groups' => 'post']), true);
 
@@ -1254,7 +1293,8 @@ final class PostController extends AbstractController
                         $postData['user_interactions'] = [
                             'has_liked_leaf' => isset($leafLikesMap[$postId]),
                             'has_liked_tree' => isset($treeLikesMap[$postId]),
-                            'has_reposted' => isset($repostsMap[$postId])
+                            'has_reposted' => isset($repostsMap[$postId]),
+                            'has_saved' => isset($savedPostsMap[$postId])
                         ];
                     }
 
