@@ -5,6 +5,7 @@ import "../styles/Home.css";
 import Modal from "../componentes/common/Modal";
 import FollowCard from "../componentes/common/FollowCard";
 import Pagination from "../componentes/common/Pagination";
+import CreateCommunityModal from "../componentes/common/CreateCommunityModal";
 
 function CommunityPage() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ function CommunityPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [followedCommunities, setFollowedCommunities] = useState(new Set());
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const communitiesPerPage = 10;
 
   useEffect(() => {
@@ -122,6 +124,20 @@ function CommunityPage() {
 
   const handleCommunityClick = (communityId) => {
     navigate(`/community/${communityId}`);
+  };
+
+  const handleOpenCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCommunityCreated = (newCommunity) => {
+    // Refresh the communities list
+    fetchCommunities();
+    checkFollowedCommunities();
   };
 
   // Resetear a página 1 cuando cambia la búsqueda
@@ -306,8 +322,13 @@ function CommunityPage() {
         </main>
       </div>
       <div className="navbarRight-content">
-        <Navbar navbarType={2} />
+        <Navbar navbarType={2} onOpenCommunityModal={handleOpenCreateModal} />
       </div>
+      <CreateCommunityModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onCommunityCreated={handleCommunityCreated}
+      />
     </div>
   );
 }

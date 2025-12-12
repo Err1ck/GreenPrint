@@ -141,6 +141,15 @@ final class CommunityController extends AbstractController
     )]
     public function create(Request $request, CommunityRepository $communities, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
+        // Get the authenticated user
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Debes estar autenticado para crear una comunidad.'],
+                JsonResponse::HTTP_UNAUTHORIZED
+            );
+        }
 
         $community = new Community();
 
@@ -155,11 +164,8 @@ final class CommunityController extends AbstractController
             );
         }
 
-        if (isset($data['photo_url'])) {
-            $community->setPhotoURL($data['photo_url']);
-        }
-        if (isset($data['banner_url'])) {
-            $community->setBannerURL($data['banner_url']);
+        if (isset($data['biography'])) {
+            $community->setBiography($data['biography']);
         }
 
         $community->setMemberCount(0);
@@ -168,7 +174,7 @@ final class CommunityController extends AbstractController
         $community->setCreatedAt(new \DateTimeImmutable());
         $community->setUpdatedAt(new \DateTimeImmutable());
 
-        // 4. Validar la entidad antes de guardar
+        // Validar la entidad antes de guardar
         $errors = $validator->validate($community);
 
         if (count($errors) > 0) {
@@ -184,14 +190,118 @@ final class CommunityController extends AbstractController
         }
 
         $entityManager->persist($community);
+        $entityManager->flush();
+
+        // Now we have the community ID, we can save images
+        $communityId = $community->getId();
+
+        // Process photo upload if provided
+        if (isset($data['photo_data'])) {
+            $photoResult = $this->processImageUpload($data['photo_data'], $communityId, 'photo');
+            if ($photoResult['success']) {
+                $community->setPhotoURL($photoResult['url']);
+            } else {
+                return new JsonResponse(
+                    ['error' => $photoResult['error']],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        // Process banner upload if provided
+        if (isset($data['banner_data'])) {
+            $bannerResult = $this->processImageUpload($data['banner_data'], $communityId, 'banner');
+            if ($bannerResult['success']) {
+                $community->setBannerURL($bannerResult['url']);
+            } else {
+                return new JsonResponse(
+                    ['error' => $bannerResult['error']],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        }
+
+        // Assign ROLE_COMMUNITY_ADMIN to the creator
+        $userRoles = $user->getRoles();
+        if (!in_array('ROLE_COMMUNITY_ADMIN', $userRoles)) {
+            $currentRoles = $user->getRoles();
+            // Filter out ROLE_USER as it's added automatically
+            $currentRoles = array_filter($currentRoles, function($role) {
+                return $role !== 'ROLE_USER';
+            });
+            $currentRoles[] = 'ROLE_COMMUNITY_ADMIN';
+            $user->setRoles($currentRoles);
+            $entityManager->persist($user);
+        }
 
         $entityManager->flush();
 
         return new JsonResponse(
-            ['message' => "La comunidad ha sido creada."],
+            [
+                'message' => "La comunidad ha sido creada.",
+                'community' => json_decode($serializer->serialize($community, 'json', ['groups' => 'community']), true),
+                'user' => json_decode($serializer->serialize($user, 'json', ['groups' => 'user']), true)
+            ],
             JsonResponse::HTTP_OK,
             [],
         );
+    }
+
+    /**
+     * Process and save an uploaded image for a community
+     */
+    private function processImageUpload(string $imageData, int $communityId, string $imageType): array
+    {
+        // Validate and decode base64
+        if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $matches)) {
+            $imageExtension = $matches[1];
+            $imageData = substr($imageData, strpos($imageData, ',') + 1);
+            $imageData = base64_decode($imageData);
+
+            if ($imageData === false) {
+                return ['success' => false, 'error' => 'Error al decodificar la imagen'];
+            }
+        } else {
+            return ['success' => false, 'error' => 'Formato de imagen inválido. Debe ser base64.'];
+        }
+
+        // Validate extension
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array(strtolower($imageExtension), $allowedExtensions)) {
+            return ['success' => false, 'error' => 'Tipo de archivo no permitido. Usa: jpg, png, gif, webp'];
+        }
+
+        // Validate size (5MB maximum)
+        if (strlen($imageData) > 5 * 1024 * 1024) {
+            return ['success' => false, 'error' => 'La imagen es demasiado grande. Máximo 5MB.'];
+        }
+
+        // Create community directory if it doesn't exist
+        $uploadDir = __DIR__ . '/../../public/uploads/communities/' . $communityId;
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Delete old image if exists
+        $pattern = $uploadDir . '/' . $imageType . '.*';
+        foreach (glob($pattern) as $oldFile) {
+            if (file_exists($oldFile)) {
+                unlink($oldFile);
+            }
+        }
+
+        // Generate filename and save
+        $filename = $imageType . '.' . $imageExtension;
+        $filepath = $uploadDir . '/' . $filename;
+
+        if (file_put_contents($filepath, $imageData) === false) {
+            return ['success' => false, 'error' => 'Error al guardar la imagen'];
+        }
+
+        // Generate public URL
+        $publicUrl = '/uploads/communities/' . $communityId . '/' . $filename;
+
+        return ['success' => true, 'url' => $publicUrl];
     }
 
     #[Route('/{id<\d+>}/delete', name: 'community_delete', methods: ['DELETE'])]

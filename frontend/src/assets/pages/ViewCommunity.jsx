@@ -240,7 +240,14 @@ function ViewCommunity() {
                             onMouseEnter={(e) => e.target.style.backgroundColor = "#f7f9f9"}
                             onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                         >
-                            ←
+                            <svg
+                                viewBox="0 0 24 24"
+                                width="20"
+                                height="20"
+                                fill="var(--color-text-primary)"
+                            >
+                                <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z" />
+                            </svg>
                         </button>
                         <div>
                             <h2 style={{
@@ -267,7 +274,7 @@ function ViewCommunity() {
                             width: "100%",
                             height: "200px",
                             backgroundColor: community?.banner_url ? "transparent" : "#cfd9de",
-                            backgroundImage: community?.banner_url ? `url(${community.banner_url})` : "none",
+                            backgroundImage: community?.banner_url ? `url(${community.banner_url.startsWith('http') ? community.banner_url : `http://127.0.0.1:8000${community.banner_url}`})` : "none",
                             backgroundSize: "cover",
                             backgroundPosition: "center"
                         }}
@@ -298,7 +305,7 @@ function ViewCommunity() {
                                     borderRadius: "20px",
                                     border: "4px solid #ffffff",
                                     backgroundColor: "#cfd9de",
-                                    backgroundImage: community?.photo_url ? `url(${community.photo_url})` : "none",
+                                    backgroundImage: community?.photo_url ? `url(${community.photo_url.startsWith('http') ? community.photo_url : `http://127.0.0.1:8000${community.photo_url}`})` : "none",
                                     backgroundSize: "cover",
                                     backgroundPosition: "center",
                                     display: "flex",
