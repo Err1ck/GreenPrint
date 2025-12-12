@@ -57,6 +57,10 @@ class Community
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Wallet $wallet = null;
 
+    #[ORM\OneToMany(mappedBy: 'community', targetEntity: CommunityMembers::class)]
+    #[Groups(['community'])]
+    private $members;
+
     public function getId(): ?int
     {
         return $this->id;

@@ -4,6 +4,7 @@ import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 import FollowCommunity from "../componentes/common/FollowCommunity";
+import EditCommunityModal from "../componentes/common/EditCommunityModal";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewCommunity() {
@@ -17,6 +18,7 @@ function ViewCommunity() {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const observer = useRef();
     const lastPostRef = useCallback(node => {
@@ -319,12 +321,55 @@ function ViewCommunity() {
                                 {!community?.photo_url && (community?.name?.charAt(0).toUpperCase() || "C")}
                             </div>
 
-                            {/* Follow Button */}
-                            <FollowCommunity
-                                communityId={parseInt(communityId)}
-                                onFollowChange={() => updateFollowerCount()}
-                                style={{ marginTop: "72px" }}
-                            />
+                            {/* Follow Button or Edit Button */}
+                            {(() => {
+                                const currentUserStr = localStorage.getItem("user");
+                                if (!currentUserStr) return null;
+                                const currentUser = JSON.parse(currentUserStr);
+
+                                // Check if user is admin of this community
+                                const isAdmin = community?.members?.some(
+                                    member => member.user?.id === currentUser.id && member.role === 'admin'
+                                ) || false;
+
+                                // Show Edit button for admins
+                                if (isAdmin) {
+                                    return (
+                                        <button
+                                            onClick={() => setIsEditModalOpen(true)}
+                                            style={{
+                                                marginTop: "72px",
+                                                padding: "8px 24px",
+                                                borderRadius: "9999px",
+                                                fontSize: "15px",
+                                                fontWeight: "700",
+                                                border: "1px solid #cfd9de",
+                                                backgroundColor: "transparent",
+                                                color: "var(--color-text-primary)",
+                                                cursor: "pointer",
+                                                transition: "all 0.2s",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.backgroundColor = "var(--color-bg-secondary)";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.backgroundColor = "transparent";
+                                            }}
+                                        >
+                                            Editar Comunidad
+                                        </button>
+                                    );
+                                }
+
+                                // Show Follow button for non-admins
+                                return (
+                                    <FollowCommunity
+                                        communityId={parseInt(communityId)}
+                                        onFollowChange={() => updateFollowerCount()}
+                                        style={{ marginTop: "72px" }}
+                                    />
+                                );
+                            })()}
                         </div>
 
                         {/* Community Name and Badge */}
@@ -556,6 +601,13 @@ function ViewCommunity() {
             <div className="navbarRight-content">
                 <Navbar navbarType={2} />
             </div>
+
+            {/* Edit Community Modal */}
+            <EditCommunityModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                communityId={parseInt(communityId)}
+            />
         </div>
     );
 }

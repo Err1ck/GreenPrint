@@ -102,10 +102,33 @@ final class CommunityController extends AbstractController
             $community->setBiography($data['biography']);
         }
 
-        if (isset($data['photo_url'])) {
+        // Process photo upload if provided
+        if (isset($data['photo_data'])) {
+            $photoResult = $this->processImageUpload($data['photo_data'], $id, 'photo');
+            if ($photoResult['success']) {
+                $community->setPhotoURL($photoResult['url']);
+            } else {
+                return new JsonResponse(
+                    ['error' => $photoResult['error']],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        } elseif (isset($data['photo_url'])) {
             $community->setPhotoURL($data['photo_url']);
         }
-        if (isset($data['banner_url'])) {
+
+        // Process banner upload if provided
+        if (isset($data['banner_data'])) {
+            $bannerResult = $this->processImageUpload($data['banner_data'], $id, 'banner');
+            if ($bannerResult['success']) {
+                $community->setBannerURL($bannerResult['url']);
+            } else {
+                return new JsonResponse(
+                    ['error' => $bannerResult['error']],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        } elseif (isset($data['banner_url'])) {
             $community->setBannerURL($data['banner_url']);
         }
 
@@ -143,7 +166,7 @@ final class CommunityController extends AbstractController
     {
         // Get the authenticated user
         $user = $this->getUser();
-        
+
         if (!$user) {
             return new JsonResponse(
                 ['error' => 'Debes estar autenticado para crear una comunidad.'],
@@ -226,13 +249,23 @@ final class CommunityController extends AbstractController
         if (!in_array('ROLE_COMMUNITY_ADMIN', $userRoles)) {
             $currentRoles = $user->getRoles();
             // Filter out ROLE_USER as it's added automatically
-            $currentRoles = array_filter($currentRoles, function($role) {
+            $currentRoles = array_filter($currentRoles, function ($role) {
                 return $role !== 'ROLE_USER';
             });
             $currentRoles[] = 'ROLE_COMMUNITY_ADMIN';
             $user->setRoles($currentRoles);
             $entityManager->persist($user);
         }
+
+        // Add creator as admin member of the community
+        $communityMember = new \App\Entity\CommunityMembers();
+        $communityMember->setUser($user);
+        $communityMember->setCommunity($community);
+        $communityMember->setRole('admin');
+        $entityManager->persist($communityMember);
+
+        // Update member count
+        $community->setMemberCount(1);
 
         $entityManager->flush();
 
@@ -393,7 +426,8 @@ final class CommunityController extends AbstractController
 
         if (!$all) {
             return new JsonResponse(['error' => 'Todavía nadie es miembro a ninguna comunidad.'], JsonResponse::HTTP_NOT_FOUND);
-        };
+        }
+        ;
 
         return new JsonResponse(
             $serializer->serialize($all, 'json', ['groups' => 'member']),

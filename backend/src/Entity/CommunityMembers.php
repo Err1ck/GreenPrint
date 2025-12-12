@@ -25,8 +25,12 @@ class CommunityMembers
 
     #[ORM\ManyToOne(targetEntity: Community::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['member', 'getAllCommunityFollowers'])]
+    #[Groups(['member', 'getAllCommunityFollowers', 'community'])]
     private ?Community $community = null;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: false, options: ['default' => 'member'])]
+    #[Groups(['member', 'getMembers', 'getAllCommunityFollowers', 'community'])]
+    private string $role = 'member';
 
     public function getId(): ?int
     {
@@ -52,6 +56,17 @@ class CommunityMembers
     public function setCommunity(Community $community): static
     {
         $this->community = $community;
+        return $this;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): static
+    {
+        $this->role = $role;
         return $this;
     }
 }
