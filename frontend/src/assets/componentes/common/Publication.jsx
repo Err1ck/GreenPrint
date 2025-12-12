@@ -361,7 +361,7 @@ const Publication = ({
                     style={{ cursor: (postType === 'community' ? communityId : userId) ? 'pointer' : 'default' }}
                 >
                     <img
-                        src={displayPhoto ? `http://127.0.0.1:8000${displayPhoto}` : defaultAvatar}
+                        src={displayPhoto ? (displayPhoto.startsWith('http') ? displayPhoto : `http://127.0.0.1:8000${displayPhoto}`) : defaultAvatar}
                         alt={displayName}
                         style={{
                             width: '40px',

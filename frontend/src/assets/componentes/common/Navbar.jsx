@@ -9,7 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import UserSettingsModal from "./UserSettingsModal";
 import TrendingTopics from "./TrendingTopics";
 
-function Navbar({ navbarType, navbarPage, onOpenModal }) {
+function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -40,8 +40,8 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <div 
-                  className="navbarImg-container" 
+                <div
+                  className="navbarImg-container"
                   onClick={() => navigate("/")}
                   style={{ cursor: "pointer" }}
                 >
@@ -376,6 +376,14 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                   classButton="button-navbar-open-modal"
                 >
                   <div className="button-text">Nuevo Post</div>
+                </Button>
+              )}
+              {onOpenCommunityModal && (
+                <Button
+                  onClick={onOpenCommunityModal}
+                  classButton="button-navbar-open-modal"
+                >
+                  <div className="button-text">Crear comunidad</div>
                 </Button>
               )}
             </div>
