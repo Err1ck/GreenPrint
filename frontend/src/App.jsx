@@ -1,4 +1,5 @@
 import { Routes, Route, Link } from "react-router-dom";
+import { useEffect } from "react";
 import HomePage from "./assets/pages/Home";
 import CommunityPage from "./assets/pages/Communities";
 import SuggestedUsersPage from "./assets/pages/SuggestedUsers";
@@ -11,7 +12,21 @@ import Search from "./assets/pages/Search";
 import SavedPosts from "./assets/pages/SavedPosts";
 import ForgetPassword from "./assets/pages/ForgetPassword";
 import Messages from "./assets/pages/Messages";
+
 function App() {
+  // Cargar tema al iniciar la aplicación
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      // Asegurar que el tema por defecto sea light
+      if (!storedTheme) {
+        localStorage.setItem("theme", "light");
+      }
+    }
+  }, []);
   return (
     <>
       <Routes>

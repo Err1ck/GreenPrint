@@ -6,7 +6,7 @@ import "../../styles/Navbar.css";
 import Footer from "./Footer";
 import Button from "../ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
-import UserSettingsModal from "./UserSettingsModal";
+import SettingsModal from "./SettingsModal";
 import TrendingTopics from "./TrendingTopics";
 
 function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
@@ -329,8 +329,8 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
           </div>
           <Footer footerType={1} />
 
-          {/* User Settings Modal */}
-          <UserSettingsModal
+          {/* Settings Modal */}
+          <SettingsModal
             isOpen={isSettingsModalOpen}
             onClose={() => setIsSettingsModalOpen(false)}
           />
@@ -349,9 +349,6 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                   onSearch={handleSearch}
                   text={"Buscador"}
                 />
-              </div>
-              <div className="section-toggle">
-                <ThemeToggle />
               </div>
 
               {/* Trending Topics */}
