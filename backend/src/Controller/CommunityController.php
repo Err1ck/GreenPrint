@@ -283,7 +283,8 @@ final class CommunityController extends AbstractController
 
         if (!$all) {
             return new JsonResponse(['error' => 'Todavía nadie es miembro a ninguna comunidad.'], JsonResponse::HTTP_NOT_FOUND);
-        };
+        }
+        ;
 
         return new JsonResponse(
             $serializer->serialize($all, 'json', ['groups' => 'member']),

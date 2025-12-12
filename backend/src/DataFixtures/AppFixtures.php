@@ -92,7 +92,7 @@ class AppFixtures extends Fixture
             $wallet->setOwnerType('community');
             $wallet->setOwnerId($i + 1); // Temporal, se actualizará después
             $wallet->setLeafCoinsUser('0.00');
-            $wallet->setTreeCoinsCommunity((string)$faker->randomFloat(2, 100, 10000));
+            $wallet->setTreeCoinsCommunity((string) $faker->randomFloat(2, 100, 10000));
             $manager->persist($wallet);
 
             $manager->persist($community);
@@ -203,39 +203,39 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
-       // ====================
+        // ====================
 // 8. CREAR POST REPLIES
 // ====================
-$replies = [];
-$createdReplies = [];
-$attempts = 0;
-$maxAttempts = 160;
+        $replies = [];
+        $createdReplies = [];
+        $attempts = 0;
+        $maxAttempts = 160;
 
-while (count($replies) < 80 && $attempts < $maxAttempts) {
-    $user = $faker->randomElement($users);
-    $post = $faker->randomElement($posts);
-    
-    $replyKey = $user->getId() . '-' . $post->getId();
-    
-    if (!in_array($replyKey, $createdReplies)) {
-        $reply = new PostReply();
-        $reply->setUser($user);
-        $reply->setPost($post);
-        $reply->setLeaf($faker->numberBetween(0, 200));
-        $reply->setImage($faker->boolean(30) ? $faker->imageUrl(640, 480) : null);
-        $reply->setContent($faker->sentence($faker->numberBetween(5, 20)));
-        $reply->setCreatedAt(new \DateTimeImmutable('-' . $faker->numberBetween(1, 60) . ' days'));
-        $reply->setUpdatedAt(new \DateTimeImmutable());
-        
-        $manager->persist($reply);
-        $replies[] = $reply;
-        $createdReplies[] = $replyKey;
-    }
-    
-    $attempts++;
-}
+        while (count($replies) < 80 && $attempts < $maxAttempts) {
+            $user = $faker->randomElement($users);
+            $post = $faker->randomElement($posts);
 
-$manager->flush();
+            $replyKey = $user->getId() . '-' . $post->getId();
+
+            if (!in_array($replyKey, $createdReplies)) {
+                $reply = new PostReply();
+                $reply->setUser($user);
+                $reply->setPost($post);
+                $reply->setLeaf($faker->numberBetween(0, 200));
+                $reply->setImage($faker->boolean(30) ? $faker->imageUrl(640, 480) : null);
+                $reply->setContent($faker->sentence($faker->numberBetween(5, 20)));
+                $reply->setCreatedAt(new \DateTimeImmutable('-' . $faker->numberBetween(1, 60) . ' days'));
+                $reply->setUpdatedAt(new \DateTimeImmutable());
+
+                $manager->persist($reply);
+                $replies[] = $reply;
+                $createdReplies[] = $replyKey;
+            }
+
+            $attempts++;
+        }
+
+        $manager->flush();
 
         // =========================
         // 9. CREAR USER POST LEAVES (likes)
@@ -297,34 +297,34 @@ $manager->flush();
 
         $manager->flush();
 
-       // ===================
+        // ===================
 // 13. CREAR REPOSTS
 // ===================
-$createdReposts = [];
-$attempts = 0;
-$maxAttempts = 80;
+        $createdReposts = [];
+        $attempts = 0;
+        $maxAttempts = 80;
 
-while (count($createdReposts) < 40 && $attempts < $maxAttempts) {
-    $user = $faker->randomElement($users);
-    $post = $faker->randomElement($posts);
-    
-    $repostKey = $user->getId() . '-' . $post->getId();
-    
-    if (!in_array($repostKey, $createdReposts)) {
-        $repost = new UserRepost();
-        $repost->setUser($user);
-        $repost->setPost($post);
-        $repost->setCreatedAt(new \DateTimeImmutable('-' . $faker->numberBetween(1, 60) . ' days'));
-        $repost->setUpdatedAt(new \DateTimeImmutable());
-        
-        $manager->persist($repost);
-        $createdReposts[] = $repostKey;
-    }
-    
-    $attempts++;
-}
+        while (count($createdReposts) < 40 && $attempts < $maxAttempts) {
+            $user = $faker->randomElement($users);
+            $post = $faker->randomElement($posts);
 
-$manager->flush();
+            $repostKey = $user->getId() . '-' . $post->getId();
+
+            if (!in_array($repostKey, $createdReposts)) {
+                $repost = new UserRepost();
+                $repost->setUser($user);
+                $repost->setPost($post);
+                $repost->setCreatedAt(new \DateTimeImmutable('-' . $faker->numberBetween(1, 60) . ' days'));
+                $repost->setUpdatedAt(new \DateTimeImmutable());
+
+                $manager->persist($repost);
+                $createdReposts[] = $repostKey;
+            }
+
+            $attempts++;
+        }
+
+        $manager->flush();
 
         // =======================
         // 14. CREAR WALLETS USERS
@@ -333,8 +333,8 @@ $manager->flush();
             $wallet = new Wallet();
             $wallet->setOwnerType('user');
             $wallet->setOwnerId($user->getId());
-            $wallet->setLeafCoinsUser((string)$faker->randomFloat(2, 0, 5000));
-            $wallet->setTreeCoinsCommunity((string)$faker->randomFloat(2, 0, 2000));
+            $wallet->setLeafCoinsUser((string) $faker->randomFloat(2, 0, 5000));
+            $wallet->setTreeCoinsCommunity((string) $faker->randomFloat(2, 0, 2000));
 
             $manager->persist($wallet);
         }
@@ -368,7 +368,7 @@ $manager->flush();
 
             if ($wallet) {
                 $transaction->setWallet($wallet);
-                $transaction->setAmount((string)$faker->randomFloat(2, 1, 500));
+                $transaction->setAmount((string) $faker->randomFloat(2, 1, 500));
                 $transaction->setType($faker->randomElement($transactionTypes));
                 $transaction->setOrigin($faker->randomElement($transactionOrigins));
                 $transaction->setOriginId($faker->optional()->numberBetween(1, 100));
