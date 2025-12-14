@@ -4,6 +4,7 @@ import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 import FollowCommunity from "../componentes/common/FollowCommunity";
+import EditCommunityModal from "../componentes/common/EditCommunityModal";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewCommunity() {
@@ -17,6 +18,8 @@ function ViewCommunity() {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const observer = useRef();
     const lastPostRef = useCallback(node => {
@@ -63,6 +66,14 @@ function ViewCommunity() {
 
             const communityData = await communityResponse.json();
             setCommunity(communityData);
+
+            // Check if current user is admin
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const currentUser = JSON.parse(userStr);
+                const adminIds = communityData.admin_ids || [];
+                setIsAdmin(adminIds.includes(currentUser.id));
+            }
 
             // Obtener posts de la comunidad
             const postsResponse = await fetch(`http://127.0.0.1:8000/api/posts/community/${communityId}`, {
@@ -319,12 +330,34 @@ function ViewCommunity() {
                                 {!community?.photo_url && (community?.name?.charAt(0).toUpperCase() || "C")}
                             </div>
 
-                            {/* Follow Button */}
-                            <FollowCommunity
-                                communityId={parseInt(communityId)}
-                                onFollowChange={() => updateFollowerCount()}
-                                style={{ marginTop: "72px" }}
-                            />
+                            {/* Admin Edit Button or Follow Button */}
+                            {isAdmin ? (
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    style={{
+                                        marginTop: "72px",
+                                        padding: "8px 24px",
+                                        borderRadius: "9999px",
+                                        fontSize: "15px",
+                                        fontWeight: "700",
+                                        border: "1px solid #00ba7c",
+                                        backgroundColor: "#00ba7c",
+                                        color: "#ffffff",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s"
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = "#009966"}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = "#00ba7c"}
+                                >
+                                    Editar Comunidad
+                                </button>
+                            ) : (
+                                <FollowCommunity
+                                    communityId={parseInt(communityId)}
+                                    onFollowChange={() => updateFollowerCount()}
+                                    style={{ marginTop: "72px" }}
+                                />
+                            )}
                         </div>
 
                         {/* Community Name and Badge */}
@@ -556,6 +589,13 @@ function ViewCommunity() {
             <div className="navbarRight-content">
                 <Navbar navbarType={2} />
             </div>
+
+            {/* Edit Community Modal */}
+            <EditCommunityModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                communityId={communityId}
+            />
         </div>
     );
 }
