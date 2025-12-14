@@ -277,6 +277,26 @@ final class CommunityController extends AbstractController
             $entityManager->persist($user);
         }
 
+        // Add creator as member of the community
+        $communityMember = new \App\Entity\CommunityMembers();
+        $communityMember->setUser($user);
+        $communityMember->setCommunity($community);
+        $communityMember->setCreatedAt(new \DateTimeImmutable());
+        $communityMember->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($communityMember);
+
+        // Add creator as follower of the community
+        $communityFollow = new \App\Entity\CommunityFollows();
+        $communityFollow->setUser($user);
+        $communityFollow->setCommunity($community);
+        $communityFollow->setCreatedAt(new \DateTimeImmutable());
+        $communityFollow->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($communityFollow);
+
+        // Update counts
+        $community->setMemberCount(1);
+        $community->setFollowerCount(1);
+
         $entityManager->flush();
 
         return new JsonResponse(
