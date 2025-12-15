@@ -46,95 +46,137 @@ final class PostController extends AbstractController
 
         // Obtener user_id opcional de los query params
         $userId = $request->query->get('user_id');
+        $currentUser = null;
 
-        // Si hay user_id, incluir las interacciones del usuario
         if ($userId) {
-            $user = $userRepository->find($userId);
+            $currentUser = $userRepository->find($userId);
+        }
 
-            if ($user) {
-                // Obtener todas las interacciones del usuario de una vez
-                $postIds = array_map(fn($post) => $post->getId(), $all);
+        // Filtrar posts de usuarios privados
+        $followsRepository = $entityManager->getRepository(\App\Entity\UserFollows::class);
+        $filteredPosts = [];
 
-                // Consultas optimizadas para obtener todas las interacciones
-                $userLeafLikes = $likeLeafs->createQueryBuilder('l')
-                    ->where('l.user = :user')
-                    ->andWhere('l.post IN (:posts)')
-                    ->setParameter('user', $user)
-                    ->setParameter('posts', $postIds)
-                    ->getQuery()
-                    ->getResult();
+        foreach ($all as $post) {
+            $postAuthor = $post->getUser();
 
-                $userTreeLikes = $likeTrees->createQueryBuilder('t')
-                    ->where('t.user = :user')
-                    ->andWhere('t.post IN (:posts)')
-                    ->setParameter('user', $user)
-                    ->setParameter('posts', $postIds)
-                    ->getQuery()
-                    ->getResult();
+            // Si no hay autor, saltar este post
+            if (!$postAuthor) {
+                continue;
+            }
 
-                $repostRepository = $entityManager->getRepository(UserRepost::class);
-                $userReposts = $repostRepository->createQueryBuilder('r')
-                    ->where('r.user = :user')
-                    ->andWhere('r.post IN (:posts)')
-                    ->setParameter('user', $user)
-                    ->setParameter('posts', $postIds)
-                    ->getQuery()
-                    ->getResult();
-
-                $savedPostsRepository = $entityManager->getRepository(\App\Entity\SavedPosts::class);
-                $userSavedPosts = $savedPostsRepository->createQueryBuilder('s')
-                    ->where('s.user = :user')
-                    ->andWhere('s.post IN (:posts)')
-                    ->setParameter('user', $user)
-                    ->setParameter('posts', $postIds)
-                    ->getQuery()
-                    ->getResult();
-
-                // Crear mapas para búsqueda rápida
-                $leafLikesMap = [];
-                foreach ($userLeafLikes as $like) {
-                    $leafLikesMap[$like->getPost()->getId()] = true;
+            // Si el autor del post tiene perfil privado
+            if ($postAuthor->isPrivate()) {
+                // Siempre mostrar si el usuario actual ES el autor
+                if ($currentUser && $currentUser->getId() === $postAuthor->getId()) {
+                    $filteredPosts[] = $post;
                 }
+                // O si el usuario actual sigue al autor
+                elseif ($currentUser) {
+                    $isFollowing = $followsRepository->findOneBy([
+                        'user' => $currentUser,
+                        'followingUser' => $postAuthor
+                    ]);
 
-                $treeLikesMap = [];
-                foreach ($userTreeLikes as $like) {
-                    $treeLikesMap[$like->getPost()->getId()] = true;
+                    if ($isFollowing) {
+                        $filteredPosts[] = $post;
+                    }
                 }
-
-                $repostsMap = [];
-                foreach ($userReposts as $repost) {
-                    $repostsMap[$repost->getPost()->getId()] = true;
-                }
-
-                $savedPostsMap = [];
-                foreach ($userSavedPosts as $saved) {
-                    $savedPostsMap[$saved->getPost()->getId()] = true;
-                }
-
-                // Serializar posts y agregar interacciones
-                $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
-
-                // Obtener repositorio de replies
-                $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
-
-                foreach ($postsData as &$postData) {
-                    $postId = $postData['id'];
-                    $postData['user_interactions'] = [
-                        'has_liked_leaf' => isset($leafLikesMap[$postId]),
-                        'has_liked_tree' => isset($treeLikesMap[$postId]),
-                        'has_reposted' => isset($repostsMap[$postId]),
-                        'has_saved' => isset($savedPostsMap[$postId])
-                    ];
-                    // Agregar contador de replies
-                    $postData['replies'] = $replyRepository->count(['post' => $postId]);
-                }
-
-                return new JsonResponse($postsData, JsonResponse::HTTP_OK);
+                // Si no hay usuario logueado o no sigue al autor, no mostrar
+            } else {
+                // Si el perfil es público, siempre mostrar el post
+                $filteredPosts[] = $post;
             }
         }
 
+
+        // Si hay user_id, incluir las interacciones del usuario
+        if ($userId && $currentUser) {
+            // Obtener todas las interacciones del usuario de una vez
+            $postIds = array_map(fn($post) => $post->getId(), $filteredPosts);
+
+            if (empty($postIds)) {
+                return new JsonResponse([], JsonResponse::HTTP_OK);
+            }
+
+            // Consultas optimizadas para obtener todas las interacciones
+            $userLeafLikes = $likeLeafs->createQueryBuilder('l')
+                ->where('l.user = :user')
+                ->andWhere('l.post IN (:posts)')
+                ->setParameter('user', $currentUser)
+                ->setParameter('posts', $postIds)
+                ->getQuery()
+                ->getResult();
+
+            $userTreeLikes = $likeTrees->createQueryBuilder('t')
+                ->where('t.user = :user')
+                ->andWhere('t.post IN (:posts)')
+                ->setParameter('user', $currentUser)
+                ->setParameter('posts', $postIds)
+                ->getQuery()
+                ->getResult();
+
+            $repostRepository = $entityManager->getRepository(UserRepost::class);
+            $userReposts = $repostRepository->createQueryBuilder('r')
+                ->where('r.user = :user')
+                ->andWhere('r.post IN (:posts)')
+                ->setParameter('user', $currentUser)
+                ->setParameter('posts', $postIds)
+                ->getQuery()
+                ->getResult();
+
+            $savedPostsRepository = $entityManager->getRepository(\App\Entity\SavedPosts::class);
+            $userSavedPosts = $savedPostsRepository->createQueryBuilder('s')
+                ->where('s.user = :user')
+                ->andWhere('s.post IN (:posts)')
+                ->setParameter('user', $currentUser)
+                ->setParameter('posts', $postIds)
+                ->getQuery()
+                ->getResult();
+
+            // Crear mapas para búsqueda rápida
+            $leafLikesMap = [];
+            foreach ($userLeafLikes as $like) {
+                $leafLikesMap[$like->getPost()->getId()] = true;
+            }
+
+            $treeLikesMap = [];
+            foreach ($userTreeLikes as $like) {
+                $treeLikesMap[$like->getPost()->getId()] = true;
+            }
+
+            $repostsMap = [];
+            foreach ($userReposts as $repost) {
+                $repostsMap[$repost->getPost()->getId()] = true;
+            }
+
+            $savedPostsMap = [];
+            foreach ($userSavedPosts as $saved) {
+                $savedPostsMap[$saved->getPost()->getId()] = true;
+            }
+
+            // Serializar posts y agregar interacciones
+            $postsData = json_decode($serializer->serialize($filteredPosts, 'json', ['groups' => 'post']), true);
+
+            // Obtener repositorio de replies
+            $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
+
+            foreach ($postsData as &$postData) {
+                $postId = $postData['id'];
+                $postData['user_interactions'] = [
+                    'has_liked_leaf' => isset($leafLikesMap[$postId]),
+                    'has_liked_tree' => isset($treeLikesMap[$postId]),
+                    'has_reposted' => isset($repostsMap[$postId]),
+                    'has_saved' => isset($savedPostsMap[$postId])
+                ];
+                // Agregar contador de replies
+                $postData['replies'] = $replyRepository->count(['post' => $postId]);
+            }
+
+            return new JsonResponse($postsData, JsonResponse::HTTP_OK);
+        }
+
         // Si no hay user_id o el usuario no existe, devolver posts sin interacciones pero con reply count
-        $postsData = json_decode($serializer->serialize($all, 'json', ['groups' => 'post']), true);
+        $postsData = json_decode($serializer->serialize($filteredPosts, 'json', ['groups' => 'post']), true);
         $replyRepository = $entityManager->getRepository(\App\Entity\PostReply::class);
 
         foreach ($postsData as &$postData) {
@@ -1211,16 +1253,51 @@ final class PostController extends AbstractController
             );
         }
 
-        // Obtener posts del usuario (solo posts de tipo "user", no de comunidad)
+        // Obtener current_user_id opcional de los query params
+        $currentUserId = $request->query->get('current_user_id');
+        $currentUser = null;
+
+        if ($currentUserId) {
+            $currentUser = $userRepository->find($currentUserId);
+        }
+
+        // PRIVACY CHECK: Si el perfil es privado, verificar acceso
+        if ($user->isPrivate()) {
+            // Si no hay usuario logueado, denegar acceso
+            if (!$currentUser) {
+                return new JsonResponse(
+                    ['error' => 'Este perfil es privado'],
+                    JsonResponse::HTTP_FORBIDDEN
+                );
+            }
+
+            // Si el usuario actual NO es el dueño del perfil
+            if ($currentUser->getId() !== $user->getId()) {
+                // Verificar si el usuario actual sigue al dueño del perfil
+                $followsRepository = $entityManager->getRepository(\App\Entity\UserFollows::class);
+                $isFollowing = $followsRepository->findOneBy([
+                    'user' => $currentUser,
+                    'followingUser' => $user
+                ]);
+
+                // Si no lo sigue, denegar acceso
+                if (!$isFollowing) {
+                    return new JsonResponse(
+                        ['error' => 'Debes seguir a este usuario para ver su perfil'],
+                        JsonResponse::HTTP_FORBIDDEN
+                    );
+                }
+            }
+        }
+
+        // Obtener posts del usuario
         $posts = $postRepository->findBy(
             ['user' => $user, 'postType' => 'user'],
             ['createdAt' => 'DESC']
         );
 
-        // Obtener current_user_id opcional de los query params
-        $currentUserId = $request->query->get('current_user_id');
-
         // Si hay current_user_id, incluir las interacciones del usuario actual
+
         if ($currentUserId) {
             $currentUser = $userRepository->find($currentUserId);
 
