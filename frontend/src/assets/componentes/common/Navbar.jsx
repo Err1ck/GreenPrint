@@ -45,7 +45,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                   onClick={() => navigate("/")}
                   style={{ cursor: "pointer" }}
                 >
-                  <SvgComponente name="imagen3" />
+                  <SvgComponente name="imagen1" />
                 </div>
               </div>
               <div className="navbar-links">

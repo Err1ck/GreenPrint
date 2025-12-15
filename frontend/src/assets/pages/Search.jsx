@@ -7,6 +7,7 @@ import Modal from "../componentes/common/Modal";
 import { formatDate, formatTime } from "../utils/dateUtils";
 import "../styles/Home.css";
 import "../styles/app.css";
+import "../styles/Search.css";
 
 function Search() {
   const navigate = useNavigate();
@@ -119,8 +120,6 @@ function Search() {
               top: 0,
               backgroundColor: "var(--color-bg)",
               backdropFilter: "blur(12px)",
-              borderBottom:
-                "var(--size-border) solid var(--color-bg-secondary)",
               zIndex: 10,
             }}
           >
@@ -174,9 +173,7 @@ function Search() {
                 </svg>
               </div>
             </div>
-
-            {/* Tabs */}
-            {/* <div
+            <div
               style={{
                 display: "flex",
                 borderBottom:
@@ -185,120 +182,21 @@ function Search() {
             >
               <div
                 onClick={() => setActiveTab("users")}
-                style={{
-                  flex: 1,
-                  padding: "16px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  position: "relative",
-                  fontWeight: activeTab === "users" ? "700" : "500",
-                  fontSize: "15px",
-                  color:
-                    activeTab === "users"
-                      ? "var(--color-text-primary)"
-                      : "#536471",
-                  transition: "background-color 0.2s",
-                  backgroundColor: "transparent",
-                }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = "var(--color-bg-secondary)")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = "transparent")
-                }
+                className={`search-tab ${
+                  activeTab === "users" ? "active" : ""
+                }`}
               >
                 Usuarios
-                {activeTab === "users" && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: "4px",
-                      backgroundColor: "var(--color-login)",
-                      borderRadius: "9999px",
-                    }}
-                  />
-                )}
               </div>
               <div
                 onClick={() => setActiveTab("posts")}
-                style={{
-                  flex: 1,
-                  padding: "16px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  position: "relative",
-                  fontWeight: activeTab === "posts" ? "700" : "500",
-                  fontSize: "15px",
-                  color:
-                    activeTab === "posts"
-                      ? "var(--color-text-primary)"
-                      : "#536471",
-                  transition: "background-color 0.2s",
-                  backgroundColor: "transparent",
-                }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = "var(--color-bg-secondary)")
-                }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = "transparent")
-                }
+                className={`search-tab ${
+                  activeTab === "posts" ? "active" : ""
+                }`}
               >
                 Posts
-                {activeTab === "posts" && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      height: "4px",
-                      backgroundColor: "var(--color-login)",
-                      borderRadius: "9999px",
-                    }}
-                  />
-                )}
               </div>
-            </div> */}
-
-            {activeTab === "users" && (
-              <div style={{ display: "flex" }}>
-                <div
-                  onClick={() => setActiveTab("users")}
-                  style={{
-                    flex: 1,
-                    padding: "16px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                    fontWeight: 500,
-                    fontSize: "15px",
-                    color: "var(--text-secondary)",
-                    transition: "all 0.2s",
-                    position: "relative",
-                  }}
-                >
-                  Usuarios
-                </div>
-                <div
-                  onClick={() => setActiveTab("posts")}
-                  style={{
-                    flex: 1,
-                    padding: "16px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                    fontWeight: 500,
-                    fontSize: "15px",
-                    color: "var(--text-secondary)",
-                    transition: "all 0.2s",
-                    position: "relative",
-                  }}
-                >
-                  Posts
-                </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Contenido */}
