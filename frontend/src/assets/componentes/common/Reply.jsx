@@ -86,7 +86,7 @@ const Reply = ({
                 {/* Avatar */}
                 <div className="section-avatar">
                     <img
-                        src={userProfileUrl || defaultAvatar}
+                        src={userProfileUrl ? (userProfileUrl.startsWith('http') ? userProfileUrl : `http://127.0.0.1:8000${userProfileUrl}`) : defaultAvatar}
                         alt={userName}
                         style={{
                             width: '40px',
@@ -137,7 +137,7 @@ const Reply = ({
                                     onMouseEnter={() => setLike1Hover(true)}
                                     onMouseLeave={() => setLike1Hover(false)}
                                     style={{
-                                        backgroundColor: like1Hover || isLike1Active ? 'rgba(249, 24, 128, 0.1)' : 'transparent',
+                                        // backgroundColor: like1Hover || isLike1Active ? 'rgba(249, 24, 128, 0.1)' : 'transparent',
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >

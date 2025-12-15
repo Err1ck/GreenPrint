@@ -84,7 +84,7 @@ const FollowCard = ({
         >
           {photoUrl && (
             <img
-              src={photoUrl}
+              src={photoUrl.startsWith('http') ? photoUrl : `http://127.0.0.1:8000${photoUrl}`}
               alt={name}
               style={{
                 width: "100%",

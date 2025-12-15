@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Repeat2, Leaf, TreeDeciduous, Bookmark } from "lucide-react";
-import LinkIcon from "../ui/LinkIcon";
-import SvgComponente from "../ui/Svg";
 import "../../styles/MainSection.css";
 import defaultAvatar from "../../img/user.png";
 
@@ -24,7 +22,6 @@ const Publication = ({
     like1 = 0,
     like2 = 0,
     clickable = true,
-    // Nuevas props para estado inicial de interacciones
     initialHasLikedLeaf = false,
     initialHasLikedTree = false,
     initialHasReposted = false,
@@ -50,7 +47,6 @@ const Publication = ({
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // Función helper para obtener el usuario actual
     const getCurrentUser = () => {
         const userStr = localStorage.getItem('user');
         const token = localStorage.getItem('token');
@@ -58,13 +54,6 @@ const Publication = ({
         return { user: JSON.parse(userStr), token };
     };
 
-    // ✨ OPTIMIZACIÓN: Eliminado useEffect que hacía peticiones individuales
-    // Ahora las interacciones vienen directamente desde las props iniciales
-    // (initialHasLikedLeaf, initialHasLikedTree, initialHasReposted)
-    // que se obtienen en una sola petición optimizada desde Home.jsx
-
-
-    // Handler para Like Leaf (like1)
     const handleLike1 = async (e) => {
         e.stopPropagation();
 
@@ -98,7 +87,6 @@ const Publication = ({
             const data = await response.json();
 
             if (response.ok) {
-                // Actualizar con el contador del servidor
                 setLike1Count(data.leaf_count);
                 setIsLike1Active(!isLike1Active);
             } else {
@@ -115,7 +103,6 @@ const Publication = ({
         }
     };
 
-    // Handler para Like Tree (like2) - solo para posts de comunidad
     const handleLike2 = async (e) => {
         e.stopPropagation();
 
@@ -151,7 +138,6 @@ const Publication = ({
             const data = await response.json();
 
             if (response.ok) {
-                // Actualizar con el contador del servidor
                 setLike2Count(data.tree_count);
                 setIsLike2Active(!isLike2Active);
             } else {
@@ -168,7 +154,6 @@ const Publication = ({
         }
     };
 
-    // Handler para Retweet
     const handleRetweet = async (e) => {
         e.stopPropagation();
 
@@ -202,7 +187,6 @@ const Publication = ({
             const data = await response.json();
 
             if (response.ok) {
-                // Actualizar con el contador del servidor
                 setRetweetCount(data.repost_count);
                 setIsRetweetActive(!isRetweetActive);
             } else {
@@ -219,7 +203,6 @@ const Publication = ({
         }
     };
 
-    // Handler para guardar/desguardar post
     const handleSave = async (e) => {
         e.stopPropagation();
 
@@ -292,23 +275,19 @@ const Publication = ({
         navigate(`/search?q=${encodeURIComponent('#' + hashtag)}`);
     };
 
-    // Función para renderizar texto con hashtags clickeables
     const renderTextWithHashtags = (text) => {
         if (!text) return null;
 
-        // Regex para encontrar hashtags
         const hashtagRegex = /#(\w+)/g;
         const parts = [];
         let lastIndex = 0;
         let match;
 
         while ((match = hashtagRegex.exec(text)) !== null) {
-            // Agregar texto antes del hashtag
             if (match.index > lastIndex) {
                 parts.push(text.substring(lastIndex, match.index));
             }
 
-            // Agregar el hashtag como elemento clickeable
             const hashtag = match[1];
             parts.push(
                 <span
@@ -336,7 +315,6 @@ const Publication = ({
             lastIndex = match.index + match[0].length;
         }
 
-        // Agregar el texto restante
         if (lastIndex < text.length) {
             parts.push(text.substring(lastIndex));
         }
@@ -361,12 +339,12 @@ const Publication = ({
                     style={{ cursor: (postType === 'community' ? communityId : userId) ? 'pointer' : 'default' }}
                 >
                     <img
-                        src={displayPhoto ? `http://127.0.0.1:8000${displayPhoto}` : defaultAvatar}
+                        src={displayPhoto ? (displayPhoto.startsWith('http') ? displayPhoto : `http://127.0.0.1:8000${displayPhoto}`) : defaultAvatar}
                         alt={displayName}
                         style={{
                             width: '40px',
                             height: '40px',
-                            borderRadius: '50%',
+                            borderRadius: postType === 'community' ? '8px' : '50%',
                             objectFit: 'cover'
                         }}
                     />
@@ -444,9 +422,9 @@ const Publication = ({
                                     className="nonaction-group"
                                     onMouseEnter={() => setCommentHover(true)}
                                     onMouseLeave={() => setCommentHover(false)}
-                                    style={{
-                                        backgroundColor: commentHover ? 'rgba(29, 155, 240, 0.1)' : 'transparent'
-                                    }}
+                                // style={{
+                                //     backgroundColor: commentHover ? 'rgba(29, 155, 240, 0.1)' : 'transparent'
+                                // }}
                                 >
                                     <MessageCircle
                                         size={18}
@@ -468,7 +446,7 @@ const Publication = ({
                                     onMouseEnter={() => setRetweetHover(true)}
                                     onMouseLeave={() => setRetweetHover(false)}
                                     style={{
-                                        backgroundColor: retweetHover || isRetweetActive ? 'rgba(52, 52, 52, 0.1)' : 'transparent',
+                                        // backgroundColor: retweetHover || isRetweetActive ? 'rgba(52, 52, 52, 0.1)' : 'transparent',
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >
@@ -498,7 +476,7 @@ const Publication = ({
                                     onMouseEnter={() => setLike1Hover(true)}
                                     onMouseLeave={() => setLike1Hover(false)}
                                     style={{
-                                        backgroundColor: like1Hover || isLike1Active ? 'rgba(249, 24, 128, 0.1)' : 'transparent',
+                                        // backgroundColor: like1Hover || isLike1Active ? 'rgba(249, 24, 128, 0.1)' : 'transparent',
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >
@@ -526,7 +504,7 @@ const Publication = ({
                                         onMouseEnter={() => setLike2Hover(true)}
                                         onMouseLeave={() => setLike2Hover(false)}
                                         style={{
-                                            backgroundColor: like2Hover || isLike2Active ? 'rgba(29, 155, 240, 0.1)' : 'transparent',
+                                            // backgroundColor: like2Hover || isLike2Active ? 'rgba(29, 155, 240, 0.1)' : 'transparent',
                                             cursor: isLoading ? 'wait' : 'pointer'
                                         }}
                                     >
@@ -554,7 +532,7 @@ const Publication = ({
                                     onMouseEnter={() => setSaveHover(true)}
                                     onMouseLeave={() => setSaveHover(false)}
                                     style={{
-                                        backgroundColor: saveHover || isSaved ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
+                                        // backgroundColor: saveHover || isSaved ? 'rgba(255, 165, 0, 0.1)' : 'transparent',
                                         cursor: isLoading ? 'wait' : 'pointer'
                                     }}
                                 >

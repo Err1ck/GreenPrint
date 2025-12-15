@@ -21,7 +21,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing' , 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees', 'message'])]
+    #[Groups(['user', 'follows', 'member', 'getFollowers', 'getFollowing', 'getMembers', 'getCommunityFollowers', 'getAllCommunityFollowers', 'post', 'reply', 'postTrees', 'replyLeaves', 'replyTrees', 'message'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string profile photo url
      */
     #[ORM\Column(length: 180, nullable: true)]
-    #[Groups(['user','post','reply'])]
+    #[Groups(['user', 'post', 'reply'])]
     private ?string $photo_url = null;
 
     /**
@@ -97,6 +97,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $tree_coins_community = 0;
 
     /**
+     * @var bool Perfil privado
+     */
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['user', 'post'])]
+    private bool $is_private = false;
+
+    /**
      * Relación con Community
      */
     #[ORM\ManyToOne(targetEntity: Community::class, inversedBy: 'users')]
@@ -114,9 +121,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username): static 
+    public function setUsername(string $username): static
     {
-        $this->username = $username;    
+        $this->username = $username;
         return $this;
     }
 
@@ -225,7 +232,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->community = $community;
         return $this;
     }
-  public function getPhotoURL(): ?string
+    public function getPhotoURL(): ?string
     {
         return $this->photo_url;
     }
@@ -246,6 +253,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->banner_url = $banner_url;
         return $this;
     }
+
+    public function isPrivate(): bool
+    {
+        return $this->is_private;
+    }
+
+    public function setIsPrivate(bool $is_private): static
+    {
+        $this->is_private = $is_private;
+        return $this;
+    }
+
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
-import FollowListModal from "../componentes/common/FollowListModal";
-import UserSettingsModal from "../componentes/common/UserSettingsModal";
+import ShowFollowersMembers from "../componentes/common/ShowFollowersMembers";
+import EditProfileModal from "../componentes/common/EditProfileModal";
 import Modal from "../componentes/common/Modal";
 import FollowUser from "../componentes/common/FollowUser";
 import { formatDate, formatTime } from "../utils/dateUtils";
@@ -612,15 +612,16 @@ function ViewProfile() {
       </div>
 
       {/* Follow List Modal */}
-      <FollowListModal
+      <ShowFollowersMembers
         isOpen={isModalOpen}
         onClose={closeModal}
-        userId={userId}
-        type={modalType}
+        entityId={userId}
+        type="user"
+        show={modalType}
       />
 
-      {/* User Settings Modal */}
-      <UserSettingsModal
+      {/* Edit Profile Modal */}
+      <EditProfileModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
