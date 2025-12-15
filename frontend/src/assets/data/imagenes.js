@@ -43,7 +43,7 @@ import Icono42 from "../img/42_save-white.svg";
 import Icono43 from "../img/43_moon.svg";
 import Icono44 from "../img/44_sun.svg";
 
-import Imagen1 from "../img/logo.jpg";
+import Imagen1 from "../img/logo.png";
 import Imagen2 from "../img/avatar-test.jpg";
 import Imagen3 from "../img/logo2.jpg";
 import Imagen4 from "../img/logo3.jpg";
