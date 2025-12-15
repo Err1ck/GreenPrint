@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Publication from "../componentes/common/Publication";
-import FollowListModal from "../componentes/common/FollowListModal";
+import ShowFollowersMembers from "../componentes/common/ShowFollowersMembers";
 import EditProfileModal from "../componentes/common/EditProfileModal";
 import Modal from "../componentes/common/Modal";
 import FollowUser from "../componentes/common/FollowUser";
@@ -223,7 +223,9 @@ function ViewProfile() {
             style={{
               width: "100%",
               height: "200px",
-              backgroundColor: user.banner_url ? "transparent" : "#cfd9de",
+              backgroundColor: user.banner_url
+                ? "transparent"
+                : "var(--color-login)",
               backgroundImage: user.banner_url
                 ? `url(http://127.0.0.1:8000${user.banner_url})`
                 : "none",
@@ -257,7 +259,7 @@ function ViewProfile() {
                   height: "134px",
                   borderRadius: "50%",
                   border: "4px solid #ffffff",
-                  backgroundColor: "#cfd9de",
+                  backgroundColor: "var(--color-login)",
                   backgroundImage: user.photo_url
                     ? `url(http://127.0.0.1:8000${user.photo_url})`
                     : "none",
@@ -596,8 +598,8 @@ function ViewProfile() {
 
       {/* Navbar Right */}
       <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
-        <Navbar 
-          navbarType={2} 
+        <Navbar
+          navbarType={2}
           onOpenModal={(() => {
             const currentUserStr = localStorage.getItem('user');
             if (currentUserStr) {
@@ -611,11 +613,12 @@ function ViewProfile() {
       </div>
 
       {/* Follow List Modal */}
-      <FollowListModal
+      <ShowFollowersMembers
         isOpen={isModalOpen}
         onClose={closeModal}
-        userId={userId}
-        type={modalType}
+        entityId={userId}
+        type="user"
+        show={modalType}
       />
 
       {/* Edit Profile Modal */}

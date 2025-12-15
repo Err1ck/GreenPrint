@@ -4,6 +4,8 @@ import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 import FollowCommunity from "../componentes/common/FollowCommunity";
+import EditCommunityModal from "../componentes/common/EditCommunityModal";
+import ShowFollowersMembers from "../componentes/common/ShowFollowersMembers";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewCommunity() {
@@ -17,6 +19,10 @@ function ViewCommunity() {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
+    const [modalShow, setModalShow] = useState(""); // "followers" or "members"
 
     const observer = useRef();
     const lastPostRef = useCallback(node => {
@@ -63,6 +69,14 @@ function ViewCommunity() {
 
             const communityData = await communityResponse.json();
             setCommunity(communityData);
+
+            // Check if current user is admin
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const currentUser = JSON.parse(userStr);
+                const adminIds = communityData.admin_ids || [];
+                setIsAdmin(adminIds.includes(currentUser.id));
+            }
 
             // Obtener posts de la comunidad
             const postsResponse = await fetch(`http://127.0.0.1:8000/api/posts/community/${communityId}`, {
@@ -133,6 +147,21 @@ function ViewCommunity() {
         }
     };
 
+    const openFollowersModal = () => {
+        setModalShow("followers");
+        setIsFollowersModalOpen(true);
+    };
+
+    const openMembersModal = () => {
+        setModalShow("members");
+        setIsFollowersModalOpen(true);
+    };
+
+    const closeFollowersModal = () => {
+        setIsFollowersModalOpen(false);
+        setModalShow("");
+    };
+
 
     if (loading) {
         return (
@@ -200,79 +229,6 @@ function ViewCommunity() {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
-                
-                .community-banner {
-                    width: 100%;
-                    height: 200px;
-                    background: linear-gradient(135deg, #00ba7c 0%, #00ba7c 100%);
-                    object-fit: cover;
-                }
-                
-                .community-content {
-                    padding: 0 16px;
-                    background: #fff;
-                }
-                
-                .community-avatar-container {
-                    margin-top: -75px;
-                    margin-bottom: 12px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-end;
-                }
-                
-                .community-avatar {
-                    width: 140px;
-                    height: 140px;
-                    border-radius: 50%;
-                    border: 4px solid #fff;
-                    background: linear-gradient(135deg, #00ba7c 0%, #00ba7c 100%);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 48px;
-                    color: white;
-                    font-weight: bold;
-                    object-fit: cover;
-                }
-                
-                .follow-button {
-                    padding: 8px 24px;
-                    border-radius: 9999px;
-                    font-weight: 700;
-                    font-size: 15px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    border: 1px solid #cfd9de;
-                }
-                
-                .follow-button.following {
-                    background: transparent;
-                    color: #0f1419;
-                }
-                
-                .follow-button.not-following {
-                    background: #00ba7c;
-                    color: #fff;
-                    border: 1px solid #00ba7c;
-                }
-                
-                .follow-button:hover {
-                    opacity: 0.9;
-                }
-
-                .community-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    color: #00ba7c;
-                    background-color: rgba(0, 186, 124, 0.1);
-                    padding: 6px 14px;
-                    border-radius: 12px;
-                    letter-spacing: 0.5px;
-                }
             `}</style>
 
             <div className="navbarLeft-content">
@@ -313,7 +269,14 @@ function ViewCommunity() {
                             onMouseEnter={(e) => e.target.style.backgroundColor = "#f7f9f9"}
                             onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
                         >
-                            ←
+                            <svg
+                                viewBox="0 0 24 24"
+                                width="20"
+                                height="20"
+                                fill="var(--color-text-primary)"
+                            >
+                                <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z" />
+                            </svg>
                         </button>
                         <div>
                             <h2 style={{
@@ -335,103 +298,239 @@ function ViewCommunity() {
                     </div>
 
                     {/* Banner */}
-                    {community?.banner_url ? (
-                        <img
-                            src={community.banner_url}
-                            alt="Banner de comunidad"
-                            className="community-banner"
-                        />
-                    ) : (
-                        <div className="community-banner"></div>
-                    )}
+                    <div
+                        style={{
+                            width: "100%",
+                            height: "200px",
+                            backgroundColor: community?.banner_url ? "transparent" : "#cfd9de",
+                            backgroundImage: community?.banner_url ? `url(${community.banner_url.startsWith('http') ? community.banner_url : `http://127.0.0.1:8000${community.banner_url}`})` : "none",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center"
+                        }}
+                    />
 
-                    {/* Community Info */}
-                    <div className="community-content">
-                        <div className="community-avatar-container">
-                            {community?.photo_url ? (
-                                <img
-                                    src={community.photo_url}
-                                    alt={community.name}
-                                    className="community-avatar"
-                                />
+                    {/* Community Info Section */}
+                    <div
+                        style={{
+                            padding: "12px 16px",
+                            borderBottom: "var(--size-border) solid var(--color-bg-secondary)"
+                        }}
+                    >
+                        {/* Avatar and Follow Button */}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                marginTop: "-68px",
+                                marginBottom: "12px"
+                            }}
+                        >
+                            {/* Square Avatar with Rounded Corners */}
+                            <div
+                                style={{
+                                    width: "134px",
+                                    height: "134px",
+                                    borderRadius: "20px",
+                                    border: "4px solid #ffffff",
+                                    backgroundColor: "#cfd9de",
+                                    backgroundImage: community?.photo_url ? `url(${community.photo_url.startsWith('http') ? community.photo_url : `http://127.0.0.1:8000${community.photo_url}`})` : "none",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "48px",
+                                    fontWeight: "700",
+                                    color: "#ffffff"
+                                }}
+                            >
+                                {!community?.photo_url && (community?.name?.charAt(0).toUpperCase() || "C")}
+                            </div>
+
+                            {/* Admin Edit Button or Follow Button */}
+                            {isAdmin ? (
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    style={{
+                                        marginTop: "72px",
+                                        padding: "8px 24px",
+                                        borderRadius: "9999px",
+                                        fontSize: "15px",
+                                        fontWeight: "700",
+                                        border: "1px solid #00ba7c",
+                                        backgroundColor: "#00ba7c",
+                                        color: "#ffffff",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s"
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = "#009966"}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = "#00ba7c"}
+                                >
+                                    Editar Comunidad
+                                </button>
                             ) : (
-                                <div className="community-avatar">
-                                    {community?.name?.charAt(0).toUpperCase() || "C"}
-                                </div>
+                                <FollowCommunity
+                                    communityId={parseInt(communityId)}
+                                    onFollowChange={() => updateFollowerCount()}
+                                    style={{ marginTop: "72px" }}
+                                />
                             )}
-                            <FollowCommunity
-                                communityId={parseInt(communityId)}
-                                onFollowChange={() => updateFollowerCount()}
-                                style={{ marginTop: "72px" }}
-                            />
                         </div>
 
+                        {/* Community Name and Badge */}
                         <div style={{ marginBottom: "12px" }}>
                             <div style={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "12px",
-                                marginBottom: "8px"
+                                gap: "8px",
+                                marginBottom: "2px"
                             }}>
-                                <h2 style={{
-                                    color: "#0f1419",
-                                    fontSize: "20px",
-                                    fontWeight: "700",
-                                    margin: 0
-                                }}>
+                                <h1
+                                    style={{
+                                        fontSize: "20px",
+                                        fontWeight: "700",
+                                        color: "var(--color-text-primary)",
+                                        margin: 0
+                                    }}
+                                >
                                     {community?.name || "Comunidad"}
-                                </h2>
-                                <span className="community-badge">
+                                </h1>
+                                <span
+                                    style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "4px",
+                                        fontSize: "12px",
+                                        fontWeight: "600",
+                                        color: "#00ba7c",
+                                        backgroundColor: "rgba(0, 186, 124, 0.1)",
+                                        padding: "2px 8px",
+                                        borderRadius: "8px",
+                                        letterSpacing: "0.3px"
+                                    }}
+                                >
                                     🌳 COMUNIDAD
                                 </span>
                             </div>
-                            <p style={{
-                                color: "#536471",
-                                fontSize: "15px",
-                                margin: 0
-                            }}>
-                                @{community?.name?.toLowerCase().replace(/\s+/g, '') || "comunidad"}
-                            </p>
                         </div>
 
+                        {/* Biography */}
                         {community?.biography && (
-                            <p style={{
-                                color: "#0f1419",
-                                fontSize: "15px",
-                                marginBottom: "12px",
-                                lineHeight: "1.5"
-                            }}>
-                                {community.biography}
-                            </p>
+                            <div style={{ marginBottom: "12px" }}>
+                                <p
+                                    style={{
+                                        fontSize: "15px",
+                                        color: "var(--color-text-primary)",
+                                        margin: 0,
+                                        lineHeight: "20px",
+                                        whiteSpace: "pre-wrap"
+                                    }}
+                                >
+                                    {community.biography}
+                                </p>
+                            </div>
                         )}
 
-                        <div style={{
-                            display: "flex",
-                            gap: "20px",
-                            marginBottom: "16px",
-                            paddingBottom: "16px",
-                            borderBottom: "1px solid #eff3f4"
-                        }}>
-                            <div>
-                                <span style={{ color: "#0f1419", fontWeight: "700" }}>
-                                    {community?.follower_count || 0}
-                                </span>
-                                <span style={{ color: "#536471", marginLeft: "4px" }}>
-                                    Seguidores
-                                </span>
+                        {/* Stats Section (Followers and Members) */}
+                        <div
+                            style={{
+                                display: "flex",
+                                gap: "24px",
+                                marginTop: "12px"
+                            }}
+                        >
+                            {/* Followers */}
+                            <div
+                                onClick={openFollowersModal}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    padding: "8px 16px",
+                                    backgroundColor: "#ecfce7",
+                                    borderRadius: "16px",
+                                    cursor: "pointer",
+                                    transition: "opacity 0.2s"
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = "0.7"}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+                            >
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#00ba7c">
+                                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                                </svg>
+                                <div>
+                                    <p
+                                        style={{
+                                            fontSize: "13px",
+                                            color: "#536471",
+                                            margin: 0,
+                                            lineHeight: "1"
+                                        }}
+                                    >
+                                        Seguidores
+                                    </p>
+                                    <p
+                                        style={{
+                                            fontSize: "17px",
+                                            fontWeight: "700",
+                                            color: "#00ba7c",
+                                            margin: 0,
+                                            lineHeight: "1.3"
+                                        }}
+                                    >
+                                        {community?.follower_count || 0}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <span style={{ color: "#0f1419", fontWeight: "700" }}>
-                                    {community?.member_count || 0}
-                                </span>
-                                <span style={{ color: "#536471", marginLeft: "4px" }}>
-                                    Miembros
-                                </span>
+
+                            {/* Members */}
+                            <div
+                                onClick={openMembersModal}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    padding: "8px 16px",
+                                    backgroundColor: "#e8f5fd",
+                                    borderRadius: "16px",
+                                    cursor: "pointer",
+                                    transition: "opacity 0.2s"
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = "0.7"}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+                            >
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="#00ba7c">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                </svg>
+                                <div>
+                                    <p
+                                        style={{
+                                            fontSize: "13px",
+                                            color: "#536471",
+                                            margin: 0,
+                                            lineHeight: "1"
+                                        }}
+                                    >
+                                        Miembros
+                                    </p>
+                                    <p
+                                        style={{
+                                            fontSize: "17px",
+                                            fontWeight: "700",
+                                            color: "#00ba7c",
+                                            margin: 0,
+                                            lineHeight: "1.3"
+                                        }}
+                                    >
+                                        {community?.member_count || 0}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Posts */}
+                    {/* Posts Section */}
                     <div>
                         {posts.length === 0 ? (
                             <div style={{
@@ -518,6 +617,22 @@ function ViewCommunity() {
             <div className="navbarRight-content">
                 <Navbar navbarType={2} />
             </div>
+
+            {/* Edit Community Modal */}
+            <EditCommunityModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                communityId={communityId}
+            />
+
+            {/* Followers/Members Modal */}
+            <ShowFollowersMembers
+                isOpen={isFollowersModalOpen}
+                onClose={closeFollowersModal}
+                entityId={communityId}
+                type="community"
+                show={modalShow}
+            />
         </div>
     );
 }

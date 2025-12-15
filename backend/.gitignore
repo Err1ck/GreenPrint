@@ -9,8 +9,10 @@
 /vendor/
 .env
 /.env
+/public/uploads/
 /public/uploads/users/
 /public/uploads/posts/
+/public/uploads/communities/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

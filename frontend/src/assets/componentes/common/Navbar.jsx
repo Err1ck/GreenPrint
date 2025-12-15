@@ -9,7 +9,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import SettingsModal from "./SettingsModal";
 import TrendingTopics from "./TrendingTopics";
 
-function Navbar({ navbarType, navbarPage, onOpenModal }) {
+function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -40,8 +40,8 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
           <div className="navbarLeft-container">
             <div className="navbarLeft-subcontainer">
               <div className="navbarImg">
-                <div 
-                  className="navbarImg-container" 
+                <div
+                  className="navbarImg-container"
                   onClick={() => navigate("/")}
                   style={{ cursor: "pointer" }}
                 >
@@ -279,6 +279,51 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                     </div>
                   </div>
                 )}
+                {navbarPage === "none" && (
+                  <div className="navbar-links-right">
+                    <LinkIcon
+                      name={"home"}
+                      href={"/"}
+                      classname={"navicon"}
+                      text={"Inicio"}
+                    />
+                    <LinkIcon
+                      name={"message"}
+                      href={"/messages"}
+                      classname={"navicon"}
+                      text={"Mensajes"}
+                    />
+                    <LinkIcon
+                      name={"save"}
+                      href={"/saved"}
+                      classname={"navicon"}
+                      text={"Guardados"}
+                    />
+                    <LinkIcon
+                      name={"comunidadesMias"}
+                      href={"/communities"}
+                      classname={"navicon"}
+                      text={"Comunidades"}
+                    />
+                    <LinkIcon
+                      name={"perfil"}
+                      href={userId ? `/profile/${userId}` : "/perfil"}
+                      classname={"navicon"}
+                      text={"Perfil"}
+                    />
+                    <div
+                      onClick={() => setIsSettingsModalOpen(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <LinkIcon
+                        name={"dots"}
+                        anchor={false}
+                        classname={"navicon"}
+                        text={"Configuración"}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -328,6 +373,14 @@ function Navbar({ navbarType, navbarPage, onOpenModal }) {
                   classButton="button-navbar-open-modal"
                 >
                   <div className="button-text">Nuevo Post</div>
+                </Button>
+              )}
+              {onOpenCommunityModal && (
+                <Button
+                  onClick={onOpenCommunityModal}
+                  classButton="button-navbar-open-modal"
+                >
+                  <div className="button-text">Crear comunidad</div>
                 </Button>
               )}
             </div>

@@ -6,12 +6,12 @@ import { X, Palette, Lock, Shield } from "lucide-react";
 function SettingsModal({ isOpen, onClose }) {
     const [activeTab, setActiveTab] = useState("appearance");
     const [isDarkMode, setIsDarkMode] = useState(false);
-    
+
     // Account states
     const [newEmail, setNewEmail] = useState("");
     const [confirmEmail, setConfirmEmail] = useState("");
     const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
-    
+
     // Privacy states
     const [isPrivate, setIsPrivate] = useState(false);
     const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
@@ -301,7 +301,7 @@ function SettingsModal({ isOpen, onClose }) {
                                 }}>
                                     Apariencia
                                 </h3>
-                                
+
                                 {/* Theme Toggle */}
                                 <div style={{
                                     padding: "16px",
@@ -380,7 +380,7 @@ function SettingsModal({ isOpen, onClose }) {
                                 }}>
                                     Cuenta y Seguridad
                                 </h3>
-                                
+
                                 {/* Cambiar Email */}
                                 <div style={{
                                     padding: "16px",
@@ -462,7 +462,7 @@ function SettingsModal({ isOpen, onClose }) {
                                         color: "#c53030",
                                         margin: "0 0 8px 0"
                                     }}>
-                                        Zona Peligrosa
+                                        Eliminar cuenta
                                     </h4>
                                     <p style={{
                                         fontSize: "13px",
@@ -501,7 +501,7 @@ function SettingsModal({ isOpen, onClose }) {
                                 }}>
                                     Privacidad
                                 </h3>
-                                
+
                                 {/* Perfil Privado */}
                                 <div style={{
                                     padding: "16px",

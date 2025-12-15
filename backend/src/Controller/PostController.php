@@ -1292,7 +1292,7 @@ final class PostController extends AbstractController
 
         // Obtener posts del usuario
         $posts = $postRepository->findBy(
-            ['user' => $user],
+            ['user' => $user, 'postType' => 'user'],
             ['createdAt' => 'DESC']
         );
 

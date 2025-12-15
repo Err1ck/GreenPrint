@@ -54,6 +54,13 @@ class Community
     #[Groups(['community', 'post'])]
     private ?string $banner_url = null;
 
+    /**
+     * @var array Admin user IDs
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['community'])]
+    private array $admin_ids = [];
+
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Wallet $wallet = null;
 
@@ -128,6 +135,17 @@ class Community
     public function setBiography(string $biography): static
     {
         $this->biography = $biography;
+        return $this;
+    }
+
+    public function getAdminIds(): array
+    {
+        return $this->admin_ids ?? [];
+    }
+
+    public function setAdminIds(array $admin_ids): static
+    {
+        $this->admin_ids = $admin_ids;
         return $this;
     }
 }
