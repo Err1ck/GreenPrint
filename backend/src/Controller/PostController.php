@@ -1211,9 +1211,9 @@ final class PostController extends AbstractController
             );
         }
 
-        // Obtener posts del usuario
+        // Obtener posts del usuario (solo posts de tipo "user", no de comunidad)
         $posts = $postRepository->findBy(
-            ['user' => $user],
+            ['user' => $user, 'postType' => 'user'],
             ['createdAt' => 'DESC']
         );
 
