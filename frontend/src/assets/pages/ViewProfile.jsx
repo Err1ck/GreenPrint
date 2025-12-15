@@ -7,7 +7,9 @@ import UserSettingsModal from "../componentes/common/UserSettingsModal";
 import Modal from "../componentes/common/Modal";
 import FollowUser from "../componentes/common/FollowUser";
 import { formatDate, formatTime } from "../utils/dateUtils";
-
+import "../styles/ViewProfile.css";
+import "../styles/Home.css";
+import "../styles/app.css";
 function ViewProfile() {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
@@ -76,8 +78,6 @@ function ViewProfile() {
     }
   };
 
-
-
   const openFollowersModal = () => {
     setModalType("followers");
     setIsModalOpen(true);
@@ -95,18 +95,18 @@ function ViewProfile() {
 
   if (error) {
     return (
-      <div style={{ display: "flex", width: "100%" }}>
-        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+      <div className="homepage-container">
+        <div className="navbarLeft-content">
           <Navbar navbarType={1} navbarPage={"profile"} />
         </div>
-        <div style={{ flex: 1, minHeight: "100vh" }}>
+        <div className="main-layout-container">
           <div
             style={{ textAlign: "center", padding: "40px", color: "#e74c3c" }}
           >
             Error: {error}
           </div>
         </div>
-        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+        <div className="navbarRight-content">
           <Navbar navbarType={2} />
         </div>
       </div>
@@ -115,16 +115,16 @@ function ViewProfile() {
 
   if (!user) {
     return (
-      <div style={{ display: "flex", width: "100%" }}>
-        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+      <div className="homepage-container">
+        <div className="navbarLeft-content">
           <Navbar navbarType={1} navbarPage={"profile"} />
         </div>
-        <div style={{ flex: 1, minHeight: "100vh" }}>
+        <div className="main-layout-container">
           <div style={{ textAlign: "center", padding: "40px", color: "#666" }}>
             Cargando perfil...
           </div>
         </div>
-        <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh" }}>
+        <div className="navbarRight-content">
           <Navbar navbarType={2} />
         </div>
       </div>
@@ -132,23 +132,13 @@ function ViewProfile() {
   }
 
   return (
-    <div style={{ display: "flex", width: "100%" }}>
-      {/* Navbar Left */}
-      <div
-        style={{
-          flex: 1,
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          flexShrink: 0,
-          zIndex: 100,
-        }}
-      >
+    <div className="homepage-container">
+      <div className="navbarLeft-content">
         <Navbar navbarType={1} navbarPage={"profile"} />
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, minHeight: "100vh" }}>
+      <div className="main-layout-container">
         <main style={{ width: "100%", maxWidth: "600px", margin: "0 auto" }}>
           {/* Header with back button */}
           <div
@@ -156,7 +146,7 @@ function ViewProfile() {
               position: "sticky",
               top: 0,
               backgroundColor: "var(--color-bg)",
-              backdropFilter: "blur(12px)",
+              // backdropFilter: "blur(12px)",
               borderBottom:
                 "var(--size-border) solid var(--color-bg-secondary)",
               padding: "12px 16px",
@@ -565,47 +555,56 @@ function ViewProfile() {
               </div>
             )}
 
-            {!loading && posts.map((post) => (
-              <Publication
-                key={post.id}
-                postId={post.id}
-                userId={post.user?.id}
-                userName={post.user?.username || "Usuario"}
-                userProfileUrl={post.user?.photo_url}
-                communityId={post.community?.id}
-                communityName={post.community?.name}
-                communityPhotoUrl={post.community?.photo_url}
-                date={formatDate(post.createdAt)}
-                time={formatTime(post.createdAt)}
-                text={post.content}
-                postImage={post.image}
-                postType={post.postType}
-                comments={post.replies || 0}
-                retweets={post.reposts}
-                like1={post.leaf}
-                like2={post.tree}
-                clickable={true}
-                // Pasar datos de interacciones del usuario si existen
-                initialHasLikedLeaf={post.user_interactions?.has_liked_leaf || false}
-                initialHasLikedTree={post.user_interactions?.has_liked_tree || false}
-                initialHasReposted={post.user_interactions?.has_reposted || false}
-                initialIsSaved={post.user_interactions?.has_saved || false}
-              />
-            ))}
+            {!loading &&
+              posts.map((post) => (
+                <Publication
+                  key={post.id}
+                  postId={post.id}
+                  userId={post.user?.id}
+                  userName={post.user?.username || "Usuario"}
+                  userProfileUrl={post.user?.photo_url}
+                  communityId={post.community?.id}
+                  communityName={post.community?.name}
+                  communityPhotoUrl={post.community?.photo_url}
+                  date={formatDate(post.createdAt)}
+                  time={formatTime(post.createdAt)}
+                  text={post.content}
+                  postImage={post.image}
+                  postType={post.postType}
+                  comments={post.replies || 0}
+                  retweets={post.reposts}
+                  like1={post.leaf}
+                  like2={post.tree}
+                  clickable={true}
+                  // Pasar datos de interacciones del usuario si existen
+                  initialHasLikedLeaf={
+                    post.user_interactions?.has_liked_leaf || false
+                  }
+                  initialHasLikedTree={
+                    post.user_interactions?.has_liked_tree || false
+                  }
+                  initialHasReposted={
+                    post.user_interactions?.has_reposted || false
+                  }
+                  initialIsSaved={post.user_interactions?.has_saved || false}
+                />
+              ))}
           </div>
         </main>
       </div>
 
       {/* Navbar Right */}
-      <div style={{ flex: 1, position: "sticky", top: 0, height: "100vh", flexShrink: 0 }}>
-        <Navbar 
-          navbarType={2} 
+      <div className="navbarRight-content">
+        <Navbar
+          navbarType={2}
           onOpenModal={(() => {
-            const currentUserStr = localStorage.getItem('user');
+            const currentUserStr = localStorage.getItem("user");
             if (currentUserStr) {
               const currentUser = JSON.parse(currentUserStr);
               // Solo pasar onOpenModal si es el perfil del usuario actual
-              return currentUser.id === parseInt(userId) ? openNewPostModal : undefined;
+              return currentUser.id === parseInt(userId)
+                ? openNewPostModal
+                : undefined;
             }
             return undefined;
           })()}

@@ -656,15 +656,14 @@
     border-right: none;
   }
 
-  .message-thread {
-    display: none;
-  }
-
   .conversation-list.hidden {
     display: none;
   }
 
   .message-thread.active {
     display: flex;
+  }
+  .messages-whatsapp-container {
+    height: calc(92% - 20px);
   }
 }
