@@ -11,6 +11,9 @@ function Modal({ children, onClose }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [user, setUser] = useState(null);
+  const [adminCommunities, setAdminCommunities] = useState([]);
+  const [selectedPublisher, setSelectedPublisher] = useState({ type: 'user', data: null });
+  const [loadingCommunities, setLoadingCommunities] = useState(true);
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
   const maxChars = 280;
@@ -19,9 +22,38 @@ function Modal({ children, onClose }) {
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (userStr) {
-      setUser(JSON.parse(userStr));
+      const userData = JSON.parse(userStr);
+      setUser(userData);
+      setSelectedPublisher({ type: 'user', data: userData });
+      fetchAdminCommunities(userData);
     }
   }, []);
+
+  const fetchAdminCommunities = async (userData) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("http://127.0.0.1:8000/api/communities", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const communities = await response.json();
+        // Filter communities where user is admin
+        const userAdminCommunities = communities.filter(community =>
+          community.admin_ids && community.admin_ids.includes(userData.id)
+        );
+        setAdminCommunities(userAdminCommunities);
+      }
+    } catch (error) {
+      console.error("Error fetching communities:", error);
+    } finally {
+      setLoadingCommunities(false);
+    }
+  };
 
   // Emojis populares organizados por categorías
   const emojiCategories = {
@@ -98,6 +130,11 @@ function Modal({ children, onClose }) {
         const formData = new FormData();
         formData.append("user", user.id);
         formData.append("content", postText);
+
+        // Add community parameter if publishing as community
+        if (selectedPublisher.type === 'community') {
+          formData.append("community", selectedPublisher.data.id);
+        }
 
         if (selectedImage) {
           if (selectedImage.file) {
@@ -212,44 +249,120 @@ function Modal({ children, onClose }) {
         </div>
 
         <div className="post-body">
+          {/* Publisher Selector */}
+          {!loadingCommunities && adminCommunities.length > 0 && (
+            <div style={{
+              padding: "12px 16px",
+              borderBottom: "1px solid #eff3f4",
+              marginBottom: "12px"
+            }}>
+              <label style={{
+                display: "block",
+                fontSize: "13px",
+                fontWeight: "600",
+                color: "#536471",
+                marginBottom: "8px"
+              }}>
+                Publicar como:
+              </label>
+              <select
+                value={selectedPublisher.type === 'user' ? 'user' : selectedPublisher.data.id}
+                onChange={(e) => {
+                  if (e.target.value === 'user') {
+                    setSelectedPublisher({ type: 'user', data: user });
+                  } else {
+                    const community = adminCommunities.find(c => c.id === parseInt(e.target.value));
+                    setSelectedPublisher({ type: 'community', data: community });
+                  }
+                }}
+                style={{
+                  width: "100%",
+                  padding: "8px 12px",
+                  fontSize: "15px",
+                  border: "1px solid #cfd9de",
+                  borderRadius: "8px",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                  outline: "none"
+                }}
+              >
+                <option value="user">👤 {user?.username || "Usuario"}</option>
+                {adminCommunities.map(community => (
+                  <option key={community.id} value={community.id}>
+                    🌳 {community.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="post-user-section">
             <div
               className="post-avatar"
               style={{
                 width: "40px",
                 height: "40px",
-                borderRadius: "50%",
+                borderRadius: selectedPublisher.type === 'community' ? "20%" : "50%",
                 overflow: "hidden",
                 backgroundColor: "#cfd9de",
                 flexShrink: 0,
                 alignSelf: "flex-start"
               }}
             >
-              {user?.photo_url ? (
-                <img
-                  src={`http://127.0.0.1:8000${user.photo_url}`}
-                  alt={user.username}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover"
-                  }}
-                />
+              {selectedPublisher.type === 'user' ? (
+                user?.photo_url ? (
+                  <img
+                    src={`http://127.0.0.1:8000${user.photo_url}`}
+                    alt={user.username}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      fontWeight: "600",
+                      color: "#536471"
+                    }}
+                  >
+                    {user?.username?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                )
               ) : (
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    color: "#536471"
-                  }}
-                >
-                  {user?.username?.charAt(0).toUpperCase() || "U"}
-                </div>
+                selectedPublisher.data?.photo_url ? (
+                  <img
+                    src={`http://127.0.0.1:8000${selectedPublisher.data.photo_url}`}
+                    alt={selectedPublisher.data.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      fontWeight: "600",
+                      color: "#536471"
+                    }}
+                  >
+                    {selectedPublisher.data?.name?.charAt(0).toUpperCase() || "C"}
+                  </div>
+                )
               )}
             </div>
             <div className="post-input-wrapper">

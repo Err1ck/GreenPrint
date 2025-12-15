@@ -4,6 +4,8 @@ import Navbar from "../componentes/common/Navbar";
 import "../styles/Home.css";
 import Publication from "../componentes/common/Publication";
 import FollowCommunity from "../componentes/common/FollowCommunity";
+import EditCommunityModal from "../componentes/common/EditCommunityModal";
+import ShowFollowersMembers from "../componentes/common/ShowFollowersMembers";
 import { formatDate, formatTime } from "../utils/dateUtils";
 
 function ViewCommunity() {
@@ -17,6 +19,10 @@ function ViewCommunity() {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
+    const [modalShow, setModalShow] = useState(""); // "followers" or "members"
 
     const observer = useRef();
     const lastPostRef = useCallback(node => {
@@ -63,6 +69,14 @@ function ViewCommunity() {
 
             const communityData = await communityResponse.json();
             setCommunity(communityData);
+
+            // Check if current user is admin
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const currentUser = JSON.parse(userStr);
+                const adminIds = communityData.admin_ids || [];
+                setIsAdmin(adminIds.includes(currentUser.id));
+            }
 
             // Obtener posts de la comunidad
             const postsResponse = await fetch(`http://127.0.0.1:8000/api/posts/community/${communityId}`, {
@@ -131,6 +145,21 @@ function ViewCommunity() {
         } catch (err) {
             console.error("Error updating follower count:", err);
         }
+    };
+
+    const openFollowersModal = () => {
+        setModalShow("followers");
+        setIsFollowersModalOpen(true);
+    };
+
+    const openMembersModal = () => {
+        setModalShow("members");
+        setIsFollowersModalOpen(true);
+    };
+
+    const closeFollowersModal = () => {
+        setIsFollowersModalOpen(false);
+        setModalShow("");
     };
 
 
@@ -319,12 +348,34 @@ function ViewCommunity() {
                                 {!community?.photo_url && (community?.name?.charAt(0).toUpperCase() || "C")}
                             </div>
 
-                            {/* Follow Button */}
-                            <FollowCommunity
-                                communityId={parseInt(communityId)}
-                                onFollowChange={() => updateFollowerCount()}
-                                style={{ marginTop: "72px" }}
-                            />
+                            {/* Admin Edit Button or Follow Button */}
+                            {isAdmin ? (
+                                <button
+                                    onClick={() => setIsEditModalOpen(true)}
+                                    style={{
+                                        marginTop: "72px",
+                                        padding: "8px 24px",
+                                        borderRadius: "9999px",
+                                        fontSize: "15px",
+                                        fontWeight: "700",
+                                        border: "1px solid #00ba7c",
+                                        backgroundColor: "#00ba7c",
+                                        color: "#ffffff",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s"
+                                    }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = "#009966"}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = "#00ba7c"}
+                                >
+                                    Editar Comunidad
+                                </button>
+                            ) : (
+                                <FollowCommunity
+                                    communityId={parseInt(communityId)}
+                                    onFollowChange={() => updateFollowerCount()}
+                                    style={{ marginTop: "72px" }}
+                                />
+                            )}
                         </div>
 
                         {/* Community Name and Badge */}
@@ -391,14 +442,19 @@ function ViewCommunity() {
                         >
                             {/* Followers */}
                             <div
+                                onClick={openFollowersModal}
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "6px",
                                     padding: "8px 16px",
                                     backgroundColor: "#ecfce7",
-                                    borderRadius: "16px"
+                                    borderRadius: "16px",
+                                    cursor: "pointer",
+                                    transition: "opacity 0.2s"
                                 }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = "0.7"}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
                             >
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="#00ba7c">
                                     <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
@@ -430,14 +486,19 @@ function ViewCommunity() {
 
                             {/* Members */}
                             <div
+                                onClick={openMembersModal}
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "6px",
                                     padding: "8px 16px",
                                     backgroundColor: "#e8f5fd",
-                                    borderRadius: "16px"
+                                    borderRadius: "16px",
+                                    cursor: "pointer",
+                                    transition: "opacity 0.2s"
                                 }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = "0.7"}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
                             >
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="#00ba7c">
                                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -556,6 +617,22 @@ function ViewCommunity() {
             <div className="navbarRight-content">
                 <Navbar navbarType={2} />
             </div>
+
+            {/* Edit Community Modal */}
+            <EditCommunityModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                communityId={communityId}
+            />
+
+            {/* Followers/Members Modal */}
+            <ShowFollowersMembers
+                isOpen={isFollowersModalOpen}
+                onClose={closeFollowersModal}
+                entityId={communityId}
+                type="community"
+                show={modalShow}
+            />
         </div>
     );
 }

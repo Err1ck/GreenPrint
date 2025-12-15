@@ -126,6 +126,11 @@ final class UserController extends AbstractController
         //     $user->setUsername($data['username']);
         // }
 
+             if (isset($data['email'])) {
+            $user->setEmail($data['email']);
+        }
+
+
         if (isset($data['biography'])) {
             $user->setBiography($data['biography']);
         }

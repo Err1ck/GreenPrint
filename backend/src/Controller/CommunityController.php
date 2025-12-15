@@ -85,6 +85,23 @@ final class CommunityController extends AbstractController
             return new JsonResponse(['error' => 'Comunidad no encontrada.'], JsonResponse::HTTP_NOT_FOUND);
         }
 
+        // Check if the current user is an admin of this community
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Debes estar autenticado para editar una comunidad.'],
+                JsonResponse::HTTP_UNAUTHORIZED
+            );
+        }
+
+        $adminIds = $community->getAdminIds();
+        if (!in_array($user->getId(), $adminIds)) {
+            return new JsonResponse(
+                ['error' => 'No tienes permisos para editar esta comunidad.'],
+                JsonResponse::HTTP_FORBIDDEN
+            );
+        }
+
         $data = json_decode($request->getContent(), true);
 
         if ($data === null) {
@@ -102,10 +119,33 @@ final class CommunityController extends AbstractController
             $community->setBiography($data['biography']);
         }
 
-        if (isset($data['photo_url'])) {
+        // Process photo upload if provided
+        if (isset($data['photo_data'])) {
+            $photoResult = $this->processImageUpload($data['photo_data'], $community->getId(), 'photo');
+            if ($photoResult['success']) {
+                $community->setPhotoURL($photoResult['url']);
+            } else {
+                return new JsonResponse(
+                    ['error' => $photoResult['error']],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        } elseif (isset($data['photo_url'])) {
             $community->setPhotoURL($data['photo_url']);
         }
-        if (isset($data['banner_url'])) {
+
+        // Process banner upload if provided
+        if (isset($data['banner_data'])) {
+            $bannerResult = $this->processImageUpload($data['banner_data'], $community->getId(), 'banner');
+            if ($bannerResult['success']) {
+                $community->setBannerURL($bannerResult['url']);
+            } else {
+                return new JsonResponse(
+                    ['error' => $bannerResult['error']],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+        } elseif (isset($data['banner_url'])) {
             $community->setBannerURL($data['banner_url']);
         }
 
@@ -170,6 +210,9 @@ final class CommunityController extends AbstractController
 
         $community->setMemberCount(0);
         $community->setFollowerCount(0);
+        
+        // Initialize admin_ids with the creator's user ID
+        $community->setAdminIds([$user->getId()]);
 
         $community->setCreatedAt(new \DateTimeImmutable());
         $community->setUpdatedAt(new \DateTimeImmutable());
@@ -233,6 +276,26 @@ final class CommunityController extends AbstractController
             $user->setRoles($currentRoles);
             $entityManager->persist($user);
         }
+
+        // Add creator as member of the community
+        $communityMember = new \App\Entity\CommunityMembers();
+        $communityMember->setUser($user);
+        $communityMember->setCommunity($community);
+        $communityMember->setCreatedAt(new \DateTimeImmutable());
+        $communityMember->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($communityMember);
+
+        // Add creator as follower of the community
+        $communityFollow = new \App\Entity\CommunityFollows();
+        $communityFollow->setUser($user);
+        $communityFollow->setCommunity($community);
+        $communityFollow->setCreatedAt(new \DateTimeImmutable());
+        $communityFollow->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($communityFollow);
+
+        // Update counts
+        $community->setMemberCount(1);
+        $community->setFollowerCount(1);
 
         $entityManager->flush();
 
