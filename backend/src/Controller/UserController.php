@@ -94,7 +94,9 @@ final class UserController extends AbstractController
                     // new OA\Property(property: 'username', type: 'string', example: 'Gordinxi'),
                     new OA\Property(property: 'biography', type: 'string', example: 'Lorem ipsum...'),
                     new OA\Property(property: 'photo_url', type: 'string', example: 'path/img'),
-                    new OA\Property(property: 'banner_url', type: 'string', example: 'path/img')
+                    new OA\Property(property: 'banner_url', type: 'string', example: 'path/img'),
+                    new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                    new OA\Property(property: 'is_private', type: 'boolean', example: false)
                 ]
             )
         ),
@@ -136,6 +138,22 @@ final class UserController extends AbstractController
 
         if (isset($data['banner_url'])) {
             $user->setBannerURL($data['banner_url']);
+        }
+
+        if (isset($data['email'])) {
+            // Verificar que el email no esté en uso por otro usuario
+            $existingUser = $users->findOneBy(['email' => $data['email']]);
+            if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                return new JsonResponse(
+                    ['error' => 'Email already in use'],
+                    JsonResponse::HTTP_BAD_REQUEST
+                );
+            }
+            $user->setEmail($data['email']);
+        }
+
+        if (isset($data['is_private'])) {
+            $user->setIsPrivate((bool) $data['is_private']);
         }
 
         // 4. Validar la entidad antes de guardar
@@ -254,7 +272,7 @@ final class UserController extends AbstractController
             mkdir($uploadDir, 0755, true);
         }
 
-// 8. Eliminar imagen anterior si existe (antes de guardar la nueva)
+        // 8. Eliminar imagen anterior si existe (antes de guardar la nueva)
         $pattern = $uploadDir . '/' . $imageType . '.*';
         foreach (glob($pattern) as $oldFile) {
             if (file_exists($oldFile)) {
@@ -612,7 +630,7 @@ final class UserController extends AbstractController
         tags: ['UserController'],
         summary: 'Unirse a una comundad. ID de la URL -> tu usuario / ID pasado por JS -> usuario a seguir.'
     )]
-    public function join(int $id, Request $request, UserRepository $users, CommunityRepository $communities,  CommunityMembersRepository $communityMembersRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    public function join(int $id, Request $request, UserRepository $users, CommunityRepository $communities, CommunityMembersRepository $communityMembersRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $user = $users->find($id);
 
@@ -691,7 +709,7 @@ final class UserController extends AbstractController
         tags: ['UserController'],
         summary: 'Dejar una comundad. ID de la URL -> tu usuario / ID pasado por JS -> usuario a seguir.'
     )]
-    public function leave(int $id, Request $request, UserRepository $users, CommunityRepository $communities,  CommunityMembersRepository $communityMembersRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
+    public function leave(int $id, Request $request, UserRepository $users, CommunityRepository $communities, CommunityMembersRepository $communityMembersRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
         $user = $users->find($id);
 
