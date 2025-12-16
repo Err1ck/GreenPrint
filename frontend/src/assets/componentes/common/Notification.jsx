@@ -12,6 +12,8 @@ const Notification = ({
   actorPhotoUrl,
   actorId,
   postId,
+  communityId,
+  communityName,
   createdAt,
   isRead,
   onMarkAsRead,
@@ -40,6 +42,10 @@ const Notification = ({
         return <Repeat2 size={20} color="#00ba7c" />;
       case "reply":
         return <MessageCircle size={20} color="#1d9bf0" />;
+      case "membership_request":
+      case "membership_accepted":
+      case "membership_rejected":
+        return <span style={{ fontSize: "20px" }}>🌳</span>;
       default:
         return null;
     }
@@ -49,8 +55,68 @@ const Notification = ({
     if (!isRead && onMarkAsRead) {
       onMarkAsRead(notificationId);
     }
-    if (postId) {
+    if (type === "membership_request" || type === "membership_accepted" || type === "membership_rejected") {
+      if (communityId) {
+        navigate(`/community/${communityId}`);
+      }
+    } else if (postId) {
       navigate(`/post/${postId}`);
+    }
+  };
+
+  const handleAcceptMember = async (e) => {
+    e.stopPropagation();
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/communities/${communityId}/accept-member/${actorId}`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      if (response.ok) {
+        alert("Miembro aceptado exitosamente");
+        onMarkAsRead(notificationId);
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Error al aceptar miembro");
+      }
+    } catch (error) {
+      console.error("Error accepting member:", error);
+      alert("Error al aceptar miembro");
+    }
+  };
+
+  const handleRejectMember = async (e) => {
+    e.stopPropagation();
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/communities/${communityId}/reject-member/${actorId}`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      if (response.ok) {
+        alert("Solicitud rechazada");
+        onMarkAsRead(notificationId);
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Error al rechazar solicitud");
+      }
+    } catch (error) {
+      console.error("Error rejecting member:", error);
+      alert("Error al rechazar solicitud");
     }
   };
 
@@ -97,6 +163,43 @@ const Notification = ({
           {message.replace(actorUsername, "").trim()}
         </p>
         <span className="notification-time">{getTimeAgo(createdAt)}</span>
+
+        {type === "membership_request" && !isRead && (
+          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+            <button
+              onClick={handleAcceptMember}
+              style={{
+                padding: "6px 16px",
+                borderRadius: "20px",
+                fontSize: "13px",
+                fontWeight: "600",
+                border: "none",
+                backgroundColor: "#00ba7c",
+                color: "#ffffff",
+                cursor: "pointer",
+                transition: "all 0.2s"
+              }}
+            >
+              Aceptar
+            </button>
+            <button
+              onClick={handleRejectMember}
+              style={{
+                padding: "6px 16px",
+                borderRadius: "20px",
+                fontSize: "13px",
+                fontWeight: "600",
+                border: "1px solid #ccc",
+                backgroundColor: "#ffffff",
+                color: "#666",
+                cursor: "pointer",
+                transition: "all 0.2s"
+              }}
+            >
+              Rechazar
+            </button>
+          </div>
+        )}
       </div>
 
       {!isRead && <div className="notification-unread-dot"></div>}

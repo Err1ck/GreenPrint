@@ -23,6 +23,8 @@ function ViewCommunity() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
     const [modalShow, setModalShow] = useState(""); // "followers" or "members"
+    const [isMember, setIsMember] = useState(false);
+    const [membershipRequested, setMembershipRequested] = useState(false);
 
     const observer = useRef();
     const lastPostRef = useCallback(node => {
@@ -76,6 +78,19 @@ function ViewCommunity() {
                 const currentUser = JSON.parse(userStr);
                 const adminIds = communityData.admin_ids || [];
                 setIsAdmin(adminIds.includes(currentUser.id));
+
+                // Check if user is a member
+                const membersResponse = await fetch(`http://127.0.0.1:8000/api/communities/${communityId}/members`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (membersResponse.ok) {
+                    const membersData = await membersResponse.json();
+                    const isMemberCheck = membersData.some(member => member.user.id === currentUser.id);
+                    setIsMember(isMemberCheck);
+                }
             }
 
             // Obtener posts de la comunidad
@@ -160,6 +175,30 @@ function ViewCommunity() {
     const closeFollowersModal = () => {
         setIsFollowersModalOpen(false);
         setModalShow("");
+    };
+
+    const requestMembership = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`http://127.0.0.1:8000/api/communities/${communityId}/request-membership`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                setMembershipRequested(true);
+                alert("Solicitud de membresía enviada a los administradores");
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || "Error al enviar solicitud");
+            }
+        } catch (error) {
+            console.error("Error requesting membership:", error);
+            alert("Error al enviar solicitud");
+        }
     };
 
 
@@ -348,7 +387,7 @@ function ViewCommunity() {
                                 {!community?.photo_url && (community?.name?.charAt(0).toUpperCase() || "C")}
                             </div>
 
-                            {/* Admin Edit Button or Follow Button */}
+                            {/* Admin Edit Button, Follow Button, or Request Membership Button */}
                             {isAdmin ? (
                                 <button
                                     onClick={() => setIsEditModalOpen(true)}
@@ -369,12 +408,41 @@ function ViewCommunity() {
                                 >
                                     Editar Comunidad
                                 </button>
-                            ) : (
+                            ) : isMember ? (
                                 <FollowCommunity
                                     communityId={parseInt(communityId)}
                                     onFollowChange={() => updateFollowerCount()}
                                     style={{ marginTop: "72px" }}
                                 />
+                            ) : (
+                                <button
+                                    onClick={requestMembership}
+                                    disabled={membershipRequested}
+                                    style={{
+                                        marginTop: "72px",
+                                        padding: "8px 24px",
+                                        borderRadius: "9999px",
+                                        fontSize: "15px",
+                                        fontWeight: "700",
+                                        border: membershipRequested ? "1px solid #ccc" : "1px solid #00ba7c",
+                                        backgroundColor: membershipRequested ? "#f0f0f0" : "#ffffff",
+                                        color: membershipRequested ? "#999" : "#00ba7c",
+                                        cursor: membershipRequested ? "not-allowed" : "pointer",
+                                        transition: "all 0.2s"
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (!membershipRequested) {
+                                            e.target.style.backgroundColor = "#f0fdf4";
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!membershipRequested) {
+                                            e.target.style.backgroundColor = "#ffffff";
+                                        }
+                                    }}
+                                >
+                                    {membershipRequested ? "Solicitud Enviada" : "Solicitar Membresía"}
+                                </button>
                             )}
                         </div>
 

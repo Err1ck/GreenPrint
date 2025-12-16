@@ -56,6 +56,7 @@ final class NotificationController extends AbstractController
         foreach ($notifications as $notification) {
             $actor = $notification->getActor();
             $post = $notification->getPost();
+            $community = $notification->getCommunity();
 
             $notificationsData[] = [
                 'id' => $notification->getId(),
@@ -70,6 +71,11 @@ final class NotificationController extends AbstractController
                 ] : null,
                 'post' => $post ? [
                     'id' => $post->getId(),
+                ] : null,
+                'community' => $community ? [
+                    'id' => $community->getId(),
+                    'name' => $community->getName(),
+                    'photo_url' => $community->getPhotoURL(),
                 ] : null,
             ];
         }
