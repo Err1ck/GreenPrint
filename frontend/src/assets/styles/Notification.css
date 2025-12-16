@@ -77,7 +77,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #1d9bf0;
+  background-color: var(--color-login);
   position: absolute;
   right: 16px;
   top: 50%;
@@ -123,8 +123,8 @@
 
 .mark-all-read-btn {
   background-color: transparent;
-  border: 1px solid #1d9bf0;
-  color: #1d9bf0;
+  border: 1px solid var(--color-login);
+  color: var(--color-login);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
