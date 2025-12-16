@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Button from "../ui/Button";
 import "../../styles/Modal.css";
 import { X, Palette, Lock, Shield } from "lucide-react";
+import { toast } from 'react-toastify';
 
 function SettingsModal({ isOpen, onClose }) {
     const [activeTab, setActiveTab] = useState("appearance");
@@ -68,12 +69,12 @@ function SettingsModal({ isOpen, onClose }) {
 
     const handleEmailChange = async () => {
         if (newEmail !== confirmEmail) {
-            alert("Los emails no coinciden");
+            toast.error("Los emails no coinciden");
             return;
         }
 
         if (!newEmail || newEmail.trim() === "") {
-            alert("El email no puede estar vacío");
+            toast.error("El email no puede estar vacío");
             return;
         }
 
@@ -83,7 +84,7 @@ function SettingsModal({ isOpen, onClose }) {
             const token = localStorage.getItem('token');
 
             if (!userStr || !token) {
-                alert("Debes iniciar sesión");
+                toast.error("Debes iniciar sesión");
                 return;
             }
 
@@ -103,14 +104,14 @@ function SettingsModal({ isOpen, onClose }) {
             if (response.ok) {
                 const updatedUser = await response.json();
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-                alert("Email actualizado correctamente");
+                toast.success("Email actualizado correctamente");
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar el email");
+                toast.error(errorData.error || "Error al actualizar el email");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al actualizar el email");
+            toast.error("Error al actualizar el email");
         } finally {
             setIsUpdatingEmail(false);
         }
@@ -123,7 +124,7 @@ function SettingsModal({ isOpen, onClose }) {
             const token = localStorage.getItem('token');
 
             if (!userStr || !token) {
-                alert("Debes iniciar sesión");
+                toast.error("Debes iniciar sesión");
                 return;
             }
 
@@ -145,14 +146,14 @@ function SettingsModal({ isOpen, onClose }) {
                 const updatedUser = await response.json();
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 setIsPrivate(newPrivacyValue);
-                alert(`Perfil ${newPrivacyValue ? 'privado' : 'público'} activado`);
+                toast.success(`Perfil ${newPrivacyValue ? 'privado' : 'público'} activado`);
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar la privacidad");
+                toast.error(errorData.error || "Error al actualizar la privacidad");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al actualizar la privacidad");
+            toast.error("Error al actualizar la privacidad");
         } finally {
             setIsUpdatingPrivacy(false);
         }
@@ -176,7 +177,7 @@ function SettingsModal({ isOpen, onClose }) {
             const token = localStorage.getItem('token');
 
             if (!userStr || !token) {
-                alert("Debes iniciar sesión");
+                toast.error("Debes iniciar sesión");
                 return;
             }
 
@@ -190,17 +191,17 @@ function SettingsModal({ isOpen, onClose }) {
             });
 
             if (response.ok) {
-                alert("Cuenta eliminada correctamente");
+                toast.success("Cuenta eliminada correctamente");
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
                 window.location.href = '/login';
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al eliminar la cuenta");
+                toast.error(errorData.error || "Error al eliminar la cuenta");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al eliminar la cuenta");
+            toast.error("Error al eliminar la cuenta");
         }
     };
 

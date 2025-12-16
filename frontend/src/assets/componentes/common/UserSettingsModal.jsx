@@ -4,7 +4,6 @@ import "../../styles/Modal.css";
 import { Camera, X } from "lucide-react";
 import defaultAvatar from "../../img/user.png";
 import { toast } from 'react-toastify';
-
 function UserSettingsModal({ isOpen, onClose }) {
     const [biography, setBiography] = useState("");
     const [profileImage, setProfileImage] = useState(null);
@@ -118,7 +117,7 @@ function UserSettingsModal({ isOpen, onClose }) {
             const token = localStorage.getItem('token');
 
             if (!userStr || !token) {
-                alert("Debes iniciar sesión");
+                toast.error("Debes iniciar sesión");
                 return;
             }
 
@@ -155,7 +154,7 @@ function UserSettingsModal({ isOpen, onClose }) {
                         await uploadBannerAndUpdate(user, token, profileUrl, bannerUrl);
                     } else {
                         const errorData = await uploadResponse.json();
-                        alert(errorData.error || "Error al subir la imagen de perfil");
+                        toast.error(errorData.error || "Error al subir la imagen de perfil");
                         setIsSubmitting(false);
                     }
                 };
@@ -166,7 +165,7 @@ function UserSettingsModal({ isOpen, onClose }) {
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al guardar los cambios");
+            toast.error("Error al guardar los cambios");
             setIsSubmitting(false);
         }
     };
@@ -202,7 +201,7 @@ function UserSettingsModal({ isOpen, onClose }) {
                         await updateUserProfile(user, token, profileUrl, bannerUrl);
                     } else {
                         const errorData = await uploadResponse.json();
-                        alert(errorData.error || "Error al subir la imagen de banner");
+                        toast.error(errorData.error || "Error al subir la imagen de banner");
                         setIsSubmitting(false);
                     }
                 };
@@ -259,7 +258,7 @@ function UserSettingsModal({ isOpen, onClose }) {
             }
         } catch (error) {
             console.error("Error updating profile:", error);
-            alert("Error al actualizar el perfil");
+            toast.error("Error al actualizar el perfil");
         } finally {
             setIsSubmitting(false);
         }

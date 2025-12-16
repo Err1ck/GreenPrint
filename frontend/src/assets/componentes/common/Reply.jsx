@@ -3,6 +3,7 @@ import { Leaf } from "lucide-react";
 import SvgComponente from "../ui/Svg";
 import "../../styles/MainSection.css";
 import defaultAvatar from "../../img/user.png";
+import { toast } from 'react-toastify';
 
 const Reply = ({
     replyId,
@@ -33,7 +34,7 @@ const Reply = ({
 
         const auth = getCurrentUser();
         if (!auth) {
-            alert("Debes iniciar sesión para dar like");
+            toast.error("Debes iniciar sesión para dar like");
             return;
         }
 
@@ -69,12 +70,12 @@ const Reply = ({
             } else {
                 console.error("Error:", data.error);
                 if (data.error && !data.error.includes("Ya has dado like")) {
-                    alert(data.error);
+                    toast.error(data.error);
                 }
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsLoading(false);
         }
