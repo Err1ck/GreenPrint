@@ -59,6 +59,11 @@ function ViewProfile() {
       const response = await fetch(url);
 
       if (!response.ok) {
+        // Manejar errores específicos
+        if (response.status === 403) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Este perfil es privado");
+        }
         throw new Error("Error al cargar los posts");
       }
 
@@ -101,9 +106,50 @@ function ViewProfile() {
         </div>
         <div className="main-layout-container">
           <div
-            style={{ textAlign: "center", padding: "40px", color: "#e74c3c" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "60px 40px",
+              textAlign: "center",
+            }}
           >
-            Error: {error}
+            {/* Icon */}
+            <svg
+              viewBox="0 0 24 24"
+              width="64"
+              height="64"
+              fill="#536471"
+              style={{ marginBottom: "20px" }}
+            >
+              <path d="M12 1C8.676 1 6 3.676 6 7v2H5c-1.105 0-2 .895-2 2v10c0 1.105.895 2 2 2h14c1.105 0 2-.895 2-2V11c0-1.105-.895-2-2-2h-1V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm-7 8h14v10H5V11zm7 2c-1.105 0-2 .895-2 2 0 .738.405 1.376 1 1.723V19h2v-2.277c.595-.347 1-.985 1-1.723 0-1.105-.895-2-2-2z" />
+            </svg>
+
+            {/* Error Message */}
+            <h2
+              style={{
+                fontSize: "24px",
+                fontWeight: "700",
+                color: "var(--color-text-primary)",
+                margin: "0 0 12px 0",
+              }}
+            >
+              {error.includes("privado") || error.includes("seguir")
+                ? "Perfil Privado"
+                : "Error"}
+            </h2>
+            <p
+              style={{
+                fontSize: "15px",
+                color: "#536471",
+                margin: 0,
+                maxWidth: "400px",
+                lineHeight: "20px",
+              }}
+            >
+              {error}
+            </p>
           </div>
         </div>
         <div className="navbarRight-content">
