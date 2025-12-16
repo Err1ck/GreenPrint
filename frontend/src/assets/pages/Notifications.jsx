@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Notification from "../componentes/common/Notification";
 import "../styles/Notifications.css";
-
+import "../styles/Home.css";
+import "../styles/app.css";
 const Notifications = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
@@ -70,9 +71,7 @@ const Notifications = () => {
       if (response.ok) {
         setNotifications((prev) =>
           prev.map((notif) =>
-            notif.id === notificationId
-              ? { ...notif, is_read: true }
-              : notif
+            notif.id === notificationId ? { ...notif, is_read: true } : notif
           )
         );
       }

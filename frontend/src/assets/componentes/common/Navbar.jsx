@@ -104,7 +104,13 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
-                    <div
+                    <LinkIcon
+                      name={"notifications"}
+                      href={"/notifications"}
+                      classname={"navicon"}
+                      text={"Notificaciones"}
+                    />
+                    {/* <div
                       onClick={() => navigate("/notifications")}
                       style={{
                         cursor: "pointer",
@@ -145,7 +151,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                         </span>
                       )}
                       <span className="navicon-text">Notificaciones</span>
-                    </div>
+                    </div> */}
                     <LinkIcon
                       name={"save"}
                       href={"/saved"}

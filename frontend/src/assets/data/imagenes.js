@@ -42,6 +42,8 @@ import Icono41 from "../img/41_save.svg";
 import Icono42 from "../img/42_save-white.svg";
 import Icono43 from "../img/43_moon.svg";
 import Icono44 from "../img/44_sun.svg";
+import Icono45 from "../img/45_notification.svg";
+import Icono46 from "../img/46_notification-white.svg";
 
 import Imagen1 from "../img/logo.png";
 import Imagen2 from "../img/avatar-test.jpg";
@@ -72,6 +74,7 @@ export const IMAGENES = {
     dots: { light: Icono39, dark: Icono40 },
     save: { light: Icono41, dark: Icono42 },
     themeToggle: { light: Icono43, dark: Icono44 },
+    notifications: { light: Icono45, dark: Icono46 },
   },
   img: {
     imagen1: Imagen1,
