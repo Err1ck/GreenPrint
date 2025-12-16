@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\PostReply;
 use App\Entity\UserPostReplyLeaf;
+use App\Entity\Notification;
 use App\Repository\PostReplyRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserPostReplyLeafRepository;
@@ -178,6 +179,23 @@ final class PostReplyController extends AbstractController
 
         $entityManager->persist($reply);
         $entityManager->flush();
+
+        // Crear notificación para el autor del post (si no es el mismo usuario)
+        $postAuthor = $post->getUser();
+        if ($postAuthor && $postAuthor->getId() !== $user->getId()) {
+            $notification = new Notification();
+            $notification->setUser($postAuthor);
+            $notification->setActor($user);
+            $notification->setPost($post);
+            $notification->setType('reply');
+            $notification->setMessage($user->getUsername() . ' ha respondido a tu post');
+            $notification->setIsRead(false);
+            $notification->setCreatedAt(new \DateTimeImmutable());
+            $notification->setUpdatedAt(new \DateTimeImmutable());
+
+            $entityManager->persist($notification);
+            $entityManager->flush();
+        }
 
         return new JsonResponse(
             ['message' => "La respuesta ha sido creada."],
