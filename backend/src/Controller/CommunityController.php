@@ -557,7 +557,7 @@ final class CommunityController extends AbstractController
                 $notification->setActor($user);
                 $notification->setCommunity($community);
                 $notification->setType('membership_request');
-                $notification->setMessage("¡{$user->getUsername()} quiere ser miembro de tu comunidad {$community->getName()}!");
+                $notification->setMessage(" quiere ser miembro de tu comunidad {$community->getName()}.");
                 $notification->setIsRead(false);
                 $notification->setCreatedAt(new \DateTimeImmutable());
                 $notification->setUpdatedAt(new \DateTimeImmutable());
@@ -659,6 +659,20 @@ final class CommunityController extends AbstractController
         $notification->setUpdatedAt(new \DateTimeImmutable());
         $entityManager->persist($notification);
 
+        $notificationRepository = $entityManager->getRepository(\App\Entity\Notification::class);
+        $membershipRequestNotification = $notificationRepository->findOneBy([
+            'actor' => $user,
+            'community' => $community,
+            'type' => 'membership_request',
+            'user' => $admin
+        ]);
+
+        if ($membershipRequestNotification) {
+            $membershipRequestNotification->setIsRead(true);
+            $membershipRequestNotification->setUpdatedAt(new \DateTimeImmutable());
+        }
+
+
         $entityManager->flush();
 
         return new JsonResponse(
@@ -726,6 +740,19 @@ final class CommunityController extends AbstractController
         $notification->setCreatedAt(new \DateTimeImmutable());
         $notification->setUpdatedAt(new \DateTimeImmutable());
         $entityManager->persist($notification);
+
+        $notificationRepository = $entityManager->getRepository(\App\Entity\Notification::class);
+        $membershipRequestNotification = $notificationRepository->findOneBy([
+            'actor' => $user,
+            'community' => $community,
+            'type' => 'membership_request',
+            'user' => $admin
+        ]);
+
+        if ($membershipRequestNotification) {
+            $membershipRequestNotification->setIsRead(true);
+            $membershipRequestNotification->setUpdatedAt(new \DateTimeImmutable());
+        }
 
         $entityManager->flush();
 

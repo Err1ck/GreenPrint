@@ -384,15 +384,15 @@ function ViewProfile() {
             )}
 
             {/* Coins Section */}
-            <div
+            {/* <div
               style={{
                 display: "flex",
                 gap: "24px",
                 marginTop: "12px",
               }}
-            >
-              {/* Leaf Coins */}
-              <div
+            > */}
+            {/* Leaf Coins */}
+            {/* <div
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -428,10 +428,10 @@ function ViewProfile() {
                     {user.leaf_coins_user || 0}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
-              {/* Tree Coins */}
-              <div
+            {/* Tree Coins */}
+            {/* <div
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -468,7 +468,7 @@ function ViewProfile() {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Followers Count */}
             <div
