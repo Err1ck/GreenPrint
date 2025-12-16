@@ -36,7 +36,6 @@ final class UserController extends AbstractController
 
         $all = $users->findAll();
 
-        // Calcular contadores para cada usuario
         foreach ($all as $user) {
             $followerCount = $followsRepo->count(['followingUser' => $user]);
             $user->setFollowerCount($followerCount);
@@ -53,7 +52,6 @@ final class UserController extends AbstractController
         );
     }
 
-    //🚪GET /api/movies/{id} → Obtener una película por ID🚪
     #[Route('/{id<\d+>}', name: 'show', methods: ['GET'])]
     #[OA\Get(
         tags: ['UserController'],
@@ -66,11 +64,9 @@ final class UserController extends AbstractController
             return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        // Calcular dinámicamente el número de seguidores
         $followerCount = $followsRepo->count(['followingUser' => $user]);
         $user->setFollowerCount($followerCount);
 
-        // Calcular dinámicamente el número de usuarios que sigue
         $followingCount = $followsRepo->count(['user' => $user]);
         $user->setFollowingCount($followingCount);
 
@@ -91,7 +87,6 @@ final class UserController extends AbstractController
             content: new OA\JsonContent(
                 type: 'object',
                 properties: [
-                    // new OA\Property(property: 'username', type: 'string', example: 'Gordinxi'),
                     new OA\Property(property: 'biography', type: 'string', example: 'Lorem ipsum...'),
                     new OA\Property(property: 'photo_url', type: 'string', example: 'path/img'),
                     new OA\Property(property: 'banner_url', type: 'string', example: 'path/img'),
@@ -103,7 +98,6 @@ final class UserController extends AbstractController
     )]
     public function edit(int $id, Request $request, UserRepository $users, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator): JsonResponse
     {
-        // 1. Buscar el usuario en la base de datos
         $user = $users->find($id);
 
         if (!$user) {
@@ -113,7 +107,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // 2. Obtener los datos JSON del request
         $data = json_decode($request->getContent(), true);
 
         if ($data === null) {
@@ -123,15 +116,9 @@ final class UserController extends AbstractController
             );
         }
 
-        // 3. Actualizar solo los campos permitidos que vengan en el request
-        // if (isset($data['username'])) {
-        //     $user->setUsername($data['username']);
-        // }
-
              if (isset($data['email'])) {
             $user->setEmail($data['email']);
         }
-
 
         if (isset($data['biography'])) {
             $user->setBiography($data['biography']);
@@ -146,7 +133,6 @@ final class UserController extends AbstractController
         }
 
         if (isset($data['email'])) {
-            // Verificar que el email no esté en uso por otro usuario
             $existingUser = $users->findOneBy(['email' => $data['email']]);
             if ($existingUser && $existingUser->getId() !== $user->getId()) {
                 return new JsonResponse(
@@ -161,7 +147,6 @@ final class UserController extends AbstractController
             $user->setIsPrivate((bool) $data['is_private']);
         }
 
-        // 4. Validar la entidad antes de guardar
         $errors = $validator->validate($user);
 
         if (count($errors) > 0) {
@@ -176,15 +161,13 @@ final class UserController extends AbstractController
             );
         }
 
-        // 5. Persistir los cambios en la base de datos
         $entityManager->flush();
 
-        // 6. Devolver el usuario actualizado
         return new JsonResponse(
             $serializer->serialize($user, 'json', ['groups' => 'user']),
             JsonResponse::HTTP_OK,
             [],
-            true // Indica que ya está serializado
+            true 
         );
     }
 
@@ -205,7 +188,6 @@ final class UserController extends AbstractController
     )]
     public function uploadImage(int $id, Request $request, UserRepository $users): JsonResponse
     {
-        // 1. Verificar que el usuario existe
         $user = $users->find($id);
         if (!$user) {
             return new JsonResponse(
@@ -214,7 +196,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // 2. Obtener datos del request
         $data = json_decode($request->getContent(), true);
 
         if (!isset($data['image_type']) || !isset($data['image_data'])) {
@@ -224,10 +205,9 @@ final class UserController extends AbstractController
             );
         }
 
-        $imageType = $data['image_type']; // 'profile' o 'banner'
+        $imageType = $data['image_type']; 
         $imageData = $data['image_data'];
 
-        // 3. Validar tipo de imagen
         if (!in_array($imageType, ['profile', 'banner'])) {
             return new JsonResponse(
                 ['error' => 'image_type debe ser "profile" o "banner"'],
@@ -235,7 +215,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // 4. Decodificar base64
         if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $matches)) {
             $imageExtension = $matches[1];
             $imageData = substr($imageData, strpos($imageData, ',') + 1);
@@ -254,7 +233,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // 5. Validar extensión
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (!in_array(strtolower($imageExtension), $allowedExtensions)) {
             return new JsonResponse(
@@ -263,7 +241,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // 6. Validar tamaño (5MB máximo)
         if (strlen($imageData) > 5 * 1024 * 1024) {
             return new JsonResponse(
                 ['error' => 'La imagen es demasiado grande. Máximo 5MB.'],
@@ -271,24 +248,21 @@ final class UserController extends AbstractController
             );
         }
 
-        // 7. Crear directorio del usuario si no existe
         $uploadDir = __DIR__ . '/../../public/uploads/users/' . $id;
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        // 8. Eliminar imagen anterior si existe (antes de guardar la nueva)
         $pattern = $uploadDir . '/' . $imageType . '.*';
         foreach (glob($pattern) as $oldFile) {
             if (file_exists($oldFile)) {
                 unlink($oldFile);
             }
         }
-        // 7. Generar nombre de archivo
+
         $filename = $imageType . '.' . $imageExtension;
         $filepath = $uploadDir . '/' . $filename;
 
-        // 9. Guardar archivo
         if (file_put_contents($filepath, $imageData) === false) {
             return new JsonResponse(
                 ['error' => 'Error al guardar la imagen'],
@@ -296,10 +270,8 @@ final class UserController extends AbstractController
             );
         }
 
-        // 10. Generar URL pública
         $publicUrl = '/uploads/users/' . $id . '/' . $filename;
 
-        // 11. Retornar URL
         return new JsonResponse(
             [
                 'success' => true,
@@ -328,10 +300,9 @@ final class UserController extends AbstractController
             );
         }
 
-        // enitity manager para usar métodos sobre la DB
-        $entityManager->remove($user); // eliminar usuario
+        $entityManager->remove($user);
 
-        $entityManager->flush(); // updatear db
+        $entityManager->flush();
 
         return new JsonResponse(
             ['message' => 'Usuario eliminado correctamente.'],
@@ -359,7 +330,6 @@ final class UserController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        // ✅ Declarar antes del if
         if (!isset($data['following_user_id'])) {
             return new JsonResponse(
                 ['error' => 'following_user_id es requerido'],
@@ -403,7 +373,6 @@ final class UserController extends AbstractController
         $follow->setCreatedAt(new \DateTimeImmutable());
         $follow->setUpdatedAt(new \DateTimeImmutable());
 
-        // ⚠️ Deberías validar $follow, no $user
         $errors = $validator->validate($follow);
 
         if (count($errors) > 0) {
@@ -423,7 +392,7 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             ['message' => "El usuario $id ha empezado a seguir al usuario $user_to_followId."],
-            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+            JsonResponse::HTTP_CREATED, 
         );
     }
 
@@ -456,7 +425,7 @@ final class UserController extends AbstractController
             }
 
             $user_to_unfollow = $users->find($data['following_user_id']);
-            $user_to_unfollowId = $data['following_user_id'] ?? null; // solo para mostrar en el return
+            $user_to_unfollowId = $data['following_user_id'] ?? null; 
 
             if (!$user_to_unfollow) {
                 return new JsonResponse(
@@ -467,7 +436,6 @@ final class UserController extends AbstractController
 
                 $followColumn = $followEntity->findOneBy(['user' => $user, 'followingUser' => $user_to_unfollow]);
 
-                // 4. Validar la entidad antes de guardar
                 $errors = $validator->validate($user);
 
                 if (count($errors) > 0) {
@@ -513,7 +481,6 @@ final class UserController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        // ✅ Declarar antes del if
         if (!isset($data['community_id'])) {
             return new JsonResponse(
                 ['error' => 'community_id es requerido'],
@@ -550,7 +517,6 @@ final class UserController extends AbstractController
         $follow->setCreatedAt(new \DateTimeImmutable());
         $follow->setUpdatedAt(new \DateTimeImmutable());
 
-        // ⚠️ Deberías validar $follow, no $user
         $errors = $validator->validate($follow);
 
         if (count($errors) > 0) {
@@ -570,7 +536,7 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             ['message' => "El usuario $id ha empezado a seguir a la comunidad $community_id."],
-            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+            JsonResponse::HTTP_CREATED, 
         );
     }
 
@@ -648,7 +614,6 @@ final class UserController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        // ✅ Declarar antes del if
         if (!isset($data['community_id'])) {
             return new JsonResponse(
                 ['error' => 'community_id es requerido'],
@@ -685,7 +650,6 @@ final class UserController extends AbstractController
         $follow->setCreatedAt(new \DateTimeImmutable());
         $follow->setUpdatedAt(new \DateTimeImmutable());
 
-        // ⚠️ Deberías validar $follow, no $user
         $errors = $validator->validate($follow);
 
         if (count($errors) > 0) {
@@ -705,7 +669,7 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             ['message' => "El usuario $id ahora es miembro de la comunidad $community_id."],
-            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+            JsonResponse::HTTP_CREATED, 
         );
     }
 
@@ -727,7 +691,6 @@ final class UserController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        // ✅ Declarar antes del if
         if (!isset($data['community_id'])) {
             return new JsonResponse(
                 ['error' => 'community_id es requerido'],
@@ -761,7 +724,7 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             ['message' => "El usuario $id ha empezado dejado de ser miembro de la comunidad $community_id."],
-            JsonResponse::HTTP_CREATED, // 201 es más apropiado para creación
+            JsonResponse::HTTP_CREATED, 
         );
     }
 
@@ -772,7 +735,6 @@ final class UserController extends AbstractController
     )]
     public function showCommunities(int $id, Request $request, UserRepository $users, CommunityMembersRepository $members, SerializerInterface $serializer): JsonResponse
     {
-        // Verificar que el usuario existe
         $user = $users->find($id);
 
         if (!$user) {
@@ -782,7 +744,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // Buscar todos los follows donde user_id = $id
         $userMemberships = $members->findBy(['user' => $user]);
 
         if (empty($userMemberships)) {
@@ -807,7 +768,6 @@ final class UserController extends AbstractController
     )]
     public function showFollowedCommunities(int $id, Request $request, UserRepository $users, CommunityFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
     {
-        // Verificar que el usuario existe
         $user = $users->find($id);
 
         if (!$user) {
@@ -817,7 +777,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // Buscar todos los follows donde user_id = $id
         $userFollows = $follows->findBy(['user' => $user]);
 
         if (empty($userFollows)) {
@@ -842,7 +801,6 @@ final class UserController extends AbstractController
     )]
     public function showFollowing(int $id, Request $request, UserRepository $users, UserFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
     {
-        // Verificar que el usuario existe
         $user = $users->find($id);
 
         if (!$user) {
@@ -852,7 +810,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // Buscar todos los follows donde user_id = $id
         $userFollows = $follows->findBy(['user' => $user]);
 
         if (empty($userFollows)) {
@@ -877,7 +834,6 @@ final class UserController extends AbstractController
     )]
     public function showFollowers(int $id, Request $request, UserRepository $users, UserFollowsRepository $follows, SerializerInterface $serializer): JsonResponse
     {
-        // Verificar que el usuario existe
         $user = $users->find($id);
 
         if (!$user) {
@@ -887,7 +843,6 @@ final class UserController extends AbstractController
             );
         }
 
-        // Buscar todos los follows donde user_id = $id
         $userFollows = $follows->findBy(['followingUser' => $user]);
 
         if (empty($userFollows)) {
