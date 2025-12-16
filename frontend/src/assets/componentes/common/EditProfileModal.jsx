@@ -3,6 +3,7 @@ import Button from "../ui/Button";
 import "../../styles/Modal.css";
 import { Camera, X } from "lucide-react";
 import defaultAvatar from "../../img/user.png";
+import { toast } from 'react-toastify';
 
 function EditProfileModal({ isOpen, onClose }) {
     const [biography, setBiography] = useState("");
@@ -246,16 +247,19 @@ function EditProfileModal({ isOpen, onClose }) {
             if (response.ok) {
                 const updatedUser = await response.json();
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-                alert("Perfil actualizado correctamente");
+                toast.success("Perfil actualizado correctamente");
                 onClose();
-                window.location.reload();
+                // Esperar 1.5 segundos para que el toast se muestre antes de recargar
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar el perfil");
+                toast.error(errorData.error || "Error al actualizar el perfil");
             }
         } catch (error) {
             console.error("Error updating profile:", error);
-            alert("Error al actualizar el perfil");
+            toast.error("Error al actualizar el perfil");
         } finally {
             setIsSubmitting(false);
         }

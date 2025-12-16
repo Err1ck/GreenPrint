@@ -12,6 +12,8 @@ import Search from "./assets/pages/Search";
 import SavedPosts from "./assets/pages/SavedPosts";
 import ForgetPassword from "./assets/pages/ForgetPassword";
 import Messages from "./assets/pages/Messages";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   // Cargar tema al iniciar la aplicación
@@ -43,6 +45,17 @@ function App() {
         <Route path="/saved" element={<SavedPosts />} />
         <Route path="/forgot-password" element={<ForgetPassword />} />
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 }
