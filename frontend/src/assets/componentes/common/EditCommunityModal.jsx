@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Button from "../ui/Button";
 import "../../styles/Modal.css";
 import { Camera, X } from "lucide-react";
+import { toast } from 'react-toastify';
 
 function EditCommunityModal({ isOpen, onClose, communityId }) {
     const [name, setName] = useState("");
@@ -117,7 +118,7 @@ function EditCommunityModal({ isOpen, onClose, communityId }) {
             const token = localStorage.getItem('token');
 
             if (!token) {
-                alert("Debes iniciar sesión");
+                toast.error("Debes iniciar sesión");
                 return;
             }
 
