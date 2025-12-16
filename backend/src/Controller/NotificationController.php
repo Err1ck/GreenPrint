@@ -46,6 +46,11 @@ final class NotificationController extends AbstractController
 
         $notifications = $notificationRepository->findByUser($user);
 
+        $notifications = $notificationRepository->findBy(
+            ['user' => $user, 'is_read' => false],
+            ['createdAt' => 'DESC']
+        );
+
         // Asegurar que $notifications es un array
         if (!is_array($notifications)) {
             $notifications = [];
