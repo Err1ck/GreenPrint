@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../componentes/common/Navbar";
 import Notification from "../componentes/common/Notification";
 import "../styles/Notifications.css";
-
+import "../styles/Home.css";
+import "../styles/app.css";
 const Notifications = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
@@ -70,9 +71,7 @@ const Notifications = () => {
       if (response.ok) {
         setNotifications((prev) =>
           prev.map((notif) =>
-            notif.id === notificationId
-              ? { ...notif, is_read: true }
-              : notif
+            notif.id === notificationId ? { ...notif, is_read: true } : notif
           )
         );
       }
@@ -113,36 +112,46 @@ const Notifications = () => {
 
   if (loading) {
     return (
-      <div className="notifications-page">
-        <Navbar navbarType={1} navbarPage="none" />
-        <main className="notifications-main">
+      <div className="homepage-container">
+        <div className="navbarLeft-content">
+          <Navbar navbarType={1} navbarPage={"notifications"} />
+        </div>
+        <div className="main-layout-container">
           <div className="notifications-container">
             <div className="loading">Cargando notificaciones...</div>
           </div>
-        </main>
-        <Navbar navbarType={3} />
+        </div>
+        <div className="navbarRight-content">
+          <Navbar navbarType={2} />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="notifications-page">
-        <Navbar navbarType={1} navbarPage="none" />
-        <main className="notifications-main">
+      <div className="homepage-container">
+        <div className="navbarLeft-content">
+          <Navbar navbarType={1} navbarPage={"notifications"} />
+        </div>
+        <div className="main-layout-container">
           <div className="notifications-container">
             <div className="error">Error: {error}</div>
           </div>
-        </main>
-        <Navbar navbarType={3} />
+        </div>
+        <div className="navbarRight-content">
+          <Navbar navbarType={2} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="notifications-page">
-      <Navbar navbarType={1} navbarPage="none" />
-      <main className="notifications-main">
+    <div className="homepage-container">
+      <div className="navbarLeft-content">
+        <Navbar navbarType={1} navbarPage={"notifications"} />
+      </div>
+      <div className="main-layout-container">
         <div className="notifications-container">
           <div className="notifications-header">
             <h1>Notificaciones</h1>
@@ -182,8 +191,10 @@ const Notifications = () => {
             </div>
           )}
         </div>
-      </main>
-      <Navbar navbarType={3} />
+      </div>
+      <div className="navbarRight-content">
+        <Navbar navbarType={2} />
+      </div>
     </div>
   );
 };

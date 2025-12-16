@@ -14,6 +14,7 @@
 }
 .navbar-links-right .navbar-home,
 .navbar-links-right .navbar-messages,
+.navbar-links-right .navbar-notifications,
 .navbar-links-right .navbar-saved,
 .navbar-links-right .navbar-community,
 .navbar-links-right .navbar-profile {
@@ -22,6 +23,7 @@
 
 .navbar-links-right:hover .navbar-home,
 .navbar-links-right:hover .navbar-messages,
+.navbar-links-right:hover .navbar-notifications,
 .navbar-links-right:hover .navbar-saved,
 .navbar-links-right:hover .navbar-community,
 .navbar-links-right:hover .navbar-profile {

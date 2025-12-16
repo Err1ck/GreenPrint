@@ -13,7 +13,8 @@ const LinkIcon = ({
   href,
   classname,
   text,
-  onSearch, // función opcional, se usa solo en modo buscador
+  onSearch,
+  badge, // función opcional, se usa solo en modo buscador
 }) => {
   // ⭐ MODO BUSCADOR: lupa + anchor=false
   if (name === "lupa" && anchor === false) {
@@ -43,7 +44,19 @@ const LinkIcon = ({
       </a>
     );
   }
-
+  if (name === "notifications") {
+    return (
+      <a className={`link-icon ${classLink || ""}`} href={href}>
+        <SvgComponente name={name} />
+        {anchor ? (
+          <span className={classname}>{text}</span>
+        ) : (
+          <div className={classname}>{text}</div>
+        )}
+        {badge}
+      </a>
+    );
+  }
   // ⭐ Caso normal: icono + texto (enlace o div)
   return (
     <a className={`link-icon ${classLink || ""}`} href={href}>
