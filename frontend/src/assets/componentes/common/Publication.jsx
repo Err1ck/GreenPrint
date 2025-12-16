@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { MessageCircle, Repeat2, Leaf, TreeDeciduous, Bookmark } from "lucide-react";
 import "../../styles/MainSection.css";
 import defaultAvatar from "../../img/user.png";
+import { toast } from "react-toastify";
 
 const Publication = ({
     postId,
@@ -59,7 +60,7 @@ const Publication = ({
 
         const auth = getCurrentUser();
         if (!auth) {
-            alert("Debes iniciar sesión para dar like");
+            toast.error("Debes iniciar sesión para dar like");
             return;
         }
 
@@ -92,12 +93,12 @@ const Publication = ({
             } else {
                 console.error("Error:", data.error);
                 if (data.error && !data.error.includes("Ya has dado like")) {
-                    alert(data.error);
+                    toast.error(data.error);
                 }
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsLoading(false);
         }
@@ -110,7 +111,7 @@ const Publication = ({
 
         const auth = getCurrentUser();
         if (!auth) {
-            alert("Debes iniciar sesión para dar like");
+            toast.error("Debes iniciar sesión para dar like");
             return;
         }
 
@@ -143,12 +144,12 @@ const Publication = ({
             } else {
                 console.error("Error:", data.error);
                 if (data.error && !data.error.includes("Ya has dado like")) {
-                    alert(data.error);
+                    toast.error(data.error);
                 }
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsLoading(false);
         }
@@ -159,7 +160,7 @@ const Publication = ({
 
         const auth = getCurrentUser();
         if (!auth) {
-            alert("Debes iniciar sesión para hacer repost");
+            toast.error("Debes iniciar sesión para hacer repost");
             return;
         }
 
@@ -192,12 +193,12 @@ const Publication = ({
             } else {
                 console.error("Error:", data.error);
                 if (data.error && !data.error.includes("Ya has hecho repost")) {
-                    alert(data.error);
+                    toast.error(data.error);
                 }
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsLoading(false);
         }
@@ -208,7 +209,7 @@ const Publication = ({
 
         const auth = getCurrentUser();
         if (!auth) {
-            alert("Debes iniciar sesión para guardar posts");
+            toast.error("Debes iniciar sesión para guardar posts");
             return;
         }
 
@@ -239,12 +240,12 @@ const Publication = ({
                 const data = await response.json();
                 console.error("Error:", data.error);
                 if (data.error && !data.error.includes("Ya has guardado") && !data.error.includes("No has guardado")) {
-                    alert(data.error);
+                    toast.error(data.error);
                 }
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsLoading(false);
         }

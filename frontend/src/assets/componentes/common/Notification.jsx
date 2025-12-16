@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Leaf, TreeDeciduous, Repeat2, MessageCircle } from "lucide-react";
 import "../../styles/Notification.css";
 import defaultAvatar from "../../img/user.png";
+import { toast } from "react-toastify";
 
 const Notification = ({
   notificationId,
@@ -79,16 +80,16 @@ const Notification = ({
         }
       );
       if (response.ok) {
-        alert("Miembro aceptado exitosamente");
+        toast.success("Miembro aceptado exitosamente");
         onMarkAsRead(notificationId);
         window.location.reload();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Error al aceptar miembro");
+        toast.error(errorData.error || "Error al aceptar miembro");
       }
     } catch (error) {
       console.error("Error accepting member:", error);
-      alert("Error al aceptar miembro");
+      toast.error("Error al aceptar miembro");
     }
   };
 
@@ -107,16 +108,16 @@ const Notification = ({
         }
       );
       if (response.ok) {
-        alert("Solicitud rechazada");
+        toast.success("Solicitud rechazada");
         onMarkAsRead(notificationId);
         window.location.reload();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Error al rechazar solicitud");
+        toast.error(errorData.error || "Error al rechazar solicitud");
       }
     } catch (error) {
       console.error("Error rejecting member:", error);
-      alert("Error al rechazar solicitud");
+      toast.error("Error al rechazar solicitud");
     }
   };
 

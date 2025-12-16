@@ -144,7 +144,7 @@ function EditCommunityModal({ isOpen, onClose, communityId }) {
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al guardar los cambios");
+            toast.error("Error al guardar los cambios");
             setIsSubmitting(false);
         }
     };
@@ -187,16 +187,16 @@ function EditCommunityModal({ isOpen, onClose, communityId }) {
             );
 
             if (response.ok) {
-                alert("Comunidad actualizada correctamente");
+                toast.success("Comunidad actualizada correctamente");
                 onClose();
                 window.location.reload();
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al actualizar la comunidad");
+                toast.error(errorData.error || "Error al actualizar la comunidad");
             }
         } catch (error) {
             console.error("Error updating community:", error);
-            alert("Error al actualizar la comunidad");
+            toast.error("Error al actualizar la comunidad");
         } finally {
             setIsSubmitting(false);
         }

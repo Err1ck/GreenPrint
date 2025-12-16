@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const FollowUser = ({
     userId,
@@ -61,7 +62,7 @@ const FollowUser = ({
             const token = localStorage.getItem('token');
 
             if (!currentUserStr || !token) {
-                alert("Debes iniciar sesión para seguir usuarios");
+                toast.error("Debes iniciar sesión para seguir usuarios");
                 return;
             }
 
@@ -103,11 +104,11 @@ const FollowUser = ({
                 }
             } else {
                 console.error("Error:", data);
-                alert(data.error || "Error al seguir/dejar de seguir");
+                toast.error(data.error || "Error al seguir/dejar de seguir");
             }
         } catch (err) {
             console.error("Error:", err);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsLoading(false);
         }
