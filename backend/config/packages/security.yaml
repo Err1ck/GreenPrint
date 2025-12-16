@@ -48,5 +48,6 @@ security:
         - { path: ^/api/users, roles: PUBLIC_ACCESS }
         - { path: ^/api/posts, roles: PUBLIC_ACCESS }
         - { path: ^/api/hashtags, roles: PUBLIC_ACCESS }
+        - { path: ^/api/notifications, roles: PUBLIC_ACCESS }
         # Requiere autenticación para el resto de las rutas API.
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }

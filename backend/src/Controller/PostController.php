@@ -6,6 +6,7 @@ use App\Entity\Post;
 use App\Entity\UserPostLeaf;
 use App\Entity\UserPostTree;
 use App\Entity\UserRepost;
+use App\Entity\Notification;
 use App\Repository\CommunityRepository;
 use App\Repository\HashtagRepository;
 use App\Repository\PostRepository;
@@ -699,6 +700,23 @@ final class PostController extends AbstractController
         $entityManager->persist($postLikeLeaf);
         $entityManager->flush();
 
+        // Crear notificación para el autor del post (si no es el mismo usuario)
+        $postAuthor = $post->getUser();
+        if ($postAuthor && $postAuthor->getId() !== $user->getId()) {
+            $notification = new Notification();
+            $notification->setUser($postAuthor);
+            $notification->setActor($user);
+            $notification->setPost($post);
+            $notification->setType('like_leaf');
+            $notification->setMessage($user->getUsername() . ' le ha dado like a tu post');
+            $notification->setIsRead(false);
+            $notification->setCreatedAt(new \DateTimeImmutable());
+            $notification->setUpdatedAt(new \DateTimeImmutable());
+
+            $entityManager->persist($notification);
+            $entityManager->flush();
+        }
+
         return new JsonResponse(
             [
                 'message' => 'Se ha dado el like (leaf) al post correctamente.',
@@ -858,6 +876,23 @@ final class PostController extends AbstractController
         $entityManager->persist($postLikeTree);
         $entityManager->flush();
 
+        // Crear notificación para el autor del post (si no es el mismo usuario)
+        $postAuthor = $post->getUser();
+        if ($postAuthor && $postAuthor->getId() !== $user->getId()) {
+            $notification = new Notification();
+            $notification->setUser($postAuthor);
+            $notification->setActor($user);
+            $notification->setPost($post);
+            $notification->setType('like_tree');
+            $notification->setMessage($user->getUsername() . ' le ha dado like (tree) a tu post de comunidad');
+            $notification->setIsRead(false);
+            $notification->setCreatedAt(new \DateTimeImmutable());
+            $notification->setUpdatedAt(new \DateTimeImmutable());
+
+            $entityManager->persist($notification);
+            $entityManager->flush();
+        }
+
         return new JsonResponse(
             [
                 'message' => 'Se ha dado el like (tree) al post correctamente.',
@@ -1009,6 +1044,23 @@ final class PostController extends AbstractController
 
         $entityManager->persist($repost);
         $entityManager->flush();
+
+        // Crear notificación para el autor del post (si no es el mismo usuario)
+        $postAuthor = $post->getUser();
+        if ($postAuthor && $postAuthor->getId() !== $user->getId()) {
+            $notification = new Notification();
+            $notification->setUser($postAuthor);
+            $notification->setActor($user);
+            $notification->setPost($post);
+            $notification->setType('repost');
+            $notification->setMessage($user->getUsername() . ' ha hecho repost de tu publicación');
+            $notification->setIsRead(false);
+            $notification->setCreatedAt(new \DateTimeImmutable());
+            $notification->setUpdatedAt(new \DateTimeImmutable());
+
+            $entityManager->persist($notification);
+            $entityManager->flush();
+        }
 
         return new JsonResponse(
             [
