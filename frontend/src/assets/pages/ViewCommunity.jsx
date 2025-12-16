@@ -7,6 +7,7 @@ import FollowCommunity from "../componentes/common/FollowCommunity";
 import EditCommunityModal from "../componentes/common/EditCommunityModal";
 import ShowFollowersMembers from "../componentes/common/ShowFollowersMembers";
 import { formatDate, formatTime } from "../utils/dateUtils";
+import { toast } from 'react-toastify';
 
 function ViewCommunity() {
     const { communityId } = useParams();
@@ -190,14 +191,14 @@ function ViewCommunity() {
 
             if (response.ok) {
                 setMembershipRequested(true);
-                alert("Solicitud de membresía enviada a los administradores");
+                toast.success("Solicitud de membresía enviada a los administradores");
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || "Error al enviar solicitud");
+                toast.error(errorData.error || "Error al enviar solicitud");
             }
         } catch (error) {
             console.error("Error requesting membership:", error);
-            alert("Error al enviar solicitud");
+            toast.error("Error al enviar solicitud");
         }
     };
 

@@ -4,6 +4,7 @@ import Navbar from "../componentes/common/Navbar";
 import MessageThread from "../componentes/common/MessageThread";
 import "../styles/Messages.css";
 import "../styles/Home.css";
+import { toast } from 'react-toastify';
 
 function Messages() {
   const location = useLocation();
@@ -163,7 +164,7 @@ function Messages() {
       fetchConversations(currentUser.id);
     } catch (error) {
       console.error("Error starting chat:", error);
-      alert("Error al iniciar la conversación. Por favor, intenta de nuevo.");
+      toast.error("Error al iniciar la conversación. Por favor, intenta de nuevo.");
     }
   };
 
@@ -196,7 +197,7 @@ function Messages() {
       fetchConversations(currentUser.id);
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Error al enviar el mensaje. Por favor, intenta de nuevo.");
+      toast.error("Error al enviar el mensaje. Por favor, intenta de nuevo.");
     }
   };
 
@@ -244,17 +245,15 @@ function Messages() {
                 {/* Tabs */}
                 <div className="messages-tabs">
                   <div
-                    className={`messages-tab ${
-                      activeTab === "conversations" ? "active" : ""
-                    }`}
+                    className={`messages-tab ${activeTab === "conversations" ? "active" : ""
+                      }`}
                     onClick={() => setActiveTab("conversations")}
                   >
                     Conversaciones
                   </div>
                   <div
-                    className={`messages-tab ${
-                      activeTab === "users" ? "active" : ""
-                    }`}
+                    className={`messages-tab ${activeTab === "users" ? "active" : ""
+                      }`}
                     onClick={() => setActiveTab("users")}
                   >
                     Usuarios
@@ -290,14 +289,13 @@ function Messages() {
                           conversation.last_message &&
                           !conversation.last_message.is_read &&
                           conversation.last_message.sender_id !==
-                            currentUser.id;
+                          currentUser.id;
 
                         return (
                           <div
                             key={conversation.id}
-                            className={`conversation-item ${
-                              isUnread ? "unread" : ""
-                            }`}
+                            className={`conversation-item ${isUnread ? "unread" : ""
+                              }`}
                             onClick={() =>
                               handleSelectConversation(conversation)
                             }
@@ -336,14 +334,14 @@ function Messages() {
                                   <>
                                     {conversation.last_message.sender_id ===
                                       currentUser.id && (
-                                      <span className="you-prefix">Tú: </span>
-                                    )}
+                                        <span className="you-prefix">Tú: </span>
+                                      )}
                                     {conversation.last_message.content.length >
-                                    50
+                                      50
                                       ? conversation.last_message.content.substring(
-                                          0,
-                                          50
-                                        ) + "..."
+                                        0,
+                                        50
+                                      ) + "..."
                                       : conversation.last_message.content}
                                   </>
                                 ) : (

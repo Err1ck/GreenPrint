@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 function StartConversationButton({ userId, username, className = "" }) {
     const navigate = useNavigate();
@@ -10,7 +11,7 @@ function StartConversationButton({ userId, username, className = "" }) {
         try {
             const userStr = localStorage.getItem("user");
             if (!userStr) {
-                alert("Debes iniciar sesión para enviar mensajes");
+                toast.error("Debes iniciar sesión para enviar mensajes");
                 navigate("/login");
                 return;
             }
@@ -18,7 +19,7 @@ function StartConversationButton({ userId, username, className = "" }) {
             const currentUser = JSON.parse(userStr);
 
             if (currentUser.id === userId) {
-                alert("No puedes enviarte mensajes a ti mismo");
+                toast.error("No puedes enviarte mensajes a ti mismo");
                 return;
             }
 
@@ -37,7 +38,7 @@ function StartConversationButton({ userId, username, className = "" }) {
             navigate("/messages", { state: { conversationId: data.conversation_id } });
         } catch (error) {
             console.error("Error starting conversation:", error);
-            alert("Error al iniciar la conversación. Por favor, intenta de nuevo.");
+            toast.error("Error al iniciar la conversación. Por favor, intenta de nuevo.");
         }
     };
 

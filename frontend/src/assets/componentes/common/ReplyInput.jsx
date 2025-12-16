@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../../styles/ReplyInput.css";
+import { toast } from 'react-toastify';
 
 const ReplyInput = ({ postId, onReplySubmitted }) => {
     const [content, setContent] = useState("");
@@ -16,13 +17,13 @@ const ReplyInput = ({ postId, onReplySubmitted }) => {
         e.preventDefault();
 
         if (!content.trim()) {
-            alert("Por favor escribe una respuesta");
+            toast.error("Por favor escribe una respuesta");
             return;
         }
 
         const auth = getCurrentUser();
         if (!auth) {
-            alert("Debes iniciar sesión para responder");
+            toast.error("Debes iniciar sesión para responder");
             return;
         }
 
@@ -51,11 +52,11 @@ const ReplyInput = ({ postId, onReplySubmitted }) => {
                 }
             } else {
                 console.error("Error:", data.error);
-                alert(data.error || "Error al crear la respuesta");
+                toast.error(data.error || "Error al crear la respuesta");
             }
         } catch (error) {
             console.error("Error de red:", error);
-            alert("Error al conectar con el servidor");
+            toast.error("Error al conectar con el servidor");
         } finally {
             setIsSubmitting(false);
         }
