@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Bell } from "lucide-react";
 import LinkIcon from "../ui/LinkIcon";
+import NotificationIcon from "../ui/NotificationIcon";
 import SvgComponente from "../ui/Svg";
 import "../../styles/Navbar.css";
+import "../../styles/NotificationIcon.css";
 import Footer from "./Footer";
 import Button from "../ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
@@ -13,6 +16,7 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Obtener el ID del usuario desde localStorage
   useEffect(() => {
@@ -21,11 +25,47 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
       try {
         const user = JSON.parse(userStr);
         setUserId(user.id);
+        fetchUnreadCount(user.id);
       } catch (error) {
         console.error("Error parsing user from localStorage:", error);
       }
     }
   }, []);
+
+  // Fetch unread notifications count
+  const fetchUnreadCount = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/notifications/unread-count?user_id=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadCount(data.unread_count || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  };
+
+  // Poll for unread count every 30 seconds
+  useEffect(() => {
+    if (!userId) return;
+
+    const interval = setInterval(() => {
+      fetchUnreadCount(userId);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [userId]);
 
   // 🔹 Lógica de búsqueda cuando se pulsa Enter en el buscador
   const handleSearch = (textoBuscado) => {
@@ -64,6 +104,48 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
+                    <div
+                      onClick={() => navigate("/notifications")}
+                      style={{
+                        cursor: "pointer",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        padding: "12px 16px",
+                        borderRadius: "9999px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          "var(--color-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "transparent")
+                      }
+                    >
+                      <Bell size={24} strokeWidth={1.5} />
+                      {unreadCount > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            left: "32px",
+                            backgroundColor: "#f91880",
+                            color: "white",
+                            borderRadius: "10px",
+                            padding: "2px 6px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            minWidth: "20px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <span className="navicon-text">Notificaciones</span>
+                    </div>
                     <LinkIcon
                       name={"save"}
                       href={"/saved"}
@@ -110,6 +192,48 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
+                    <div
+                      onClick={() => navigate("/notifications")}
+                      style={{
+                        cursor: "pointer",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        padding: "12px 16px",
+                        borderRadius: "9999px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          "var(--color-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "transparent")
+                      }
+                    >
+                      <Bell size={24} strokeWidth={1.5} />
+                      {unreadCount > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            left: "32px",
+                            backgroundColor: "#f91880",
+                            color: "white",
+                            borderRadius: "10px",
+                            padding: "2px 6px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            minWidth: "20px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <span className="navicon-text">Notificaciones</span>
+                    </div>
                     <LinkIcon
                       name={"save"}
                       href={"/saved"}
@@ -155,6 +279,48 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
+                    <div
+                      onClick={() => navigate("/notifications")}
+                      style={{
+                        cursor: "pointer",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        padding: "12px 16px",
+                        borderRadius: "9999px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          "var(--color-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "transparent")
+                      }
+                    >
+                      <Bell size={24} strokeWidth={1.5} />
+                      {unreadCount > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            left: "32px",
+                            backgroundColor: "#f91880",
+                            color: "white",
+                            borderRadius: "10px",
+                            padding: "2px 6px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            minWidth: "20px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <span className="navicon-text">Notificaciones</span>
+                    </div>
                     <LinkIcon
                       classLink={"navbar-saved"}
                       name={"save"}
@@ -201,6 +367,48 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
+                    <div
+                      onClick={() => navigate("/notifications")}
+                      style={{
+                        cursor: "pointer",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        padding: "12px 16px",
+                        borderRadius: "9999px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          "var(--color-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "transparent")
+                      }
+                    >
+                      <Bell size={24} strokeWidth={1.5} />
+                      {unreadCount > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            left: "32px",
+                            backgroundColor: "#f91880",
+                            color: "white",
+                            borderRadius: "10px",
+                            padding: "2px 6px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            minWidth: "20px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <span className="navicon-text">Notificaciones</span>
+                    </div>
                     <LinkIcon
                       name={"save"}
                       href={"/saved"}
@@ -247,6 +455,48 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
+                    <div
+                      onClick={() => navigate("/notifications")}
+                      style={{
+                        cursor: "pointer",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        padding: "12px 16px",
+                        borderRadius: "9999px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          "var(--color-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "transparent")
+                      }
+                    >
+                      <Bell size={24} strokeWidth={1.5} />
+                      {unreadCount > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            left: "32px",
+                            backgroundColor: "#f91880",
+                            color: "white",
+                            borderRadius: "10px",
+                            padding: "2px 6px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            minWidth: "20px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <span className="navicon-text">Notificaciones</span>
+                    </div>
                     <LinkIcon
                       name={"save"}
                       href={"/saved"}
@@ -293,6 +543,48 @@ function Navbar({ navbarType, navbarPage, onOpenModal, onOpenCommunityModal }) {
                       classname={"navicon"}
                       text={"Mensajes"}
                     />
+                    <div
+                      onClick={() => navigate("/notifications")}
+                      style={{
+                        cursor: "pointer",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "16px",
+                        padding: "12px 16px",
+                        borderRadius: "9999px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor =
+                          "var(--color-hover)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "transparent")
+                      }
+                    >
+                      <Bell size={24} strokeWidth={1.5} />
+                      {unreadCount > 0 && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            top: "8px",
+                            left: "32px",
+                            backgroundColor: "#f91880",
+                            color: "white",
+                            borderRadius: "10px",
+                            padding: "2px 6px",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            minWidth: "20px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <span className="navicon-text">Notificaciones</span>
+                    </div>
                     <LinkIcon
                       name={"save"}
                       href={"/saved"}

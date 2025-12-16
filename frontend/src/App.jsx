@@ -12,6 +12,7 @@ import Search from "./assets/pages/Search";
 import SavedPosts from "./assets/pages/SavedPosts";
 import ForgetPassword from "./assets/pages/ForgetPassword";
 import Messages from "./assets/pages/Messages";
+import Notifications from "./assets/pages/Notifications";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/users" element={<SuggestedUsersPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/post/:id" element={<ViewPost />} />
