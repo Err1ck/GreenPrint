@@ -3,6 +3,7 @@ import Button from "../ui/Button";
 import LinkIcon from "../ui/LinkIcon";
 import { X } from "lucide-react";
 import "../../styles/Modal.css";
+import { toast } from "react-toastify";
 
 function Modal({ children, onClose }) {
   const [postText, setPostText] = useState("");
@@ -120,7 +121,7 @@ function Modal({ children, onClose }) {
         const userStr = localStorage.getItem("user");
 
         if (!token || !userStr) {
-          alert("Debes iniciar sesión para crear un post");
+          toast.error("Debes iniciar sesión para crear un post");
           setIsSubmitting(false);
           return;
         }
@@ -161,14 +162,14 @@ function Modal({ children, onClose }) {
         try {
           const data = await response.json();
           console.error("Error al crear el post:", data);
-          alert(data.error || "Error al crear el post");
+          toast.error(data.error || "Error al crear el post");
         } catch (jsonError) {
-          alert("Error al crear el post");
+          toast.error("Error al crear el post");
         }
         setIsSubmitting(false);
       } catch (error) {
         console.error("Error de red:", error);
-        alert("Error al conectar con el servidor");
+        toast.error("Error al conectar con el servidor");
         setIsSubmitting(false);
       }
     }
