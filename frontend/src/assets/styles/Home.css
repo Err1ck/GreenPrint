@@ -39,9 +39,6 @@
 
 .main-content {
   flex: 1;
-  /* max-width: 600px; */
-  /* border-left: 1px solid #eff3f4;
-  border-right: 1px solid #eff3f4; */
 }
 
 .navbarRight-content {
@@ -50,4 +47,95 @@
   top: 0;
   height: 100vh;
   flex-shrink: 0;
+}
+
+/* ===================================
+   RESPONSIVE LAYOUT
+   =================================== */
+
+/* Tablets grandes y pantallas medianas (hasta 1280px) */
+@media (max-width: 1280px) {
+  .navbarLeft-content {
+    flex: 0 0 auto;
+    max-width: 88px;
+    background-color: var(--color-bg);
+  }
+
+  .navbarRight-content {
+    flex: 0 0 auto;
+    max-width: 350px;
+  }
+
+  .main-layout-container {
+    flex: 1 1 auto;
+  }
+}
+
+/* Tablets (hasta 1024px) - Ocultar navbar derecha */
+@media (max-width: 1024px) {
+  .navbarLeft-content {
+    flex: 0 0 auto;
+    max-width: 68px;
+  }
+  .navbarImg {
+    display: none;
+  }
+  .footer1 {
+    display: none;
+  }
+  .navbarRight-content {
+    display: none;
+  }
+
+  .main-layout-container {
+    flex: 1;
+  }
+}
+
+/* Tablets pequeñas (hasta 768px) - Navbar inferior */
+@media (max-width: 768px) {
+  .homepage-container {
+    flex-direction: column;
+    padding-bottom: 60px; /* Espacio para navbar inferior */
+  }
+
+  .navbarLeft-content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    height: auto;
+    max-width: none;
+    z-index: 1000;
+  }
+
+  .main-layout-container {
+    flex: 1;
+    width: 100%;
+  }
+
+  .main-content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .navbarRight-content {
+    display: none;
+  }
+}
+
+/* Móviles (hasta 480px) */
+@media (max-width: 480px) {
+  .homepage-container {
+    padding-bottom: 56px;
+  }
+}
+
+/* Landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+  .homepage-container {
+    padding-bottom: 50px;
+  }
 }
