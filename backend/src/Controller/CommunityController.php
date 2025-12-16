@@ -494,4 +494,244 @@ final class CommunityController extends AbstractController
             true
         );
     }
+
+    #[Route('/{id<\d+>}/request-membership', name: 'request_membership', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['CommunityController'],
+        summary: 'Solicita ser miembro de una comunidad.'
+    )]
+    public function requestMembership(
+        int $id,
+        CommunityRepository $communities,
+        CommunityMembersRepository $membersRepo,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Debes estar autenticado para solicitar membresía.'],
+                JsonResponse::HTTP_UNAUTHORIZED
+            );
+        }
+
+        $community = $communities->find($id);
+        if (!$community) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Check if user is already a member
+        $existingMember = $membersRepo->findOneBy([
+            'user' => $user,
+            'community' => $community
+        ]);
+
+        if ($existingMember) {
+            return new JsonResponse(
+                ['error' => 'Ya eres miembro de esta comunidad.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // Get all admins of the community
+        $adminIds = $community->getAdminIds();
+        
+        if (empty($adminIds)) {
+            return new JsonResponse(
+                ['error' => 'Esta comunidad no tiene administradores.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // Create notifications for all admins
+        $userRepository = $entityManager->getRepository(\App\Entity\User::class);
+        
+        foreach ($adminIds as $adminId) {
+            $admin = $userRepository->find($adminId);
+            if ($admin) {
+                $notification = new \App\Entity\Notification();
+                $notification->setUser($admin);
+                $notification->setActor($user);
+                $notification->setCommunity($community);
+                $notification->setType('membership_request');
+                $notification->setMessage("¡{$user->getUsername()} quiere ser miembro de tu comunidad {$community->getName()}!");
+                $notification->setIsRead(false);
+                $notification->setCreatedAt(new \DateTimeImmutable());
+                $notification->setUpdatedAt(new \DateTimeImmutable());
+                
+                $entityManager->persist($notification);
+            }
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => 'Solicitud de membresía enviada a los administradores.'],
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    #[Route('/{id<\d+>}/accept-member/{userId<\d+>}', name: 'accept_member', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['CommunityController'],
+        summary: 'Acepta una solicitud de membresía (solo administradores).'
+    )]
+    public function acceptMember(
+        int $id,
+        int $userId,
+        CommunityRepository $communities,
+        CommunityMembersRepository $membersRepo,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $admin = $this->getUser();
+        
+        if (!$admin) {
+            return new JsonResponse(
+                ['error' => 'Debes estar autenticado.'],
+                JsonResponse::HTTP_UNAUTHORIZED
+            );
+        }
+
+        $community = $communities->find($id);
+        if (!$community) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Check if current user is admin
+        $adminIds = $community->getAdminIds();
+        if (!in_array($admin->getId(), $adminIds)) {
+            return new JsonResponse(
+                ['error' => 'No tienes permisos para aceptar miembros.'],
+                JsonResponse::HTTP_FORBIDDEN
+            );
+        }
+
+        // Get the user to be added
+        $userRepository = $entityManager->getRepository(\App\Entity\User::class);
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Check if already a member
+        $existingMember = $membersRepo->findOneBy([
+            'user' => $user,
+            'community' => $community
+        ]);
+
+        if ($existingMember) {
+            return new JsonResponse(
+                ['error' => 'El usuario ya es miembro.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        // Add as member
+        $communityMember = new \App\Entity\CommunityMembers();
+        $communityMember->setUser($user);
+        $communityMember->setCommunity($community);
+        $communityMember->setCreatedAt(new \DateTimeImmutable());
+        $communityMember->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($communityMember);
+
+        // Update member count
+        $community->setMemberCount($community->getMemberCount() + 1);
+
+        // Create acceptance notification for the user
+        $notification = new \App\Entity\Notification();
+        $notification->setUser($user);
+        $notification->setActor($admin);
+        $notification->setCommunity($community);
+        $notification->setType('membership_accepted');
+        $notification->setMessage("¡Tu solicitud para unirte a \"{$community->getName()}\" ha sido aceptada!");
+        $notification->setIsRead(false);
+        $notification->setCreatedAt(new \DateTimeImmutable());
+        $notification->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($notification);
+
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => 'Miembro aceptado exitosamente.'],
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    #[Route('/{id<\d+>}/reject-member/{userId<\d+>}', name: 'reject_member', methods: ['POST'])]
+    #[OA\Post(
+        tags: ['CommunityController'],
+        summary: 'Rechaza una solicitud de membresía (solo administradores).'
+    )]
+    public function rejectMember(
+        int $id,
+        int $userId,
+        CommunityRepository $communities,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $admin = $this->getUser();
+        
+        if (!$admin) {
+            return new JsonResponse(
+                ['error' => 'Debes estar autenticado.'],
+                JsonResponse::HTTP_UNAUTHORIZED
+            );
+        }
+
+        $community = $communities->find($id);
+        if (!$community) {
+            return new JsonResponse(
+                ['error' => 'Comunidad no encontrada.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Check if current user is admin
+        $adminIds = $community->getAdminIds();
+        if (!in_array($admin->getId(), $adminIds)) {
+            return new JsonResponse(
+                ['error' => 'No tienes permisos para rechazar miembros.'],
+                JsonResponse::HTTP_FORBIDDEN
+            );
+        }
+
+        // Get the user
+        $userRepository = $entityManager->getRepository(\App\Entity\User::class);
+        $user = $userRepository->find($userId);
+        
+        if (!$user) {
+            return new JsonResponse(
+                ['error' => 'Usuario no encontrado.'],
+                JsonResponse::HTTP_NOT_FOUND
+            );
+        }
+
+        // Create rejection notification for the user
+        $notification = new \App\Entity\Notification();
+        $notification->setUser($user);
+        $notification->setActor($admin);
+        $notification->setCommunity($community);
+        $notification->setType('membership_rejected');
+        $notification->setMessage("Tu solicitud para unirte a \"{$community->getName()}\" ha sido rechazada.");
+        $notification->setIsRead(false);
+        $notification->setCreatedAt(new \DateTimeImmutable());
+        $notification->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($notification);
+
+        $entityManager->flush();
+
+        return new JsonResponse(
+            ['message' => 'Solicitud rechazada.'],
+            JsonResponse::HTTP_OK
+        );
+    }
 }

@@ -46,7 +46,15 @@ class Notification
     private ?Post $post = null;
 
     /**
-     * @var string Tipo de notificación: like_leaf, like_tree, repost, reply
+     * @var Community Comunidad relacionada con la notificación (nullable)
+     */
+    #[ORM\ManyToOne(targetEntity: Community::class)]
+    #[ORM\JoinColumn(name: 'community_id', referencedColumnName: 'id', onDelete: 'CASCADE', nullable: true)]
+    #[Groups(['notification'])]
+    private ?Community $community = null;
+
+    /**
+     * @var string Tipo de notificación: like_leaf, like_tree, repost, reply, membership_request
      */
     #[ORM\Column(length: 50)]
     #[Groups(['notification'])]
@@ -101,6 +109,17 @@ class Notification
     public function setPost(?Post $post): static
     {
         $this->post = $post;
+        return $this;
+    }
+
+    public function getCommunity(): ?Community
+    {
+        return $this->community;
+    }
+
+    public function setCommunity(?Community $community): static
+    {
+        $this->community = $community;
         return $this;
     }
 

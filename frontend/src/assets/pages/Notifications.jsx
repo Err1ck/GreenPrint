@@ -172,6 +172,8 @@ const Notifications = () => {
                   actorPhotoUrl={notification.actor?.photo_url}
                   actorId={notification.actor?.id}
                   postId={notification.post?.id}
+                  communityId={notification.community?.id}
+                  communityName={notification.community?.name}
                   createdAt={notification.created_at}
                   isRead={notification.is_read}
                   onMarkAsRead={handleMarkAsRead}
